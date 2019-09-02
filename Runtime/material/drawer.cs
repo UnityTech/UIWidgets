@@ -57,11 +57,10 @@ namespace Unity.UIWidgets.material {
             Widget child = null,
             DrawerAlignment? alignment = null,
             DrawerCallback drawerCallback = null,
-            DragStartBehavior? dragStartBehavior = null
+            DragStartBehavior dragStartBehavior = DragStartBehavior.start
         ) : base(key: key) {
             D.assert(child != null);
             D.assert(alignment != null);
-            D.assert(dragStartBehavior != null);
             this.child = child;
             this.alignment = alignment ?? DrawerAlignment.start;
             this.drawerCallback = drawerCallback;

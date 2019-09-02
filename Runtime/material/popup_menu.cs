@@ -479,6 +479,7 @@ namespace Unity.UIWidgets.material {
             float elevation = 8.0f
         ) {
             D.assert(context != null);
+            D.assert(position != null);
             D.assert(items != null && items.isNotEmpty());
             D.assert(MaterialD.debugCheckHasMaterialLocalizations(context));
 

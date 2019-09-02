@@ -217,12 +217,10 @@ namespace Unity.UIWidgets.widgets {
             return !this.hasError;
         }
 
-        bool _validate() {
+        void _validate() {
             if (this.widget.validator != null) {
                 this._errorText = this.widget.validator(this._value);
             }
-
-            return !this.hasError;
         }
 
         public virtual void didChange(T value) {

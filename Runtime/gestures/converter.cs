@@ -48,10 +48,24 @@ namespace Unity.UIWidgets.gestures {
 
         public Offset lastPosition;
 
+        public Offset deltaTo(Offset to) {
+            return to - this.lastPosition;
+        }
+
         public override string ToString() {
             return $"_PointerState(pointer: {this.pointer}, down: {this.down}, lastPosition: {this.lastPosition})";
         }
+
+        internal static int _synthesiseDownButtons(int buttons, PointerDeviceKind kind) {
+            switch (kind) {
+                case PointerDeviceKind.touch:
+                    return buttons;
+                default:
+                    return buttons;
+            }
+        }
     }
+
 
     public static class PointerEventConverter {
         static readonly Dictionary<int, _PointerState> _pointers = new Dictionary<int, _PointerState>();
@@ -69,10 +83,36 @@ namespace Unity.UIWidgets.gestures {
         public static IEnumerable<PointerEvent> expand(IEnumerable<PointerData> data, float devicePixelRatio) {
             foreach (PointerData datum in data) {
                 var position = new Offset(datum.physicalX, datum.physicalY) / devicePixelRatio;
+                var radiusMinor = _toLogicalPixels(datum.radiusMinor, devicePixelRatio);
+                var radiusMajor = _toLogicalPixels(datum.radiusMajor, devicePixelRatio);
+                var radiusMin = _toLogicalPixels(datum.radiusMin, devicePixelRatio);
+                var radiusMax = _toLogicalPixels(datum.radiusMax, devicePixelRatio);
                 var timeStamp = datum.timeStamp;
                 var kind = datum.kind;
 
                 switch (datum.change) {
+                    case PointerChange.add: {
+                        D.assert(!_pointers.ContainsKey(datum.device));
+                        _PointerState state = _ensureStateForPointer(datum, position);
+                        D.assert(state.lastPosition == position);
+                        yield return new PointerAddedEvent(
+                            timeStamp: timeStamp,
+                            kind: kind,
+                            device: datum.device,
+                            position: position,
+                            obscured: datum.obscured,
+                            pressureMin: datum.pressureMin,
+                            pressureMax: datum.pressureMax,
+                            distance: datum.distance,
+                            distanceMax: datum.distanceMax,
+                            radiusMin: radiusMin,
+                            radiusMax: radiusMax,
+                            orientation: datum.orientation,
+                            tilt: datum.tilt
+                        );
+                        break;
+                    }
+
                     case PointerChange.down: {
                         _PointerState state = _ensureStateForPointer(datum, position);
                         if (state.down) {
@@ -142,13 +182,14 @@ namespace Unity.UIWidgets.gestures {
                             state.lastPosition = position;
                         }
 
+                        Offset scrollDelta = new Offset(_scrollData.scrollX, _scrollData.scrollY) / devicePixelRatio;
                         yield return new PointerScrollEvent(
                             timeStamp: timeStamp,
                             pointer: state.pointer,
                             kind: kind,
                             device: _scrollData.device,
                             position: position,
-                            delta: new Offset(_scrollData.scrollX, _scrollData.scrollY) / devicePixelRatio
+                            scrollDelta: scrollDelta
                         );
                         break;
                     }
@@ -225,6 +266,10 @@ namespace Unity.UIWidgets.gestures {
 #endif
                 }
             }
+        }
+
+        static float _toLogicalPixels(float physicalPixels, float devicePixelRatio) {
+            return physicalPixels / devicePixelRatio;
         }
     }
 }

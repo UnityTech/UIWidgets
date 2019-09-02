@@ -413,8 +413,7 @@ namespace Unity.UIWidgets.ui {
                 width: textureWidth,
                 height: textureHeight,
                 layerBounds: maskBounds,
-                filterMode: FilterMode.Bilinear,
-                noMSAA: true
+                filterMode: FilterMode.Bilinear
             );
 
             parentLayer.addLayer(maskLayer);
@@ -454,8 +453,7 @@ namespace Unity.UIWidgets.ui {
                 width: textureWidth,
                 height: textureHeight,
                 layerBounds: maskLayer.layerBounds,
-                filterMode: FilterMode.Bilinear,
-                noMSAA: true
+                filterMode: FilterMode.Bilinear
             );
 
             parentLayer.addLayer(blurXLayer);
@@ -465,8 +463,7 @@ namespace Unity.UIWidgets.ui {
                 width: textureWidth,
                 height: textureHeight,
                 layerBounds: maskLayer.layerBounds,
-                filterMode: FilterMode.Bilinear,
-                noMSAA: true
+                filterMode: FilterMode.Bilinear
             );
 
             parentLayer.addLayer(blurYLayer);
@@ -1109,12 +1106,8 @@ namespace Unity.UIWidgets.ui {
                             subLayer.width, subLayer.height,
                             RenderTextureFormat.Default, 24) {
                             useMipMap = false,
-                            autoGenerateMips = false,
+                            autoGenerateMips = false
                         };
-
-                        if (this._renderTexture.antiAliasing != 0 && !subLayer.noMSAA) {
-                            desc.msaaSamples = this._renderTexture.antiAliasing;
-                        }
 
                         cmdBuf.GetTemporaryRT(subLayer.rtID, desc, subLayer.filterMode);
                         this._drawLayer(subLayer, cmdBuf);

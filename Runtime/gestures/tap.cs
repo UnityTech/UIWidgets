@@ -28,8 +28,7 @@ namespace Unity.UIWidgets.gestures {
 
     public class TapGestureRecognizer : PrimaryPointerGestureRecognizer {
         public TapGestureRecognizer(object debugOwner = null)
-            : base(deadline: Constants.kPressTimeout, debugOwner: debugOwner) {
-        }
+            : base(deadline: Constants.kPressTimeout, debugOwner: debugOwner) { }
 
         public GestureTapDownCallback onTapDown;
 
@@ -48,15 +47,24 @@ namespace Unity.UIWidgets.gestures {
         protected override void handlePrimaryPointer(PointerEvent evt) {
             if (evt is PointerUpEvent) {
                 this._finalPosition = evt.position;
-                this._checkUp();
+
+                if (this._wonArenaForPrimaryPointer) {
+                    this.resolve(GestureDisposition.accepted);
+                    this._checkUp();
+                }
             }
             else if (evt is PointerCancelEvent) {
+                if (this._sentTapDown && this.onTapCancel != null) {
+                    this.invokeCallback<object>("onTapCancel", () => this.onTapCancel);
+                }
+
                 this._reset();
             }
         }
 
         protected override void resolve(GestureDisposition disposition) {
             if (this._wonArenaForPrimaryPointer && disposition == GestureDisposition.rejected) {
+                D.assert(this._sentTapDown);
                 if (this.onTapCancel != null) {
                     this.invokeCallback<object>("spontaneous onTapCancel", () => {
                         this.onTapCancel();
@@ -86,7 +94,7 @@ namespace Unity.UIWidgets.gestures {
         public override void rejectGesture(int pointer) {
             base.rejectGesture(pointer);
             if (pointer == this.primaryPointer) {
-                if (this.onTapCancel != null) {
+                if (this._sentTapDown && this.onTapCancel != null) {
                     this.invokeCallback<object>("forced onTapCancel", () => {
                         this.onTapCancel();
                         return null;
@@ -111,12 +119,7 @@ namespace Unity.UIWidgets.gestures {
         }
 
         void _checkUp() {
-            if (this._wonArenaForPrimaryPointer && this._finalPosition != null) {
-                this.resolve(GestureDisposition.accepted);
-                if (!this._wonArenaForPrimaryPointer || this._finalPosition == null) {
-                    return;
-                }
-
+            if (this._finalPosition != null) {
                 if (this.onTapUp != null) {
                     this.invokeCallback<object>("onTapUp", () => {
                         this.onTapUp(new TapUpDetails(globalPosition: this._finalPosition));

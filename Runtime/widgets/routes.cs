@@ -28,7 +28,7 @@ namespace Unity.UIWidgets.widgets {
         protected internal override void install(OverlayEntry insertionPoint) {
             D.assert(this._overlayEntries.isEmpty());
             this._overlayEntries.AddRange(this.createOverlayEntries());
-            this.navigator.overlay?.insertAll(this._overlayEntries, insertionPoint);
+            this.navigator.overlay?.insertAll(this._overlayEntries, above: insertionPoint);
             base.install(insertionPoint);
         }
 
@@ -122,11 +122,11 @@ namespace Unity.UIWidgets.widgets {
 
                     break;
                 case AnimationStatus.dismissed:
-                    // We might still be the current route if a subclass is controlling the
+                    // We might still be an active route if a subclass is controlling the
                     // the transition and hits the dismissed status. For example, the iOS
                     // back gesture drives this animation to the dismissed status before
                     // popping the navigator.
-                    if (!this.isCurrent) {
+                    if (!this.isActive) {
                         this.navigator.finalizeRoute(this);
                         D.assert(this.overlayEntries.isEmpty());
                     }
@@ -605,7 +605,7 @@ namespace Unity.UIWidgets.widgets {
             this._willPopCallbacks.Remove(callback);
         }
 
-        protected bool hasScopedWillPopCallback {
+        protected internal bool hasScopedWillPopCallback {
             get { return this._willPopCallbacks.isNotEmpty(); }
         }
 

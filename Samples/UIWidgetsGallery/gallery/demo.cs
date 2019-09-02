@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Unity.UIWidgets.cupertino;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.material;
 using Unity.UIWidgets.painting;
@@ -42,7 +43,7 @@ namespace UIWidgetsGallery.gallery {
                    && other.description == this.description
                    && other.documentationUrl == this.documentationUrl;
         }
-        
+
         public override bool Equals(object obj) {
             if (ReferenceEquals(null, obj)) {
                 return false;
@@ -175,8 +176,7 @@ namespace UIWidgetsGallery.gallery {
     }
 
     public class FullScreenCodeDialogState : State<FullScreenCodeDialog> {
-        public FullScreenCodeDialogState() {
-        }
+        public FullScreenCodeDialogState() { }
 
         string _exampleCode;
 
@@ -246,6 +246,30 @@ namespace UIWidgetsGallery.gallery {
             return new IconButton(
                 icon: new Icon(Icons.library_books),
                 tooltip: "API documentation",
+                onPressed: () => Application.OpenURL(this.documentationUrl)
+            );
+        }
+    }
+
+    class CupertinoDemoDocumentationButton : StatelessWidget {
+        public CupertinoDemoDocumentationButton(
+            string routeName,
+            Key key = null
+        ) : base(key: key) {
+            this.documentationUrl = DemoUtils.kDemoDocumentationUrl[routeName];
+
+            D.assert(
+                DemoUtils.kDemoDocumentationUrl[routeName] != null,
+                () => $"A documentation URL was not specified for demo route {routeName} in kAllGalleryDemos"
+            );
+        }
+
+        public readonly string documentationUrl;
+
+        public override Widget build(BuildContext context) {
+            return new CupertinoButton(
+                padding: EdgeInsets.zero,
+                child: new Icon(CupertinoIcons.book),
                 onPressed: () => Application.OpenURL(this.documentationUrl)
             );
         }

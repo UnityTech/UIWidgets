@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.UIWidgets.foundation;
@@ -577,7 +577,7 @@ namespace Unity.UIWidgets.ui {
                         this._paragraphStyle.fontStyle ?? TextStyle.kDefaultfontStyle).font;
                     var metrics = FontMetrics.fromFont(defaultFont,
                         (int) (this._paragraphStyle.fontSize ?? TextStyle.kDefaultFontSize));
-                    updateLineMetrics(metrics, this._paragraphStyle.lineHeight ?? TextStyle.kDefaultHeight);
+                    updateLineMetrics(metrics, this._paragraphStyle.height ?? TextStyle.kDefaultHeight);
                 }
 
                 this._lineHeights[lineNumber] = ((lineNumber == 0 ? 0 : this._lineHeights[lineNumber - 1])
@@ -1118,6 +1118,12 @@ namespace Unity.UIWidgets.ui {
 
         public void Add(KeyValuePair<TKey, TValue> item) {
             this.Set(item.Key, item.Value, throwOnExisting: true);
+        }
+        
+        public void AddAll(IEnumerable<TKey> list) {
+            foreach (var key in list) {
+                this.Add(new KeyValuePair<TKey, TValue>(key, default));
+            }
         }
 
         void Set(TKey key, TValue value, bool throwOnExisting) {

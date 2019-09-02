@@ -106,13 +106,19 @@ namespace Unity.UIWidgets.material {
 
 
     class _MaterialAppState : State<MaterialApp> {
+        HeroController _heroController;
+        
         public override void initState() {
             base.initState();
+            this._heroController = new HeroController(createRectTween: this._createRectTween);
             this._updateNavigator();
         }
 
         public override void didUpdateWidget(StatefulWidget oldWidget) {
             base.didUpdateWidget(oldWidget);
+            if (this.widget.navigatorKey != (oldWidget as MaterialApp).navigatorKey) {
+                this._heroController = new HeroController(createRectTween: this._createRectTween);
+            }
             this._updateNavigator();
         }
 
@@ -124,9 +130,10 @@ namespace Unity.UIWidgets.material {
                 this.widget.onGenerateRoute != null ||
                 this.widget.onUnknownRoute != null) {
                 this._navigatorObservers = new List<NavigatorObserver>(this.widget.navigatorObservers);
+                this._navigatorObservers.Add(this._heroController);
             }
             else {
-                this._navigatorObservers = null;
+                this._navigatorObservers = new List<NavigatorObserver>();
             }
         }
 

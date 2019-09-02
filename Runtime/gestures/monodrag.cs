@@ -95,7 +95,8 @@ namespace Unity.UIWidgets.gestures {
         protected override void handleEvent(PointerEvent evt) {
             D.assert(this._state != _DragState.ready);
             if (evt is PointerScrollEvent) {
-                Offset delta = evt.delta;
+                var scrollEvt = (PointerScrollEvent) evt;
+                Offset delta = scrollEvt.scrollDelta;
                 if (this.onUpdate != null) {
                     this.invokeCallback<object>("onUpdate", () => {
                         this.onUpdate(new DragUpdateDetails(

@@ -772,7 +772,7 @@ namespace Unity.UIWidgets.rendering {
                 this.computeMaxIntrinsicHeight);
         }
 
-        protected virtual float computeMaxIntrinsicHeight(float width) {
+        protected internal virtual float computeMaxIntrinsicHeight(float width) {
             return 0.0f;
         }
 
@@ -1093,12 +1093,12 @@ namespace Unity.UIWidgets.rendering {
 
                     if (this.constraints.hasBoundedWidth) {
                         testIntrinsicsForValues(this.getMinIntrinsicWidth, this.getMaxIntrinsicWidth, "Width",
-                            this.constraints.maxWidth);
+                            this.constraints.maxHeight);
                     }
 
                     if (this.constraints.hasBoundedHeight) {
                         testIntrinsicsForValues(this.getMinIntrinsicHeight, this.getMaxIntrinsicHeight, "Height",
-                            this.constraints.maxHeight);
+                            this.constraints.maxWidth);
                     }
 
                     debugCheckingIntrinsics = false;

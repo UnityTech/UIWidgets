@@ -66,10 +66,6 @@ namespace Unity.UIWidgets.engine {
             return this._uiWidgetsPanel.devicePixelRatio;
         }
 
-        protected override int queryAntiAliasing() {
-            return this._uiWidgetsPanel.antiAliasing;
-        }
-
         protected override Vector2 queryWindowSize() {
             var rect = this._uiWidgetsPanel.rectTransform.rect;
             // Here we use ReferenceEquals instead of "==" due to
@@ -111,7 +107,6 @@ namespace Unity.UIWidgets.engine {
         static Event _repaintEvent;
 
         [SerializeField] protected float devicePixelRatioOverride;
-        [SerializeField] protected int antiAliasingOverride = Window.defaultAntiAliasing;
         WindowAdapter _windowAdapter;
         Texture _texture;
         Vector2 _lastMouseMove;
@@ -168,10 +163,6 @@ namespace Unity.UIWidgets.engine {
                     ? this.devicePixelRatioOverride
                     : this._displayMetrics.devicePixelRatio;
             }
-        }
-
-        public int antiAliasing {
-            get { return this.antiAliasingOverride >= 0 ? this.antiAliasingOverride : QualitySettings.antiAliasing; }
         }
 
         public WindowPadding viewPadding {

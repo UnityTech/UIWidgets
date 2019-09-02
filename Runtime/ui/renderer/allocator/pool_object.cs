@@ -33,10 +33,12 @@ namespace Unity.UIWidgets.ui {
             var ret = pool.Pop();
             ret.setup();
 
+            #pragma warning disable CS0162
             if (AllocDebugger.enableDebugging) {
                 AllocDebugger.onAlloc(debugKey, debugName, allocatedCount);
                 ret.activated_flag = true;
             }
+            #pragma warning restore CS0162
 
             return ret;
         }
@@ -46,6 +48,7 @@ namespace Unity.UIWidgets.ui {
                 return;
             }
 
+            #pragma warning disable CS0162
             if (AllocDebugger.enableDebugging) {
                 if (!obj.activated_flag) {
                     Debug.Assert(false, "an item has been recycled more than once !");
@@ -55,6 +58,7 @@ namespace Unity.UIWidgets.ui {
 
                 AllocDebugger.onRelease(debugKey, debugName, allocatedCount);
             }
+            #pragma warning restore CS0162
 
             obj.clear();
             if (pool.Count > POOL_MAX_SIZE) {

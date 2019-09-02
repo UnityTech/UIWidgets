@@ -1,10 +1,20 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using Unity.UIWidgets.foundation;
 using UnityEngine;
 
 namespace Unity.UIWidgets.ui {
+
+    public enum PathOperation {
+        difference,
+        intersect,
+        union,
+        xor,
+        reverseDifference,
+    }
+
     struct VertexUV {
         public List<Vector3> fillVertices;
         public List<Vector2> fillUV;
@@ -214,6 +224,26 @@ namespace Unity.UIWidgets.ui {
             }
 
             return Rect.fromLTRB(this._minX, this._minY, this._maxX, this._maxY);
+        }
+
+        public static Path combine(PathOperation operation, Path path1, Path path2) {
+            D.assert(path1 != null);
+            D.assert(path2 != null);
+            Path path = null;
+            D.assert(() => {
+                Debug.LogWarning("Path._op() not implemented yet!");
+                return true;
+            });
+            return path;
+//            if (path._op(path1, path2, (int) operation)) {
+//                return path;
+//            }
+//            throw new UIWidgetsError("Path.combine() failed.  This may be due an invalid path; " +
+//                                     "in particular, check for NaN values.");
+        }
+
+        public PathMetrics computeMetrics(bool forceClosed = false) {
+            return PathMetrics._(this, forceClosed);
         }
 
         void _appendMoveTo(float x, float y) {
@@ -1296,6 +1326,77 @@ namespace Unity.UIWidgets.ui {
 
             return _return_check_zero(r);
         }
+    }
+
+    public class PathMetrics : IEnumerable<PathMetric> {
+        public PathMetrics(IEnumerator<PathMetric> enumerator) {
+            this._enumerator = enumerator;
+        }
+
+        public static PathMetrics _(Path path, bool forceClosed) {
+            return new PathMetrics(PathMetricIterator._(new _PathMeasure())); // TODO: complete the implementation
+        }
+
+        public readonly IEnumerator<PathMetric> _enumerator;
+
+        public IEnumerator<PathMetric> GetEnumerator() {
+            return this._enumerator;
+        }
+
+        IEnumerator IEnumerable.GetEnumerator() {
+            return this.GetEnumerator();
+        }
+    }
+
+    public class PathMetric {
+        // TODO
+        public readonly float length;
+    }
+
+    public class PathMetricIterator : IEnumerator<PathMetric> {
+        PathMetricIterator(_PathMeasure measure) {
+            this._pathMeasure = measure;
+        }
+
+        internal static PathMetricIterator _(_PathMeasure _pathMeasure) {
+            D.assert(_pathMeasure != null);
+            return new PathMetricIterator(_pathMeasure);
+        }
+
+        // PathMetric _pathMetric; // TODO
+        _PathMeasure _pathMeasure;
+
+        public void Reset() {
+            throw new NotImplementedException();
+        }
+
+        public PathMetric Current {
+            get {
+                return null; // TODO : return this._pathMetric;
+            }
+        }
+
+        object IEnumerator.Current {
+            get {
+                return null; // TODO : return this._pathMetric;
+            }
+        }
+
+        public bool MoveNext() {
+//        if (_pathMeasure._nextContour()) {
+//          _pathMetric = PathMetric._(_pathMeasure);
+//          return true;
+//        }
+//        _pathMetric = null;
+            return false;
+        }
+
+        public void Dispose() {
+            throw new NotImplementedException();
+        }
+    }
+
+    class _PathMeasure {
     }
 
     public enum PathWinding {

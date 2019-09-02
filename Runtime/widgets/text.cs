@@ -106,15 +106,17 @@ namespace Unity.UIWidgets.widgets {
         public Text(string data,
             Key key = null,
             TextStyle style = null,
+            StrutStyle strutStyle = null,
             TextAlign? textAlign = null,
             bool? softWrap = null,
             TextOverflow? overflow = null,
             float? textScaleFactor = null,
             int? maxLines = null) : base(key) {
-            D.assert(data != null);
+            D.assert(data != null, () => "A non-null string must be provided to a Text widget.");
             this.textSpan = null;
             this.data = data;
             this.style = style;
+            this.strutStyle = strutStyle;
             this.textAlign = textAlign;
             this.softWrap = softWrap;
             this.overflow = overflow;
@@ -125,15 +127,17 @@ namespace Unity.UIWidgets.widgets {
         Text(TextSpan textSpan,
             Key key = null,
             TextStyle style = null,
+            StrutStyle strutStyle = null,
             TextAlign? textAlign = null,
             bool? softWrap = null,
             TextOverflow? overflow = null,
             float? textScaleFactor = null,
             int? maxLines = null) : base(key) {
-            D.assert(textSpan != null);
+            D.assert(textSpan != null, () => "A non-null TextSpan must be provided to a Text.rich widget.");
             this.textSpan = textSpan;
             this.data = null;
             this.style = style;
+            this.strutStyle = strutStyle;
             this.textAlign = textAlign;
             this.softWrap = softWrap;
             this.overflow = overflow;
@@ -144,6 +148,7 @@ namespace Unity.UIWidgets.widgets {
         public static Text rich(TextSpan textSpan,
             Key key = null,
             TextStyle style = null,
+            StrutStyle strutStyle = null,
             TextAlign? textAlign = null,
             bool? softWrap = null,
             TextOverflow? overflow = null,
@@ -152,6 +157,7 @@ namespace Unity.UIWidgets.widgets {
             return new Text(
                 textSpan, key,
                 style,
+                strutStyle,
                 textAlign,
                 softWrap,
                 overflow,
@@ -164,6 +170,8 @@ namespace Unity.UIWidgets.widgets {
         public readonly TextSpan textSpan;
 
         public readonly TextStyle style;
+
+        public readonly StrutStyle strutStyle;
 
         public readonly TextAlign? textAlign;
 
@@ -188,6 +196,7 @@ namespace Unity.UIWidgets.widgets {
                 overflow: this.overflow ?? defaultTextStyle.overflow,
                 textScaleFactor: this.textScaleFactor ?? MediaQuery.textScaleFactorOf(context),
                 maxLines: this.maxLines ?? defaultTextStyle.maxLines,
+                strutStyle: this.strutStyle,
                 text: new TextSpan(
                     style: effectiveTextStyle,
                     text: this.data,

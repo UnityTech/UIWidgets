@@ -118,8 +118,11 @@ namespace Unity.UIWidgets.material {
         public override void didUpdateWidget(StatefulWidget _oldWidget) {
             base.didUpdateWidget(_oldWidget);
             _AccountDetails oldWidget = _oldWidget as _AccountDetails;
-            if (this._animation.status == AnimationStatus.dismissed ||
-                this._animation.status == AnimationStatus.reverse) {
+            if (oldWidget.isOpen == this.widget.isOpen) {
+                return;
+            }
+            
+            if(this.widget.isOpen ?? false) {
                 this._controller.forward();
             }
             else {

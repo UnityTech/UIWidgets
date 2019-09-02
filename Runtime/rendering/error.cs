@@ -29,7 +29,7 @@ namespace Unity.UIWidgets.rendering {
         );
 
         static ParagraphStyle paragraphStyle = new ParagraphStyle(
-            lineHeight: 1.0f
+            height: 1.0f
         );
     }
 }

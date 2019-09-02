@@ -48,6 +48,8 @@ namespace Unity.UIWidgets.gestures {
 
         public readonly GestureArenaManager gestureArena;
 
+        public readonly PointerSignalResolver pointerSignalResolver = new PointerSignalResolver();
+
         public readonly Dictionary<int, HitTestResult> _hitTests = new Dictionary<int, HitTestResult>();
 
         public readonly HashSet<HitTestTarget> lastMoveTargets = new HashSet<HitTestTarget>();
@@ -61,10 +63,13 @@ namespace Unity.UIWidgets.gestures {
             }
 
             HitTestResult hitTestResult = null;
-            if (evt is PointerDownEvent) {
+            if (evt is PointerDownEvent || evt is PointerSignalEvent) {
                 D.assert(!this._hitTests.ContainsKey(evt.pointer));
                 hitTestResult = new HitTestResult();
                 this.hitTest(hitTestResult, evt.position);
+                if (evt is PointerDownEvent) {
+                    this._hitTests[evt.pointer] = hitTestResult;
+                }
 
                 this._hitTests[evt.pointer] = hitTestResult;
                 D.assert(() => {
@@ -159,6 +164,9 @@ namespace Unity.UIWidgets.gestures {
             }
             else if (evt is PointerUpEvent) {
                 this.gestureArena.sweep(evt.pointer);
+            }
+            else if (evt is PointerSignalEvent) {
+                this.pointerSignalResolver.resolve((PointerSignalEvent) evt);
             }
         }
     }

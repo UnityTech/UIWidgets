@@ -1421,7 +1421,13 @@ namespace Unity.UIWidgets.foundation {
         }
 
         public virtual string toString(DiagnosticLevel minLevel = DiagnosticLevel.debug) {
-            return this.toDiagnosticsNode(style: DiagnosticsTreeStyle.singleLine).toString(minLevel: minLevel);
+            string fullString = null;
+            D.assert(() => {
+                fullString = this.toDiagnosticsNode(style: DiagnosticsTreeStyle.singleLine)
+                    .toString(minLevel: minLevel);
+                return true;
+            });
+            return fullString ?? this.toStringShort();
         }
 
         public virtual DiagnosticsNode toDiagnosticsNode(

@@ -47,9 +47,11 @@ namespace Unity.UIWidgets.material {
             Widget flexibleSpace = null,
             PreferredSizeWidget bottom = null,
             float? elevation = null,
+            ShapeBorder shape = null,
             Color backgroundColor = null,
             Brightness? brightness = null,
             IconThemeData iconTheme = null,
+            IconThemeData actionsIconTheme = null,
             TextTheme textTheme = null,
             bool primary = true,
             bool? centerTitle = null,
@@ -65,9 +67,11 @@ namespace Unity.UIWidgets.material {
             this.flexibleSpace = flexibleSpace;
             this.bottom = bottom;
             this.elevation = elevation;
+            this.shape = shape;
             this.backgroundColor = backgroundColor;
             this.brightness = brightness;
             this.iconTheme = iconTheme;
+            this.actionsIconTheme = actionsIconTheme;
             this.textTheme = textTheme;
             this.primary = primary;
             this.centerTitle = centerTitle;
@@ -91,11 +95,15 @@ namespace Unity.UIWidgets.material {
 
         public readonly float? elevation;
 
+        public readonly ShapeBorder shape;
+
         public readonly Color backgroundColor;
 
         public readonly Brightness? brightness;
 
         public readonly IconThemeData iconTheme;
+
+        public readonly IconThemeData actionsIconTheme;
 
         public readonly TextTheme textTheme;
 
@@ -153,9 +161,12 @@ namespace Unity.UIWidgets.material {
             bool canPop = parentRoute?.canPop ?? false;
             bool useCloseButton = parentRoute is PageRoute && ((PageRoute) parentRoute).fullscreenDialog;
 
-            IconThemeData appBarIconTheme = this.widget.iconTheme
+            IconThemeData overallIconTheme = this.widget.iconTheme
                                             ?? appBarTheme.iconTheme
                                             ?? themeData.primaryIconTheme;
+            IconThemeData actionsIconTheme = this.widget.actionsIconTheme
+                                             ?? appBarTheme.actionsIconTheme
+                                             ?? overallIconTheme;
             TextStyle centerStyle = this.widget.textTheme?.title
                                     ?? appBarTheme.textTheme?.title
                                     ?? themeData.primaryTextTheme.title;
@@ -174,8 +185,11 @@ namespace Unity.UIWidgets.material {
                     sideStyle = sideStyle.copyWith(color: sideStyle.color.withOpacity(opacity));
                 }
 
-                appBarIconTheme = appBarIconTheme.copyWith(
-                    opacity: opacity * (appBarIconTheme.opacity ?? 1.0f)
+                overallIconTheme = overallIconTheme.copyWith(
+                    opacity: opacity * (overallIconTheme.opacity ?? 1.0f)
+                );
+                actionsIconTheme = actionsIconTheme.copyWith(
+                    opacity: opacity * (actionsIconTheme.opacity ?? 1.0f)
                 );
             }
 
@@ -223,6 +237,13 @@ namespace Unity.UIWidgets.material {
                     tooltip: MaterialLocalizations.of(context).openAppDrawerTooltip);
             }
 
+            if (actions != null) {
+                actions = IconTheme.merge(
+                    data: actionsIconTheme,
+                    child: actions
+                );
+            }
+
             Widget toolbar = new NavigationToolbar(
                 leading: leading,
                 middle: title,
@@ -234,7 +255,7 @@ namespace Unity.UIWidgets.material {
                 child: new CustomSingleChildLayout(
                     layoutDelegate: new _ToolbarContainerLayout(),
                     child: IconTheme.merge(
-                        data: appBarIconTheme,
+                        data: overallIconTheme,
                         child: new DefaultTextStyle(
                             style: sideStyle,
                             child: toolbar)
@@ -299,6 +320,7 @@ namespace Unity.UIWidgets.material {
                     elevation: this.widget.elevation
                                ?? appBarTheme.elevation
                                ?? _defaultElevation,
+                    shape: this.widget.shape,
                     child: appBar
                 ));
         }
@@ -379,6 +401,7 @@ namespace Unity.UIWidgets.material {
             Color backgroundColor,
             Brightness? brightness,
             IconThemeData iconTheme,
+            IconThemeData actionsIconTheme,
             TextTheme textTheme,
             bool primary,
             bool? centerTitle,
@@ -402,6 +425,7 @@ namespace Unity.UIWidgets.material {
             this.backgroundColor = backgroundColor;
             this.brightness = brightness;
             this.iconTheme = iconTheme;
+            this.actionsIconTheme = actionsIconTheme;
             this.textTheme = textTheme;
             this.primary = primary;
             this.centerTitle = centerTitle;
@@ -426,6 +450,7 @@ namespace Unity.UIWidgets.material {
         public readonly Color backgroundColor;
         public readonly Brightness? brightness;
         public readonly IconThemeData iconTheme;
+        public readonly IconThemeData actionsIconTheme;
         public readonly TextTheme textTheme;
         public readonly bool primary;
         public readonly bool? centerTitle;
@@ -506,6 +531,7 @@ namespace Unity.UIWidgets.material {
                    || this.backgroundColor != oldDelegate.backgroundColor
                    || this.brightness != oldDelegate.brightness
                    || this.iconTheme != oldDelegate.iconTheme
+                   || this.actionsIconTheme != oldDelegate.actionsIconTheme
                    || this.textTheme != oldDelegate.textTheme
                    || this.primary != oldDelegate.primary
                    || this.centerTitle != oldDelegate.centerTitle
@@ -537,6 +563,7 @@ namespace Unity.UIWidgets.material {
             Color backgroundColor = null,
             Brightness? brightness = null,
             IconThemeData iconTheme = null,
+            IconThemeData actionsIconTheme = null,
             TextTheme textTheme = null,
             bool primary = true,
             bool? centerTitle = null,
@@ -558,6 +585,7 @@ namespace Unity.UIWidgets.material {
             this.backgroundColor = backgroundColor;
             this.brightness = brightness;
             this.iconTheme = iconTheme;
+            this.actionsIconTheme = actionsIconTheme;
             this.textTheme = textTheme;
             this.primary = primary;
             this.centerTitle = centerTitle;
@@ -590,6 +618,8 @@ namespace Unity.UIWidgets.material {
         public readonly Brightness? brightness;
 
         public readonly IconThemeData iconTheme;
+        
+        public readonly IconThemeData actionsIconTheme;
 
         public readonly TextTheme textTheme;
 
@@ -666,6 +696,7 @@ namespace Unity.UIWidgets.material {
                         backgroundColor: this.widget.backgroundColor,
                         brightness: this.widget.brightness,
                         iconTheme: this.widget.iconTheme,
+                        actionsIconTheme: this.widget.actionsIconTheme,
                         textTheme: this.widget.textTheme,
                         primary: this.widget.primary,
                         centerTitle: this.widget.centerTitle,

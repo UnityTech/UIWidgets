@@ -87,12 +87,14 @@ namespace Unity.UIWidgets.material {
         public ExpansionPanel(
             ExpansionPanelHeaderBuilder headerBuilder = null,
             Widget body = null,
-            bool isExpanded = false) {
+            bool isExpanded = false,
+            bool canTapOnHeader = false) {
             D.assert(headerBuilder != null);
             D.assert(body != null);
             this.headerBuilder = headerBuilder;
             this.body = body;
             this.isExpanded = isExpanded;
+            this.canTapOnHeader = false;
         }
 
         public readonly ExpansionPanelHeaderBuilder headerBuilder;
@@ -100,6 +102,8 @@ namespace Unity.UIWidgets.material {
         public readonly Widget body;
 
         public readonly bool isExpanded;
+
+        public readonly bool canTapOnHeader;
     }
 
 
@@ -107,7 +111,9 @@ namespace Unity.UIWidgets.material {
         public ExpansionPanelRadio(
             object value = null,
             ExpansionPanelHeaderBuilder headerBuilder = null,
-            Widget body = null) : base(body: body, headerBuilder: headerBuilder) {
+            Widget body = null,
+            bool canTapOnHeader = false)
+            : base(body: body, headerBuilder: headerBuilder, canTapOnHeader: canTapOnHeader) {
             D.assert(headerBuilder != null);
             D.assert(body != null);
             D.assert(value != null);
@@ -263,6 +269,10 @@ namespace Unity.UIWidgets.material {
                 }
 
                 ExpansionPanel child = this.widget.children[index];
+                Widget headerWidget = child.headerBuilder(
+                    context,
+                    this._isChildExpanded(index)
+                );
                 Row header = new Row(
                     children: new List<Widget> {
                         new Expanded(
@@ -273,9 +283,7 @@ namespace Unity.UIWidgets.material {
                                 child: new ConstrainedBox(
                                     constraints: new BoxConstraints(
                                         minHeight: ExpansionPanelUtils._kPanelHeaderCollapsedHeight),
-                                    child: child.headerBuilder(
-                                        context,
-                                        this._isChildExpanded(index))
+                                    child: headerWidget
                                 )
                             )
                         ),
@@ -284,7 +292,11 @@ namespace Unity.UIWidgets.material {
                             child: new ExpandIcon(
                                 isExpanded: this._isChildExpanded(index),
                                 padding: EdgeInsets.all(16.0f),
-                                onPressed: (bool isExpanded) => this._handlePressed(isExpanded, expandIndex)
+                                onPressed: !child.canTapOnHeader
+                                    ? (ValueChanged<bool>) ((bool isExpanded) => {
+                                        this._handlePressed(isExpanded, expandIndex);
+                                    })
+                                    : null
                             )
                         )
                     }
@@ -294,7 +306,13 @@ namespace Unity.UIWidgets.material {
                         key: new _SaltedKey<BuildContext, int>(context, index * 2),
                         child: new Column(
                             children: new List<Widget> {
-                                header,
+                                child.canTapOnHeader
+                                    ? (Widget) new InkWell(
+                                        onTap: () =>
+                                            this._handlePressed(this._isChildExpanded(expandIndex), expandIndex),
+                                        child: header
+                                    )
+                                    : header,
                                 new AnimatedCrossFade(
                                     firstChild: new Container(height: 0.0f),
                                     secondChild: child.body,

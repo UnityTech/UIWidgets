@@ -11,12 +11,14 @@ namespace Unity.UIWidgets.material {
             Decoration indicator = null,
             TabBarIndicatorSize? indicatorSize = null,
             Color labelColor = null,
+            EdgeInsets labelPadding = null,
             TextStyle labelStyle = null,
             Color unselectedLabelColor = null,
             TextStyle unselectedLabelStyle = null) {
             this.indicator = indicator;
             this.indicatorSize = indicatorSize;
             this.labelColor = labelColor;
+            this.labelPadding = labelPadding;
             this.labelStyle = labelStyle;
             this.unselectedLabelColor = unselectedLabelColor;
             this.unselectedLabelStyle = unselectedLabelStyle;
@@ -28,6 +30,8 @@ namespace Unity.UIWidgets.material {
 
         public readonly Color labelColor;
 
+        public readonly EdgeInsets labelPadding;
+
         public readonly TextStyle labelStyle;
 
         public readonly Color unselectedLabelColor;
@@ -38,6 +42,7 @@ namespace Unity.UIWidgets.material {
             Decoration indicator = null,
             TabBarIndicatorSize? indicatorSize = null,
             Color labelColor = null,
+            EdgeInsets labelPadding = null,
             TextStyle labelStyle = null,
             Color unselectedLabelColor = null,
             TextStyle unselectedLabelStyle = null
@@ -46,6 +51,7 @@ namespace Unity.UIWidgets.material {
                 indicator: indicator ?? this.indicator,
                 indicatorSize: indicatorSize ?? this.indicatorSize,
                 labelColor: labelColor ?? this.labelColor,
+                labelPadding: labelPadding ?? this.labelPadding,
                 labelStyle: labelStyle ?? this.labelStyle,
                 unselectedLabelColor: unselectedLabelColor ?? this.unselectedLabelColor,
                 unselectedLabelStyle: unselectedLabelStyle ?? this.unselectedLabelStyle);
@@ -62,6 +68,7 @@ namespace Unity.UIWidgets.material {
                 indicator: Decoration.lerp(a.indicator, b.indicator, t),
                 indicatorSize: t < 0.5 ? a.indicatorSize : b.indicatorSize,
                 labelColor: Color.lerp(a.labelColor, b.labelColor, t),
+                labelPadding: EdgeInsets.lerp(a.labelPadding, b.labelPadding, t),
                 labelStyle: TextStyle.lerp(a.labelStyle, b.labelStyle, t),
                 unselectedLabelColor: Color.lerp(a.unselectedLabelColor, b.unselectedLabelColor, t),
                 unselectedLabelStyle: TextStyle.lerp(a.unselectedLabelStyle, b.unselectedLabelStyle, t)
@@ -73,6 +80,7 @@ namespace Unity.UIWidgets.material {
                 var hashCode = this.indicator != null ? this.indicator.GetHashCode() : 0;
                 hashCode = (hashCode * 397) ^ (this.indicatorSize != null ? this.indicatorSize.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ (this.labelColor != null ? this.labelColor.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (this.labelPadding != null ? this.labelPadding.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ (this.labelStyle != null ? this.labelStyle.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^
                            (this.unselectedLabelColor != null ? this.unselectedLabelColor.GetHashCode() : 0);
@@ -95,6 +103,7 @@ namespace Unity.UIWidgets.material {
             return other.indicator == this.indicator &&
                    other.indicatorSize == this.indicatorSize &&
                    other.labelColor == this.labelColor &&
+                   other.labelPadding == this.labelPadding &&
                    other.unselectedLabelColor == this.unselectedLabelColor;
         }
 

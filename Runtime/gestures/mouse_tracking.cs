@@ -188,7 +188,7 @@ namespace Unity.UIWidgets.gestures {
                 if (trackedAnnotation.activeDevices.Contains(deviceId)) {
                     if (trackedAnnotation.annotation?.onExit != null) {
                         trackedAnnotation.annotation.onExit(
-                            PointerExitEvent.fromHoverEvent(this._lastMouseEvent[deviceId]));
+                            PointerExitEvent.fromMouseEvent(this._lastMouseEvent[deviceId]));
                     }
 
                     trackedAnnotation.activeDevices.Remove(deviceId);
@@ -230,13 +230,13 @@ namespace Unity.UIWidgets.gestures {
                 if (!hitAnnotation.activeDevices.Contains(deviceId)) {
                     hitAnnotation.activeDevices.Add(deviceId);
                     if (hitAnnotation.annotation?.onEnter != null) {
-                        hitAnnotation.annotation.onEnter(PointerEnterEvent.fromHoverEvent(lastEvent));
+                        hitAnnotation.annotation.onEnter(PointerEnterEvent.fromMouseEvent(lastEvent));
                     }
                 }
 
                 //hover
-                if (hitAnnotation.annotation?.onHover != null) {
-                    hitAnnotation.annotation.onHover(PointerHoverEvent.fromHoverEvent(lastEvent));
+                if (hitAnnotation.annotation?.onHover != null && lastEvent is PointerHoverEvent) {
+                    hitAnnotation.annotation.onHover(lastEvent as PointerHoverEvent);
                 }
 
                 //leave

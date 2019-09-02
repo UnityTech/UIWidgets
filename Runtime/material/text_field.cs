@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Text;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.gestures;
 using Unity.UIWidgets.painting;
@@ -19,23 +20,48 @@ namespace Unity.UIWidgets.material {
         bool? isFocused);
         
     public class TextField : StatefulWidget {
-        public TextField(Key key = null, TextEditingController controller = null, FocusNode focusNode = null,
-            InputDecoration decoration = null, bool noDecoration = false, TextInputType keyboardType = null,
+        public TextField(Key key = null,
+            TextEditingController controller = null,
+            FocusNode focusNode = null,
+            InputDecoration decoration = null,
+            bool noDecoration = false,
+            TextInputType keyboardType = null,
             TextInputAction? textInputAction = null,
-            TextCapitalization textCapitalization = TextCapitalization.none, TextStyle style = null,
-            TextAlign textAlign = TextAlign.left, TextDirection textDirection = TextDirection.ltr,
-            bool autofocus = false, bool obscureText = false, bool autocorrect = false, int? maxLines = 1,
-            int? maxLength = null, bool maxLengthEnforced = true, ValueChanged<string> onChanged = null,
+            TextCapitalization textCapitalization = TextCapitalization.none,
+            TextStyle style = null,
+            StrutStyle strutStyle = null,
+            TextAlign textAlign = TextAlign.left,
+            TextDirection textDirection = TextDirection.ltr,
+            bool autofocus = false,
+            bool obscureText = false,
+            bool autocorrect = false,
+            int? maxLines = 1,
+            int? minLines = null,
+            bool expands = false,
+            int? maxLength = null,
+            bool maxLengthEnforced = true,
+            ValueChanged<string> onChanged = null,
             VoidCallback onEditingComplete = null,
-            ValueChanged<string> onSubmitted = null, List<TextInputFormatter> inputFormatters = null,
-            bool? enabled = null, float? cursorWidth = 2.0f, Radius cursorRadius = null, Color cursorColor = null,
-            Brightness? keyboardAppearance = null, EdgeInsets scrollPadding = null,
-            DragStartBehavior dragStartBehavior = DragStartBehavior.down,
+            ValueChanged<string> onSubmitted = null,
+            List<TextInputFormatter> inputFormatters = null,
+            bool? enabled = null,
+            float? cursorWidth = 2.0f,
+            Radius cursorRadius = null,
+            Color cursorColor = null,
+            Brightness? keyboardAppearance = null,
+            EdgeInsets scrollPadding = null,
+            DragStartBehavior dragStartBehavior = DragStartBehavior.start,
             bool? enableInteractiveSelection = null,
             GestureTapCallback onTap = null,
-            InputCounterWidgetBuilder buildCounter = null
+            InputCounterWidgetBuilder buildCounter = null,
+            ScrollPhysics scrollPhysics = null
         ) : base(key: key) {
             D.assert(maxLines == null || maxLines > 0);
+            D.assert(minLines == null || minLines > 0);
+            D.assert((maxLines == null) || (minLines == null) || (maxLines >= minLines),
+                () => "minLines can't be greater than maxLines");
+            D.assert(!expands || (maxLines == null && minLines == null),
+                () => "minLines and maxLines must be null when expands is true.");
             D.assert(maxLength == null || maxLength == TextField.noMaxLength || maxLength > 0);
 
             this.controller = controller;
@@ -44,12 +70,15 @@ namespace Unity.UIWidgets.material {
             this.textInputAction = textInputAction;
             this.textCapitalization = textCapitalization;
             this.style = style;
+            this.strutStyle = strutStyle;
             this.textAlign = textAlign;
             this.textDirection = textDirection;
             this.autofocus = autofocus;
             this.obscureText = obscureText;
             this.autocorrect = autocorrect;
             this.maxLines = maxLines;
+            this.minLines = minLines;
+            this.expands = expands;
             this.maxLength = maxLength;
             this.maxLengthEnforced = maxLengthEnforced;
             this.onChanged = onChanged;
@@ -68,6 +97,7 @@ namespace Unity.UIWidgets.material {
             this.scrollPadding = scrollPadding ?? EdgeInsets.all(20.0f);
             this.dragStartBehavior = dragStartBehavior;
             this.buildCounter = buildCounter;
+            this.scrollPhysics = scrollPhysics;
         }
 
         public readonly TextEditingController controller;
@@ -84,6 +114,8 @@ namespace Unity.UIWidgets.material {
 
         public readonly TextStyle style;
 
+        public readonly StrutStyle strutStyle;
+
         public readonly TextAlign textAlign;
 
         public readonly TextDirection textDirection;
@@ -95,6 +127,10 @@ namespace Unity.UIWidgets.material {
         public readonly bool autocorrect;
 
         public readonly int? maxLines;
+
+        public readonly int? minLines;
+
+        public readonly bool expands;
         
         public const long noMaxLength = -1;
 
@@ -125,6 +161,8 @@ namespace Unity.UIWidgets.material {
         public readonly bool? enableInteractiveSelection;
         
         public readonly DragStartBehavior dragStartBehavior;
+
+        public readonly ScrollPhysics scrollPhysics;
         
         public bool selectionEnabled {
             get {
@@ -154,6 +192,8 @@ namespace Unity.UIWidgets.material {
             properties.add(new DiagnosticsProperty<bool>("obscureText", this.obscureText, defaultValue: false));
             properties.add(new DiagnosticsProperty<bool>("autocorrect", this.autocorrect, defaultValue: true));
             properties.add(new IntProperty("maxLines", this.maxLines, defaultValue: 1));
+            properties.add(new IntProperty("minLines", this.minLines, defaultValue: null));
+            properties.add(new DiagnosticsProperty<bool>("expands", this.expands, defaultValue: false));
             properties.add(new IntProperty("maxLength", this.maxLength, defaultValue: null));
             properties.add(new FlagProperty("maxLengthEnforced", value: this.maxLengthEnforced, defaultValue: true,
                 ifFalse: "maxLength not enforced"));
@@ -167,6 +207,7 @@ namespace Unity.UIWidgets.material {
             properties.add(new DiagnosticsProperty<Brightness?>("keyboardAppearance", this.keyboardAppearance, defaultValue: null));
             properties.add(new DiagnosticsProperty<EdgeInsets>("scrollPadding", this.scrollPadding, defaultValue: EdgeInsets.all(20.0f)));
             properties.add(new FlagProperty("selectionEnabled", value: this.selectionEnabled, defaultValue: true, ifFalse: "selection disabled"));
+            properties.add(new DiagnosticsProperty<ScrollPhysics>("scrollPhysics", this.scrollPhysics, defaultValue: null));
         }
     }
 
@@ -294,9 +335,14 @@ namespace Unity.UIWidgets.material {
         }
 
         void _handleSelectionChanged(TextSelection selection, SelectionChangedCause cause) {
-            if (Theme.of(this.context).platform == RuntimePlatform.IPhonePlayer
-                && cause == SelectionChangedCause.longPress) {
-                this._editableTextKey.currentState?.bringIntoView(selection.basePos);
+            switch (Theme.of(this.context).platform) {
+                case RuntimePlatform.IPhonePlayer:
+                    if (cause == SelectionChangedCause.longPress) {
+                        this._editableTextKey.currentState?.bringIntoView(selection.basePos);
+                    }
+                    return;
+                case RuntimePlatform.Android:
+                    break;
             }
         }
 
@@ -361,15 +407,56 @@ namespace Unity.UIWidgets.material {
             this._cancelCurrentSplash();
         }
 
-        void _handleLongPress() {
-            if (this.widget.enableInteractiveSelection == true) {
-                this._renderEditable.handleLongPress();
+        void _handleSingleLongTapStart(LongPressStartDetails details) {
+            if (this.widget.selectionEnabled) {
+                switch (Theme.of(this.context).platform) {
+                    case RuntimePlatform.IPhonePlayer:
+                        this._renderEditable.selectPositionAt(
+                            from: details.globalPosition,
+                            cause: SelectionChangedCause.longPress
+                        );
+                        break;
+                    case RuntimePlatform.Android:
+                        this._renderEditable.selectWord(cause: SelectionChangedCause.longPress);
+                        Feedback.forLongPress(this.context);
+                        break;
+                }
             }
-
             this._confirmCurrentSplash();
         }
 
-        void _handleDragSelectionStart(DragStartDetails details) {
+        void _handleSingleLongTapMoveUpdate(LongPressMoveUpdateDetails details) {
+            if (this.widget.selectionEnabled) {
+                switch (Theme.of(this.context).platform) {
+                    case RuntimePlatform.IPhonePlayer:
+                        this._renderEditable.selectPositionAt(
+                            from: details.globalPosition,
+                            cause: SelectionChangedCause.longPress
+                        );
+                        break;
+                    case RuntimePlatform.Android:
+                        this._renderEditable.selectWordsInRange(
+                            from: details.globalPosition - details.offsetFromOrigin,
+                            to: details.globalPosition,
+                            cause: SelectionChangedCause.longPress);
+                        Feedback.forLongPress(this.context);
+                        break;
+                }
+            }
+        }
+
+        void _handleSingleLongTapEnd(LongPressEndDetails details) {
+            this._editableTextKey.currentState.showToolbar();
+        }
+
+        void _handleDoubleTapDown(TapDownDetails details) {
+            if (this.widget.selectionEnabled) {
+                this._renderEditable.selectWord(cause: SelectionChangedCause.doubleTap);
+                this._editableTextKey.currentState.showToolbar();
+            }
+        }
+
+        void _handleMouseDragSelectionStart(DragStartDetails details) {
             this._renderEditable.selectPositionAt(
                 from: details.globalPosition,
                 cause: SelectionChangedCause.drag);
@@ -377,7 +464,7 @@ namespace Unity.UIWidgets.material {
             this._startSplash(details.globalPosition);
         }
 
-        void _handleDragSelectionUpdate(DragStartDetails startDetails,
+        void _handleMouseDragSelectionUpdate(DragStartDetails startDetails,
             DragUpdateDetails updateDetails) {
             this._renderEditable.selectPositionAt(
                 from: startDetails.globalPosition,
@@ -462,12 +549,15 @@ namespace Unity.UIWidgets.material {
                     textInputAction: this.widget.textInputAction,
                     textCapitalization: this.widget.textCapitalization,
                     style: style,
+                    strutStyle: this.widget.strutStyle,
                     textAlign: this.widget.textAlign,
                     textDirection: this.widget.textDirection,
                     autofocus: this.widget.autofocus,
                     obscureText: this.widget.obscureText,
                     autocorrect: this.widget.autocorrect,
                     maxLines: this.widget.maxLines,
+                    minLines: this.widget.minLines,
+                    expands: this.widget.expands,
                     selectionColor: themeData.textSelectionColor,
                     selectionControls: this.widget.selectionEnabled ? textSelectionControls : null,
                     onChanged: this.widget.onChanged,
@@ -486,7 +576,8 @@ namespace Unity.UIWidgets.material {
                     scrollPadding: this.widget.scrollPadding,
                     keyboardAppearance: keyboardAppearance,
                     enableInteractiveSelection: this.widget.enableInteractiveSelection == true,
-                    dragStartBehavior: this.widget.dragStartBehavior
+                    dragStartBehavior: this.widget.dragStartBehavior,
+                    scrollPhysics: this.widget.scrollPhysics
                 )
             );
 
@@ -501,6 +592,7 @@ namespace Unity.UIWidgets.material {
                             textAlign: this.widget.textAlign,
                             isFocused: focusNode.hasFocus,
                             isEmpty: controller.value.text.isEmpty(),
+                            expands: this.widget.expands,
                             child: _child
                         );
                     },
@@ -515,9 +607,12 @@ namespace Unity.UIWidgets.material {
                     // onForcePressStart: forcePressEnabled ? this._handleForcePressStarted : null, // TODO: Remove this when force press is added
                     onSingleTapUp: this._handleSingleTapUp,
                     onSingleTapCancel: this._handleSingleTapCancel,
-                    onSingleLongTapStart: this._handleLongPress,
-                    onDragSelectionStart: this._handleDragSelectionStart,
-                    onDragSelectionUpdate: this._handleDragSelectionUpdate,
+                    onSingleLongTapStart: this._handleSingleLongTapStart,
+                    onSingleLongTapMoveUpdate: this._handleSingleLongTapMoveUpdate,
+                    onSingleLongTapEnd: this._handleSingleLongTapEnd,
+                    onDoubleTapDown: this._handleDoubleTapDown,
+                    onDragSelectionStart: this._handleMouseDragSelectionStart,
+                    onDragSelectionUpdate: this._handleMouseDragSelectionUpdate,
                     behavior: HitTestBehavior.translucent,
                     child: child
                 )
