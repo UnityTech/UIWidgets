@@ -94,6 +94,8 @@ namespace Unity.UIWidgets.ui {
             layer.clipStack.save();
         }
 
+        static uiOffset[] _cachedPoints = new uiOffset[4];
+
         void _saveLayer(uiRect bounds, uiPaint paint) {
             D.assert(bounds.width > 0);
             D.assert(bounds.height > 0);
@@ -125,32 +127,31 @@ namespace Unity.UIWidgets.ui {
             this._currentLayer = layer;
 
             if (paint.backdrop != null) {
-                var points = new uiOffset[4];
                 
                 if (paint.backdrop is _uiBlurImageFilter) {
                     var filter = (_uiBlurImageFilter) paint.backdrop;
                     if (!(filter.sigmaX == 0 && filter.sigmaY == 0)) {
-                        points[0] = bounds.topLeft;
-                        points[1] = bounds.bottomLeft;
-                        points[2] = bounds.bottomRight;
-                        points[3] = bounds.topRight;
+                        _cachedPoints[0] = bounds.topLeft;
+                        _cachedPoints[1] = bounds.bottomLeft;
+                        _cachedPoints[2] = bounds.bottomRight;
+                        _cachedPoints[3] = bounds.topRight;
 
-                        points = state.matrix.Value.mapPoints(points);
+                        state.matrix.Value.mapPoints(ref _cachedPoints);
 
                         var parentBounds = parentLayer.layerBounds;
                         for (int i = 0; i < 4; i++) {
-                            points[i] = new uiOffset(
-                                (points[i].dx - parentBounds.left) / parentBounds.width,
-                                (points[i].dy - parentBounds.top) / parentBounds.height
+                            _cachedPoints[i] = new uiOffset(
+                                (_cachedPoints[i].dx - parentBounds.left) / parentBounds.width,
+                                (_cachedPoints[i].dy - parentBounds.top) / parentBounds.height
                             );
                         }
 
                         var mesh = ImageMeshGenerator.imageMesh(
                             null,
-                            points[0],
-                            points[1],
-                            points[2],
-                            points[3],
+                            _cachedPoints[0],
+                            _cachedPoints[1],
+                            _cachedPoints[2],
+                            _cachedPoints[3],
                             bounds);
                         var renderDraw = CanvasShader.texRT(layer, layer.layerPaint.Value, mesh, parentLayer);
                         layer.draws.Add(renderDraw);
@@ -165,18 +166,18 @@ namespace Unity.UIWidgets.ui {
                     if (!filter.transform.isIdentity()) {
                         layer.filterMode = filter.filterMode;
 
-                        points[0] = bounds.topLeft;
-                        points[1] = bounds.bottomLeft;
-                        points[2] = bounds.bottomRight;
-                        points[3] = bounds.topRight;
+                        _cachedPoints[0] = bounds.topLeft;
+                        _cachedPoints[1] = bounds.bottomLeft;
+                        _cachedPoints[2] = bounds.bottomRight;
+                        _cachedPoints[3] = bounds.topRight;
                         
-                        points = state.matrix.Value.mapPoints(points);
+                        state.matrix.Value.mapPoints(ref _cachedPoints);
 
                         var parentBounds = parentLayer.layerBounds;
                         for (int i = 0; i < 4; i++) {
-                            points[i] = new uiOffset(
-                                (points[i].dx - parentBounds.left) / parentBounds.width,
-                                (points[i].dy - parentBounds.top) / parentBounds.height
+                            _cachedPoints[i] = new uiOffset(
+                                (_cachedPoints[i].dx - parentBounds.left) / parentBounds.width,
+                                (_cachedPoints[i].dy - parentBounds.top) / parentBounds.height
                             );
                         }
 
@@ -186,10 +187,10 @@ namespace Unity.UIWidgets.ui {
 
                         var mesh = ImageMeshGenerator.imageMesh(
                             matrix,
-                            points[0],
-                            points[1],
-                            points[2],
-                            points[3],
+                            _cachedPoints[0],
+                            _cachedPoints[1],
+                            _cachedPoints[2],
+                            _cachedPoints[3],
                             bounds);
                         var renderDraw = CanvasShader.texRT(layer, layer.layerPaint.Value, mesh, parentLayer);
                         layer.draws.Add(renderDraw);
