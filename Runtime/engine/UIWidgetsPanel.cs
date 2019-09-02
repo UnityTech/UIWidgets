@@ -240,13 +240,16 @@ namespace Unity.UIWidgets.engine {
 
         void handleMouseMovement() {
             var pos = this.getPointPosition(Input.mousePosition);
+            if (pos == null) {
+                return;
+            }
             this._windowAdapter.postPointerEvent(new PointerData(
                 timeStamp: Timer.timespanSinceStartup,
                 change: PointerChange.hover,
                 kind: PointerDeviceKind.mouse,
                 device: this.getMouseButtonDown(),
-                physicalX: pos.x,
-                physicalY: pos.y
+                physicalX: pos.Value.x,
+                physicalY: pos.Value.y
             ));
         }
 
@@ -254,10 +257,13 @@ namespace Unity.UIWidgets.engine {
             if (Input.mouseScrollDelta.y != 0 || Input.mouseScrollDelta.x != 0) {
                 var scaleFactor = this.canvas.scaleFactor;
                 var pos = this.getPointPosition(Input.mousePosition);
+                if (pos == null) {
+                    return;
+                }
                 this._windowAdapter.onScroll(Input.mouseScrollDelta.x * scaleFactor,
                     Input.mouseScrollDelta.y * scaleFactor,
-                    pos.x,
-                    pos.y,
+                    pos.Value.x,
+                    pos.Value.y,
                     InputUtils.getScrollButtonKey());
             }
         }
@@ -276,31 +282,41 @@ namespace Unity.UIWidgets.engine {
         }
 
         public void OnPointerDown(PointerEventData eventData) {
-            EventSystem.current.SetSelectedGameObject(this.gameObject, eventData);
             var position = this.getPointPosition(eventData);
+            if (position == null) {
+                return;
+            }
+            EventSystem.current.SetSelectedGameObject(this.gameObject, eventData);
             this._windowAdapter.postPointerEvent(new PointerData(
                 timeStamp: Timer.timespanSinceStartup,
                 change: PointerChange.down,
                 kind: InputUtils.getPointerDeviceKind(eventData),
                 device: InputUtils.getPointerDeviceKey(eventData),
-                physicalX: position.x,
-                physicalY: position.y
+                physicalX: position.Value.x,
+                physicalY: position.Value.y
             ));
         }
 
         public void OnPointerUp(PointerEventData eventData) {
             var position = this.getPointPosition(eventData);
+            if (position == null) {
+                return;
+            }
             this._windowAdapter.postPointerEvent(new PointerData(
                 timeStamp: Timer.timespanSinceStartup,
                 change: PointerChange.up,
                 kind: InputUtils.getPointerDeviceKind(eventData),
                 device: InputUtils.getPointerDeviceKey(eventData),
-                physicalX: position.x,
-                physicalY: position.y
+                physicalX: position.Value.x,
+                physicalY: position.Value.y
             ));
         }
 
-        public Vector2 getPointPosition(PointerEventData eventData) {
+        public Vector2? getPointPosition(PointerEventData eventData) {
+            if (eventData.enterEventCamera == null && this.canvas.renderMode == RenderMode.ScreenSpaceCamera) {
+                return null;
+            }
+            
             Vector2 localPoint;
             RectTransformUtility.ScreenPointToLocalPointInRectangle(this.rectTransform, eventData.position,
                 eventData.enterEventCamera, out localPoint);
@@ -310,7 +326,7 @@ namespace Unity.UIWidgets.engine {
             return localPoint;
         }
 
-        public Vector2 getPointPosition(Vector2 position) {
+        public Vector2? getPointPosition(Vector2 position) {
             Vector2 localPoint;
             Camera eventCamera = null;
 
@@ -318,6 +334,9 @@ namespace Unity.UIWidgets.engine {
                 eventCamera = this.canvas.GetComponent<GraphicRaycaster>().eventCamera;
             }
 
+            if (eventCamera == null && this.canvas.renderMode == RenderMode.ScreenSpaceCamera) {
+                return null;
+            }
 
             RectTransformUtility.ScreenPointToLocalPointInRectangle(this.rectTransform, position,
                 eventCamera, out localPoint);
@@ -329,44 +348,52 @@ namespace Unity.UIWidgets.engine {
 
         public void OnDrag(PointerEventData eventData) {
             var position = this.getPointPosition(eventData);
+            if (position == null) {
+                return;
+            }
             this._windowAdapter.postPointerEvent(new PointerData(
                 timeStamp: Timer.timespanSinceStartup,
                 change: PointerChange.move,
                 kind: InputUtils.getPointerDeviceKind(eventData),
                 device: InputUtils.getPointerDeviceKey(eventData),
-                physicalX: position.x,
-                physicalY: position.y
+                physicalX: position.Value.x,
+                physicalY: position.Value.y
             ));
         }
 
         public void OnPointerEnter(PointerEventData eventData) {
+            var position = this.getPointPosition(eventData);
+            if (position == null) {
+                return;
+            }
             var pointerKey = InputUtils.getPointerDeviceKey(eventData);
             this._enteredPointers.Add(pointerKey);
 
             this._lastMouseMove = eventData.position;
-            var position = this.getPointPosition(eventData);
             this._windowAdapter.postPointerEvent(new PointerData(
                 timeStamp: Timer.timespanSinceStartup,
                 change: PointerChange.hover,
                 kind: InputUtils.getPointerDeviceKind(eventData),
                 device: pointerKey,
-                physicalX: position.x,
-                physicalY: position.y
+                physicalX: position.Value.x,
+                physicalY: position.Value.y
             ));
         }
 
         public void OnPointerExit(PointerEventData eventData) {
+            var position = this.getPointPosition(eventData);
+            if (position == null) {
+                return;
+            }
             var pointerKey = InputUtils.getPointerDeviceKey(eventData);
             this._enteredPointers.Remove(pointerKey);
-
-            var position = this.getPointPosition(eventData);
             this._windowAdapter.postPointerEvent(new PointerData(
                 timeStamp: Timer.timespanSinceStartup,
                 change: PointerChange.hover,
                 kind: InputUtils.getPointerDeviceKind(eventData),
                 device: pointerKey,
-                physicalX: position.x,
-                physicalY: position.y
+                physicalX: position.Value.x,
+                physicalY: position.Value.y
             ));
         }
 
