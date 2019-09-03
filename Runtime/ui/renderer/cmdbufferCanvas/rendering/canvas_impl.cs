@@ -94,7 +94,7 @@ namespace Unity.UIWidgets.ui {
             layer.clipStack.save();
         }
 
-        readonly uiOffset[] _saveLayer_Points = new uiOffset[4];
+        static uiOffset[] _cachedPoints = new uiOffset[4];
 
         void _saveLayer(uiRect bounds, uiPaint paint) {
             D.assert(bounds.width > 0);
@@ -127,30 +127,31 @@ namespace Unity.UIWidgets.ui {
             this._currentLayer = layer;
 
             if (paint.backdrop != null) {
-                if (paint.backdrop is _BlurImageFilter) {
-                    var filter = (_BlurImageFilter) paint.backdrop;
+                
+                if (paint.backdrop is _uiBlurImageFilter) {
+                    var filter = (_uiBlurImageFilter) paint.backdrop;
                     if (!(filter.sigmaX == 0 && filter.sigmaY == 0)) {
-                        this._saveLayer_Points[0] = bounds.topLeft;
-                        this._saveLayer_Points[1] = bounds.bottomLeft;
-                        this._saveLayer_Points[2] = bounds.bottomRight;
-                        this._saveLayer_Points[3] = bounds.topRight;
+                        _cachedPoints[0] = bounds.topLeft;
+                        _cachedPoints[1] = bounds.bottomLeft;
+                        _cachedPoints[2] = bounds.bottomRight;
+                        _cachedPoints[3] = bounds.topRight;
 
-                        state.matrix.Value.mapPoints(this._saveLayer_Points);
+                        state.matrix.Value.mapPoints(ref _cachedPoints);
 
                         var parentBounds = parentLayer.layerBounds;
                         for (int i = 0; i < 4; i++) {
-                            this._saveLayer_Points[i] = new uiOffset(
-                                (this._saveLayer_Points[i].dx - parentBounds.left) / parentBounds.width,
-                                (this._saveLayer_Points[i].dy - parentBounds.top) / parentBounds.height
+                            _cachedPoints[i] = new uiOffset(
+                                (_cachedPoints[i].dx - parentBounds.left) / parentBounds.width,
+                                (_cachedPoints[i].dy - parentBounds.top) / parentBounds.height
                             );
                         }
 
                         var mesh = ImageMeshGenerator.imageMesh(
                             null,
-                            this._saveLayer_Points[0],
-                            this._saveLayer_Points[1],
-                            this._saveLayer_Points[2],
-                            this._saveLayer_Points[3],
+                            _cachedPoints[0],
+                            _cachedPoints[1],
+                            _cachedPoints[2],
+                            _cachedPoints[3],
                             bounds);
                         var renderDraw = CanvasShader.texRT(layer, layer.layerPaint.Value, mesh, parentLayer);
                         layer.draws.Add(renderDraw);
@@ -160,35 +161,36 @@ namespace Unity.UIWidgets.ui {
                         layer.draws.Add(CanvasShader.texRT(layer, paint, blurMesh, blurLayer));
                     }
                 }
-                else if (paint.backdrop is _MatrixImageFilter) {
-                    var filter = (_MatrixImageFilter) paint.backdrop;
+                else if (paint.backdrop is _uiMatrixImageFilter) {
+                    var filter = (_uiMatrixImageFilter) paint.backdrop;
                     if (!filter.transform.isIdentity()) {
                         layer.filterMode = filter.filterMode;
 
-                        this._saveLayer_Points[0] = bounds.topLeft;
-                        this._saveLayer_Points[1] = bounds.bottomLeft;
-                        this._saveLayer_Points[2] = bounds.bottomRight;
-                        this._saveLayer_Points[3] = bounds.topRight;
-                        state.matrix.Value.mapPoints(this._saveLayer_Points);
+                        _cachedPoints[0] = bounds.topLeft;
+                        _cachedPoints[1] = bounds.bottomLeft;
+                        _cachedPoints[2] = bounds.bottomRight;
+                        _cachedPoints[3] = bounds.topRight;
+                        
+                        state.matrix.Value.mapPoints(ref _cachedPoints);
 
                         var parentBounds = parentLayer.layerBounds;
                         for (int i = 0; i < 4; i++) {
-                            this._saveLayer_Points[i] = new uiOffset(
-                                (this._saveLayer_Points[i].dx - parentBounds.left) / parentBounds.width,
-                                (this._saveLayer_Points[i].dy - parentBounds.top) / parentBounds.height
+                            _cachedPoints[i] = new uiOffset(
+                                (_cachedPoints[i].dx - parentBounds.left) / parentBounds.width,
+                                (_cachedPoints[i].dy - parentBounds.top) / parentBounds.height
                             );
                         }
 
                         var matrix = uiMatrix3.makeTrans(-bounds.left, -bounds.top);
-                        matrix.postConcat(uiMatrix3.fromMatrix3(filter.transform));
+                        matrix.postConcat(filter.transform);
                         matrix.postTranslate(bounds.left, bounds.top);
 
                         var mesh = ImageMeshGenerator.imageMesh(
                             matrix,
-                            this._saveLayer_Points[0],
-                            this._saveLayer_Points[1],
-                            this._saveLayer_Points[2],
-                            this._saveLayer_Points[3],
+                            _cachedPoints[0],
+                            _cachedPoints[1],
+                            _cachedPoints[2],
+                            _cachedPoints[3],
                             bounds);
                         var renderDraw = CanvasShader.texRT(layer, layer.layerPaint.Value, mesh, parentLayer);
                         layer.draws.Add(renderDraw);
