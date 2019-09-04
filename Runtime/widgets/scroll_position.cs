@@ -61,6 +61,14 @@ namespace Unity.UIWidgets.widgets {
 
         float? _maxScrollExtent;
 
+        public bool hasMinScrollExtent {
+            get { return this._minScrollExtent != null; }
+        }
+
+        public bool hasMaxScrollExtent {
+            get { return this._maxScrollExtent != null; }
+        }
+
         public override float pixels {
             get {
                 D.assert(this._pixels != null);

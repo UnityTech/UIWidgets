@@ -30,7 +30,7 @@ namespace Unity.UIWidgets.widgets {
         public readonly float viewportFraction;
 
 
-        public float page {
+        public virtual float page {
             get {
                 D.assert(this.positions.isNotEmpty(),
                     () => "PageController.page cannot be accessed before a PageView is built with it."
