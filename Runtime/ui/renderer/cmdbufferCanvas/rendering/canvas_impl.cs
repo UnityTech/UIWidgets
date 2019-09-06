@@ -42,6 +42,9 @@ namespace Unity.UIWidgets.ui {
                 this._lastScissor = null;
                 this._layers.Clear();
             }
+
+            _instanceNum--;
+            _releaseComputeBuffer();
         }
 
         public PictureFlusher(RenderTexture renderTexture, float devicePixelRatio, MeshPool meshPool) {
@@ -57,6 +60,8 @@ namespace Unity.UIWidgets.ui {
             this.___drawTextDrawMeshCallback = this._drawTextDrawMeshCallback;
             this.___drawPathDrawMeshCallback2 = this._drawPathDrawMeshCallback2;
             this.___drawPathDrawMeshCallback = this._drawPathDrawMeshCallback;
+
+            _instanceNum++;
         }
 
         readonly _drawPathDrawMeshCallbackDelegate ___drawTextDrawMeshCallback;
@@ -681,7 +686,11 @@ namespace Unity.UIWidgets.ui {
         }
 
         void _drawImage(Image image, uiOffset offset, uiPaint paint) {
-            D.assert(image != null);
+            D.assert(image != null && image.valid);
+
+            if (image == null || !image.valid) {
+                return;
+            }
 
             this._drawImageRect(image,
                 null,
@@ -693,7 +702,11 @@ namespace Unity.UIWidgets.ui {
         }
 
         void _drawImageRect(Image image, uiRect? src, uiRect dst, uiPaint paint) {
-            D.assert(image != null);
+            D.assert(image != null && image.valid);
+
+            if (image == null || !image.valid) {
+                return;
+            }
 
             if (src == null) {
                 src = uiRectHelper.one;
@@ -714,7 +727,11 @@ namespace Unity.UIWidgets.ui {
         }
 
         void _drawImageNine(Image image, uiRect? src, uiRect center, uiRect dst, uiPaint paint) {
-            D.assert(image != null);
+            D.assert(image != null && image.valid);
+
+            if (image == null || !image.valid) {
+                return;
+            }
 
             var scaleX = 1f / image.width;
             var scaleY = 1f / image.height;
@@ -1029,8 +1046,13 @@ namespace Unity.UIWidgets.ui {
         }
 
         public void flush(uiPicture picture) {
+            if (!CanvasShader.isReady()) {
+                return;
+            }
+            
             this._reset();
             this._resetRenderTextureId();
+            this._resetComputeBuffer();
 
             this._drawUIPicture(picture, false);
 
@@ -1047,6 +1069,7 @@ namespace Unity.UIWidgets.ui {
                 // this is necessary for webgl2. not sure why... just to be safe to disable the scissor.
                 cmdBuf.DisableScissorRect();
 
+                this._bindComputeBuffer();
                 Graphics.ExecuteCommandBuffer(cmdBuf);
             }
 
@@ -1131,12 +1154,7 @@ namespace Unity.UIWidgets.ui {
                         if (mesh == null) {
                             continue;
                         }
-
-                        D.assert(mesh.vertices.Count > 0);
-                        cmd.meshObj.SetVertices(mesh.vertices?.data);
-                        cmd.meshObj.SetTriangles(mesh.triangles?.data, 0, false);
-                        cmd.meshObj.SetUVs(0, mesh.uv?.data);
-
+                        
                         if (mesh.matrix == null) {
                             cmd.properties.SetFloatArray(CmdDraw.matId, CmdDraw.idMat3.fMat);
                         }
@@ -1155,7 +1173,22 @@ namespace Unity.UIWidgets.ui {
                             cmd.properties.SetFloatArray(CmdDraw.matId, this._drawLayer_matArray);
                         }
 
-                        cmdBuf.DrawMesh(cmd.meshObj, CmdDraw.idMat, cmd.material, 0, cmd.pass, cmd.properties.mpb);
+                        D.assert(mesh.vertices.Count > 0);
+                        if (CanvasShader.supportComputeBuffer) {
+                            this._addMeshToComputeBuffer(mesh.vertices?.data, mesh.uv?.data, mesh.triangles?.data);
+                            cmd.properties.SetBuffer(CmdDraw.vertexBufferId, _computeBuffer);
+                            cmd.properties.SetBuffer(CmdDraw.indexBufferId, _indexBuffer);
+                            cmd.properties.SetInt(CmdDraw.startIndexId, _startIndex);
+                            cmdBuf.DrawProcedural(Matrix4x4.identity, cmd.material, cmd.pass, MeshTopology.Triangles, mesh.triangles.Count, 1, cmd.properties.mpb);
+                        }
+                        else {
+                            cmd.meshObj.SetVertices(mesh.vertices?.data);
+                            cmd.meshObj.SetTriangles(mesh.triangles?.data, 0, false);
+                            cmd.meshObj.SetUVs(0, mesh.uv?.data);
+
+                            cmdBuf.DrawMesh(cmd.meshObj, CmdDraw.idMat, cmd.material, 0, cmd.pass, cmd.properties.mpb);
+                        }
+
                         if (cmd.layerId != null) {
                             cmdBuf.SetGlobalTexture(CmdDraw.texId, BuiltinRenderTextureType.None);
                         }
