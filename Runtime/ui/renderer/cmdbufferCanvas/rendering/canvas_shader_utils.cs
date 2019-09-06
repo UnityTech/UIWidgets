@@ -35,5 +35,9 @@ namespace Unity.UIWidgets.ui {
         public void SetFloatArray(int mid, float[] array) {
             this.mpb.SetFloatArray(mid, array);
         }
+
+        public void SetBuffer(int mid, ComputeBuffer buffer) {
+            this.mpb.SetBuffer(mid, buffer);
+        }
     }
 }

@@ -4,16 +4,16 @@ using UnityEngine;
 
 namespace Unity.UIWidgets.ui {
     public partial struct uiMatrix3 {
-        public void mapPoints(uiOffset[] dst, uiOffset[] src) {
+        public void mapPoints(ref uiOffset[] dst, ref uiOffset[] src) {
             D.assert(dst != null && src != null && dst.Length == src.Length);
-            this._getMapPtsProc()(this, dst, src, src.Length);
+            this._getMapPtsProc()(this, ref dst, ref src, src.Length);
         }
 
-        public void mapPoints(uiOffset[] pts) {
-            this.mapPoints(pts, pts);
+        public void mapPoints(ref uiOffset[] pts) {
+            this.mapPoints(ref pts, ref pts);
         }
 
-        delegate void MapPtsProc(uiMatrix3 mat, uiOffset[] dst, uiOffset[] src, int count);
+        delegate void MapPtsProc(uiMatrix3 mat, ref uiOffset[] dst, ref uiOffset[] src, int count);
 
         static readonly MapPtsProc[] gMapPtsProcs = {
             Identity_pts, Trans_pts,
@@ -36,7 +36,7 @@ namespace Unity.UIWidgets.ui {
             return GetMapPtsProc(this._getType());
         }
 
-        static void Identity_pts(uiMatrix3 m, uiOffset[] dst, uiOffset[] src, int count) {
+        static void Identity_pts(uiMatrix3 m, ref uiOffset[] dst, ref uiOffset[] src, int count) {
             D.assert(m._getType() == 0);
 
             if (dst != src && count > 0) {
@@ -44,7 +44,7 @@ namespace Unity.UIWidgets.ui {
             }
         }
 
-        static void Trans_pts(uiMatrix3 m, uiOffset[] dst, uiOffset[] src, int count) {
+        static void Trans_pts(uiMatrix3 m, ref uiOffset[] dst, ref uiOffset[] src, int count) {
             D.assert(m._getType() <= TypeMask.kTranslate_Mask);
             if (count > 0) {
                 var tx = m.getTranslateX();
@@ -55,7 +55,7 @@ namespace Unity.UIWidgets.ui {
             }
         }
 
-        static void Scale_pts(uiMatrix3 m, uiOffset[] dst, uiOffset[] src, int count) {
+        static void Scale_pts(uiMatrix3 m, ref uiOffset[] dst, ref uiOffset[] src, int count) {
             D.assert(m._getType() <= (TypeMask.kScale_Mask | TypeMask.kTranslate_Mask));
             if (count > 0) {
                 var tx = m.getTranslateX();
@@ -69,7 +69,7 @@ namespace Unity.UIWidgets.ui {
             }
         }
 
-        static void Persp_pts(uiMatrix3 m, uiOffset[] dst, uiOffset[] src, int count) {
+        static void Persp_pts(uiMatrix3 m, ref uiOffset[] dst, ref uiOffset[] src, int count) {
             D.assert(m._hasPerspective());
 
             if (count > 0) {
@@ -91,7 +91,7 @@ namespace Unity.UIWidgets.ui {
             }
         }
 
-        static void Affine_pts(uiMatrix3 m, uiOffset[] dst, uiOffset[] src, int count) {
+        static void Affine_pts(uiMatrix3 m, ref uiOffset[] dst, ref uiOffset[] src, int count) {
             D.assert(m._getType() != TypeMask.kPerspective_Mask);
             if (count > 0) {
                 var tx = m.getTranslateX();

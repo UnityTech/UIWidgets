@@ -216,6 +216,7 @@ namespace Unity.UIWidgets.editor {
 
             if (this._canvas != null) {
                 this._canvas.reset();
+                this._canvas.dispose();
                 this._canvas = null;
             }
         }

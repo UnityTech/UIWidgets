@@ -46,7 +46,7 @@ namespace Unity.UIWidgets.ui {
             }
 
             var bound =  path.getBounds();
-            var sigma = state.scale * paint.maskFilter.Value.sigma;
+            var sigma = state.scale * paint.maskFilter.Value.sigma / 3f;
             
             var vertices = ObjectPool<uiList<Vector3>>.alloc();
             vertices.SetCapacity(4);
@@ -67,7 +67,8 @@ namespace Unity.UIWidgets.ui {
             ObjectPool<uiMeshMesh>.release(meshBounds);
             ObjectPool<uiMeshMesh>.release(blurMesh);
             var mesh = uiMeshMesh.create(state.matrix, vertices, _triangles);
-            layer.draws.Add(CanvasShader.fastShadow(layer, mesh, sigma, path.isRect, path.isCircle, path.rRectCorner, new Vector4(bound.left, bound.top, bound.right, bound.bottom), paint.color));
+            var shadowColor = paint.color.withAlpha(128);
+            layer.draws.Add(CanvasShader.fastShadow(layer, mesh, sigma, path.isRect, path.isCircle, path.rRectCorner, new Vector4(bound.left, bound.top, bound.right, bound.bottom), shadowColor));
         }
 
     }

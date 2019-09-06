@@ -23,6 +23,10 @@ namespace Unity.UIWidgets.ui {
             this._isDynamic = isDynamic;
         }
 
+        public bool valid {
+            get { return this._texture != null; }
+        }
+
         public int width {
             get { return this._texture != null ? this._texture.width : 0; }
         }
