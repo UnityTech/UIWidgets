@@ -686,7 +686,11 @@ namespace Unity.UIWidgets.ui {
         }
 
         void _drawImage(Image image, uiOffset offset, uiPaint paint) {
-            D.assert(image != null);
+            D.assert(image != null && image.valid);
+
+            if (image == null || !image.valid) {
+                return;
+            }
 
             this._drawImageRect(image,
                 null,
@@ -698,7 +702,11 @@ namespace Unity.UIWidgets.ui {
         }
 
         void _drawImageRect(Image image, uiRect? src, uiRect dst, uiPaint paint) {
-            D.assert(image != null);
+            D.assert(image != null && image.valid);
+
+            if (image == null || !image.valid) {
+                return;
+            }
 
             if (src == null) {
                 src = uiRectHelper.one;
@@ -719,7 +727,11 @@ namespace Unity.UIWidgets.ui {
         }
 
         void _drawImageNine(Image image, uiRect? src, uiRect center, uiRect dst, uiPaint paint) {
-            D.assert(image != null);
+            D.assert(image != null && image.valid);
+
+            if (image == null || !image.valid) {
+                return;
+            }
 
             var scaleX = 1f / image.width;
             var scaleY = 1f / image.height;
