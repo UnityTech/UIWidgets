@@ -15,6 +15,11 @@ namespace Unity.UIWidgets.ui {
         static int initialFrameCount;
         static Shader testShader;
         const string testShaderName = "UIWidgets/canvas_convexFill_cb";
+        
+        
+        const bool enableComputeBuffer = false;
+
+        public static bool supportComputeBuffer;
 
         static bool OnNotPrepared() {
             initStage = InitStage.Prepared;
@@ -24,7 +29,7 @@ namespace Unity.UIWidgets.ui {
             var material = new Material(testShader);
             //for Unity 2018 or below, shader is compiled after Shader.Find() call immediately,
             //therefore we can just skip the manually preload if the compilation fails
-            if (!material.shader.isSupported) {
+            if (!material.shader.isSupported || !enableComputeBuffer) {
                 ObjectUtils.SafeDestroy(material);
                 return OnPrepared(true);
             }

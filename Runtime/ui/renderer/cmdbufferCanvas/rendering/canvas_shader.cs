@@ -169,10 +169,6 @@ namespace Unity.UIWidgets.ui {
             return shader;
         }
 
-        public static bool enableComputeBuffer = true;
-
-        public static bool supportComputeBuffer;
-
         static CanvasShader() {
             
         }
