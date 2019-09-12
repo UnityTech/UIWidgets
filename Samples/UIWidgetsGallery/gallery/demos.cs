@@ -375,15 +375,15 @@ namespace UIWidgetsGallery.gallery {
                 //     documentationUrl: "https://docs.flutter.io/flutter/material/TabBarView-class.html",
                 //     buildRoute: (BuildContext context) => PageSelectorDemo()
                 // ),
-                // new GalleryDemo(
-                //     title: "Pickers",
-                //     subtitle: "Date and time selection widgets",
-                //     icon: GalleryIcons.@event,
-                //     category: GalleryDemoCategory._kMaterialComponents,
-                //     routeName: DateAndTimePickerDemo.routeName,
-                //     documentationUrl: "https://docs.flutter.io/flutter/material/showDatePicker.html",
-                //     buildRoute: (BuildContext context) => DateAndTimePickerDemo()
-                // ),
+                new GalleryDemo(
+                    title: "Pickers",
+                    subtitle: "Date and time selection widgets",
+                    icon: GalleryIcons.@event,
+                    category: _kMaterialComponents,
+                    routeName: DateAndTimePickerDemo.routeName,
+                    documentationUrl: "https://docs.flutter.io/flutter/material/showDatePicker.html",
+                    buildRoute: (BuildContext context) => new DateAndTimePickerDemo()
+                ),
                 // new GalleryDemo(
                 //     title: "Progress indicators",
                 //     subtitle: "Linear, circular, indeterminate",
