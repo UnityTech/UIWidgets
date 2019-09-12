@@ -47,7 +47,6 @@ namespace Unity.UIWidgets.material {
             SelectableDayPredicate selectableDayPredicate = null,
             DatePickerMode initialDatePickerMode = DatePickerMode.day,
             Locale locale = null,
-            TextDirection textDirection = TextDirection.ltr,
             TransitionBuilder builder = null
         ) {
             D.assert(initialDate >= firstDate, () => "initialDate must be on or after firstDate");
@@ -66,11 +65,6 @@ namespace Unity.UIWidgets.material {
                 lastDate: lastDate,
                 selectableDayPredicate: selectableDayPredicate,
                 initialDatePickerMode: initialDatePickerMode
-            );
-
-            child = new Directionality(
-                textDirection: textDirection,
-                child: child
             );
 
             if (locale != null) {
@@ -487,12 +481,10 @@ namespace Unity.UIWidgets.material {
         }
 
         MaterialLocalizations localizations;
-        TextDirection textDirection;
 
         public override void didChangeDependencies() {
             base.didChangeDependencies();
             this.localizations = MaterialLocalizations.of(this.context);
-            this.textDirection = Directionality.of(this.context);
         }
 
         DateTime _todayDate;
@@ -763,12 +755,10 @@ namespace Unity.UIWidgets.material {
 
         bool _announcedInitialDate = false;
         public MaterialLocalizations localizations;
-        public TextDirection textDirection;
 
         public override void didChangeDependencies() {
             base.didChangeDependencies();
             this.localizations = MaterialLocalizations.of(this.context);
-            this.textDirection = Directionality.of(this.context);
             if (!this._announcedInitialDate) {
                 this._announcedInitialDate = true;
             }
