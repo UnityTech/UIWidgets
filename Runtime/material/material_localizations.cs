@@ -189,7 +189,7 @@ namespace Unity.UIWidgets.material {
         public override string formatMediumDate(DateTime date) {
             string day = _shortWeekdays[((int) date.DayOfWeek + 6) % 7];
             string month = _shortMonths[date.Month - 1];
-            return $"{day}, {month} ${date.Day}";
+            return $"{day}, {month} {date.Day}";
         }
 
         public override string formatFullDate(DateTime date) {
