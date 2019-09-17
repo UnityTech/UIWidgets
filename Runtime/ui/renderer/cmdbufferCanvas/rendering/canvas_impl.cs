@@ -281,7 +281,7 @@ namespace Unity.UIWidgets.ui {
 
         void _clipRect(Rect rect) {
             var path = uiPath.create();
-            path.addRect(uiRectHelper.fromRect(rect));
+            path.addRect(uiRectHelper.fromRect(rect).Value);
             this._clipPath(path);
             uiPathCacheManager.putToCache(path);
         }
@@ -771,7 +771,7 @@ namespace Unity.UIWidgets.ui {
                         break;
                     case DrawSaveLayer cmd: {
                         saveCount++;
-                        this._saveLayer(uiRectHelper.fromRect(cmd.rect), uiPaint.fromPaint(cmd.paint));
+                        this._saveLayer(uiRectHelper.fromRect(cmd.rect).Value, uiPaint.fromPaint(cmd.paint));
                         break;
                     }
 
@@ -849,14 +849,14 @@ namespace Unity.UIWidgets.ui {
                     }
 
                     case DrawImageRect cmd: {
-                        this._drawImageRect(cmd.image, uiRectHelper.fromRect(cmd.src), uiRectHelper.fromRect(cmd.dst),
+                        this._drawImageRect(cmd.image, uiRectHelper.fromRect(cmd.src), uiRectHelper.fromRect(cmd.dst).Value,
                             uiPaint.fromPaint(cmd.paint));
                         break;
                     }
 
                     case DrawImageNine cmd: {
                         this._drawImageNine(cmd.image, uiRectHelper.fromRect(cmd.src),
-                            uiRectHelper.fromRect(cmd.center), uiRectHelper.fromRect(cmd.dst),
+                            uiRectHelper.fromRect(cmd.center).Value, uiRectHelper.fromRect(cmd.dst).Value,
                             uiPaint.fromPaint(cmd.paint));
                         break;
                     }
@@ -1019,7 +1019,7 @@ namespace Unity.UIWidgets.ui {
             matrix.preTranslate(offset.dx, offset.dy);
 
             var mesh = TextBlobMesh.create(textBlob.Value, scale, matrix);
-            var textBlobBounds = matrix.mapRect(uiRectHelper.fromRect(textBlob.Value.boundsInText));
+            var textBlobBounds = matrix.mapRect(uiRectHelper.fromRect(textBlob.Value.boundsInText).Value);
 
             // request font texture so text mesh could be generated correctly
             var style = textBlob.Value.style;
