@@ -290,6 +290,10 @@ namespace Unity.UIWidgets.ui {
             filterMode = FilterMode.Bilinear
         };
 
+        Paint _defaultPaint = new Paint {
+            filterMode = FilterMode.Bilinear
+        };
+
         public void paint(Canvas canvas, Offset offset) {
             for (int i = 0; i < this._paintRecordsCount; i++) {
                 var paintRecord = this._paintRecords[i];
@@ -301,7 +305,9 @@ namespace Unity.UIWidgets.ui {
                 
                 if (paintRecord.style.foreground != null) {
                     this._textPaint = paintRecord.style.foreground;
-                } else {
+                }
+                else {
+                    this._textPaint = this._defaultPaint;
                     this._textPaint.color = paintRecord.style.color;
                 }
 
