@@ -286,7 +286,11 @@ namespace Unity.UIWidgets.ui {
             this._paragraphStyle = null;
         }
 
-        readonly Paint _textPaint = new Paint {
+        Paint _textPaint = new Paint {
+            filterMode = FilterMode.Bilinear
+        };
+
+        Paint _defaultPaint = new Paint {
             filterMode = FilterMode.Bilinear
         };
 
@@ -298,8 +302,17 @@ namespace Unity.UIWidgets.ui {
 
             for (int i = 0; i < this._paintRecordsCount; i++) {
                 var paintRecord = this._paintRecords[i];
-                this._textPaint.color = paintRecord.style.color;
+                
+                if (paintRecord.style.foreground != null) {
+                    this._textPaint = paintRecord.style.foreground;
+                }
+                else {
+                    this._textPaint = this._defaultPaint;
+                    this._textPaint.color = paintRecord.style.color;
+                }
+
                 canvas.drawTextBlob(paintRecord.text, paintRecord.shiftedOffset(offset), this._textPaint);
+                
                 this.paintDecorations(canvas, paintRecord, offset);
             }
         }
