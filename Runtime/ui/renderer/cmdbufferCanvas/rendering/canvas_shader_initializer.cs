@@ -19,10 +19,18 @@ namespace Unity.UIWidgets.ui {
         
         const bool enableComputeBuffer = true;
 
+        const bool enableDebugLog = true;
+
         public static bool supportComputeBuffer;
 
+        static void DebugAssert(bool condition, string logMsg) {
+            if (enableDebugLog && !condition) {
+                Debug.Log(logMsg);
+            }
+        }
+
         static void DoPrepareDefaultShader() {
-            Debug.Log($"do prepare default shader @frame = {Time.frameCount}");
+            DebugAssert(false, $"do prepare default shader @frame = {Time.frameCount}");
             supportComputeBuffer = false;
             
             var convexFillShader = GetShader("UIWidgets/canvas_convexFill");
@@ -109,8 +117,8 @@ namespace Unity.UIWidgets.ui {
             var isShaderSupported = testShader.isSupported;
             testShader = null;
             supportComputeBuffer = enableComputeBuffer && SystemInfo.supportsComputeShaders && isShaderSupported;
-            
-            Debug.Log($"do prepare computebuffer shader @frame = {Time.frameCount} with support state = {supportComputeBuffer}");
+
+            DebugAssert(false, $"do prepare computebuffer shader @frame = {Time.frameCount} with support state = {supportComputeBuffer}");
 
             if (!supportComputeBuffer) {
                 return;
