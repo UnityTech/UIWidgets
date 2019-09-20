@@ -5,7 +5,7 @@ namespace Unity.UIWidgets.ui {
     static partial class CanvasShader {
         const bool enableComputeBuffer = true;
 
-        const bool enableDebugLog = true;
+        const bool enableDebugLog = false;
 
         public static bool supportComputeBuffer;
 
