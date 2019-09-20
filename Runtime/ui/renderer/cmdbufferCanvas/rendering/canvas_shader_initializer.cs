@@ -22,6 +22,7 @@ namespace Unity.UIWidgets.ui {
         public static bool supportComputeBuffer;
 
         static void DoPrepareDefaultShader() {
+            Debug.Log($"do prepare default shader @frame = {Time.frameCount}");
             supportComputeBuffer = false;
             
             var convexFillShader = GetShader("UIWidgets/canvas_convexFill");
@@ -50,6 +51,8 @@ namespace Unity.UIWidgets.ui {
         }
 
         static bool OnNotPrepared() {
+            DoPrepareDefaultShader();
+            
             initStage = InitStage.Prepared;
 
             initialFrameCount = Time.frameCount;
@@ -62,26 +65,30 @@ namespace Unity.UIWidgets.ui {
                 return OnPrepared(true);
             }
 
-            using (var cmdBuf = new CommandBuffer()) {
-                var renderTarget = new RenderTexture(1, 1, 1);
-                cmdBuf.SetRenderTarget(renderTarget);
+            try {
+                using (var cmdBuf = new CommandBuffer()) {
+                    var renderTarget = new RenderTexture(1, 1, 1);
+                    cmdBuf.SetRenderTarget(renderTarget);
 
-                var mesh = new Mesh {
-                    vertices = new[] {new Vector3(0, 0, 0), new Vector3(0, 1, 0), new Vector3(1, 1, 0)},
-                    uv = new[] {new Vector2(0, 0), new Vector2(0, 1), new Vector2(1, 1)},
-                    triangles = new[] {0, 1, 2}
-                };
-                cmdBuf.DrawMesh(mesh, Matrix4x4.identity, material);
-                cmdBuf.DisableScissorRect();
-                Graphics.ExecuteCommandBuffer(cmdBuf);
+                    var mesh = new Mesh {
+                        vertices = new[] {new Vector3(0, 0, 0), new Vector3(0, 1, 0), new Vector3(1, 1, 0)},
+                        uv = new[] {new Vector2(0, 0), new Vector2(0, 1), new Vector2(1, 1)},
+                        triangles = new[] {0, 1, 2}
+                    };
+                    cmdBuf.DrawMesh(mesh, Matrix4x4.identity, material);
+                    cmdBuf.DisableScissorRect();
+                    Graphics.ExecuteCommandBuffer(cmdBuf);
 
-                ObjectUtils.SafeDestroy(renderTarget);
-                ObjectUtils.SafeDestroy(mesh);
+                    ObjectUtils.SafeDestroy(renderTarget);
+                    ObjectUtils.SafeDestroy(mesh);
+                }
+
+                ObjectUtils.SafeDestroy(material);
             }
-
-            ObjectUtils.SafeDestroy(material);
+            catch (Exception e) {
+                
+            }
             
-            DoPrepareDefaultShader();
             return true;
         }
 
@@ -102,6 +109,8 @@ namespace Unity.UIWidgets.ui {
             var isShaderSupported = testShader.isSupported;
             testShader = null;
             supportComputeBuffer = enableComputeBuffer && SystemInfo.supportsComputeShaders && isShaderSupported;
+            
+            Debug.Log($"do prepare computebuffer shader @frame = {Time.frameCount} with support state = {supportComputeBuffer}");
 
             if (!supportComputeBuffer) {
                 return;
