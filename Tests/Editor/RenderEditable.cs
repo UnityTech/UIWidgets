@@ -12,7 +12,6 @@ using Unity.UIWidgets.ui;
 using UnityEditor;
 using UnityEngine;
 using Color = Unity.UIWidgets.ui.Color;
-using TextStyle = Unity.UIWidgets.painting.TextStyle;
 
 namespace UIWidgets.Tests {
     public class RenderEditable : EditorWindow, TextSelectionDelegate {
@@ -49,8 +48,7 @@ namespace UIWidgets.Tests {
                 this._pixels += correction;
             }
 
-            public override void jumpTo(float pixels) {
-            }
+            public override void jumpTo(float pixels) { }
 
             public override IPromise animateTo(float to, TimeSpan duration, Curve curve) {
                 return Promise.Resolved();
@@ -147,7 +145,7 @@ namespace UIWidgets.Tests {
 
             flexbox.add(this.flexItemBox(
                 new Unity.UIWidgets.rendering.RenderEditable(span, TextDirection.ltr,
-                    new _FixedViewportOffset(0.0f), new ValueNotifier<bool>(true),
+                    offset: new _FixedViewportOffset(0.0f), showCursor: new ValueNotifier<bool>(true),
                     onSelectionChanged: this.selectionChanged, cursorColor: Color.fromARGB(255, 0, 0, 0),
                     maxLines: 100,
                     selectionColor: Color.fromARGB(255, 255, 0, 0),
@@ -162,7 +160,7 @@ namespace UIWidgets.Tests {
                 }, style: new TextStyle(height: 1.0f));
             flexbox.add(this.flexItemBox(
                 new Unity.UIWidgets.rendering.RenderEditable(span, TextDirection.ltr,
-                    new _FixedViewportOffset(0.0f), new ValueNotifier<bool>(true),
+                    offset: new _FixedViewportOffset(0.0f), showCursor: new ValueNotifier<bool>(true),
                     onSelectionChanged: this.selectionChanged, cursorColor: Color.fromARGB(255, 0, 0, 0),
                     maxLines: 100,
                     selectionColor: Color.fromARGB(255, 255, 0, 0),
@@ -175,7 +173,7 @@ namespace UIWidgets.Tests {
                 }, style: new TextStyle(height: 1.0f));
             flexbox.add(this.flexItemBox(
                 new Unity.UIWidgets.rendering.RenderEditable(span, TextDirection.ltr,
-                    new _FixedViewportOffset(0.0f), new ValueNotifier<bool>(true),
+                    offset: new _FixedViewportOffset(0.0f), showCursor: new ValueNotifier<bool>(true),
                     onSelectionChanged: this.selectionChanged, cursorColor: Color.fromARGB(255, 0, 0, 0),
                     selectionColor: Color.fromARGB(255, 255, 0, 0),
                     textSelectionDelegate: this)
@@ -191,11 +189,9 @@ namespace UIWidgets.Tests {
         }
 
         public TextEditingValue textEditingValue { get; set; }
-        
-        public void hideToolbar() {
-        }
 
-        public void bringIntoView(TextPosition textPosition) {
-        }
+        public void hideToolbar() { }
+
+        public void bringIntoView(TextPosition textPosition) { }
     }
 }
