@@ -170,7 +170,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         static CanvasShader() {
-            
+            InitShaders();
         }
 
         static readonly int _viewportId = Shader.PropertyToID("_viewport");
