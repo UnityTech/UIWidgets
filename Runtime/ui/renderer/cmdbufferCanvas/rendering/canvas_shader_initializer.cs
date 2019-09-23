@@ -3,7 +3,7 @@ using UnityEngine.Rendering;
 
 namespace Unity.UIWidgets.ui {
     static partial class CanvasShader {
-        const bool enableComputeBuffer = true;
+        const bool enableComputeBuffer = false;
 
         const bool enableDebugLog = false;
 
