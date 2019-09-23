@@ -1,74 +1,31 @@
-using System;
-using Unity.UIWidgets.foundation;
 using UnityEngine;
 using UnityEngine.Rendering;
 
 namespace Unity.UIWidgets.ui {
-    enum InitStage {
-        NotPrepared,
-        Prepared,
-        Ready
-    }
-
     static partial class CanvasShader {
-        static InitStage initStage = InitStage.NotPrepared;
-        static int initialFrameCount;
-        static Shader testShader;
-        const string testShaderName = "UIWidgets/canvas_convexFill_cb";
+        const bool enableComputeBuffer = false;
 
-        static bool OnNotPrepared() {
-            initStage = InitStage.Prepared;
+        const bool enableDebugLog = false;
 
-            initialFrameCount = Time.frameCount;
-            testShader = GetShader(testShaderName);
-            var material = new Material(testShader);
-            //for Unity 2018 or below, shader is compiled after Shader.Find() call immediately,
-            //therefore we can just skip the manually preload if the compilation fails
-            if (!material.shader.isSupported) {
-                ObjectUtils.SafeDestroy(material);
-                return OnPrepared(true);
+        public static bool supportComputeBuffer;
+
+        static void DebugAssert(bool condition, string logMsg) {
+            if (enableDebugLog && !condition) {
+                Debug.Log(logMsg);
             }
-
-            using (var cmdBuf = new CommandBuffer()) {
-                var renderTarget = new RenderTexture(1, 1, 1);
-                cmdBuf.SetRenderTarget(renderTarget);
-
-                var mesh = new Mesh {
-                    vertices = new[] {new Vector3(0, 0, 0), new Vector3(0, 1, 0), new Vector3(1, 1, 0)},
-                    uv = new[] {new Vector2(0, 0), new Vector2(0, 1), new Vector2(1, 1)},
-                    triangles = new[] {0, 1, 2}
-                };
-                cmdBuf.DrawMesh(mesh, Matrix4x4.identity, material);
-                cmdBuf.DisableScissorRect();
-                Graphics.ExecuteCommandBuffer(cmdBuf);
-
-                ObjectUtils.SafeDestroy(renderTarget);
-                ObjectUtils.SafeDestroy(mesh);
-            }
-
-            ObjectUtils.SafeDestroy(material);
-
-            return false;
         }
 
-        static bool OnPrepared(bool forceReady = false) {
-            D.assert(initStage == InitStage.Prepared);
-            if (!forceReady && initialFrameCount >= Time.frameCount) {
-                return false;
-            }
-
-            initStage = InitStage.Ready;
-            DoPrepare();
-            return true;
+        static bool IsShaderSupported() {
+            return SystemInfo.graphicsDeviceType == GraphicsDeviceType.Metal ||
+                   SystemInfo.graphicsDeviceType == GraphicsDeviceType.Vulkan ||
+                   SystemInfo.graphicsDeviceType == GraphicsDeviceType.Direct3D12;
         }
 
-        static void DoPrepare() {
-            D.assert(testShader != null);
-            var isShaderSupported = testShader.isSupported;
-            testShader = null;
-            supportComputeBuffer = enableComputeBuffer && SystemInfo.supportsComputeShaders && isShaderSupported;
+        static void InitShaders() {
+            supportComputeBuffer = enableComputeBuffer && SystemInfo.supportsComputeShaders && IsShaderSupported();
 
             if (!supportComputeBuffer) {
+                DebugAssert(false, "init default shaders");
                 var convexFillShader = GetShader("UIWidgets/canvas_convexFill");
                 var fill0Shader = GetShader("UIWidgets/canvas_fill0");
                 var fill1Shader = GetShader("UIWidgets/canvas_fill1");
@@ -94,6 +51,7 @@ namespace Unity.UIWidgets.ui {
                 _shadowRBox = new Material(shadowRBoxShader) {hideFlags = HideFlags.HideAndDontSave};
             }
             else {
+                DebugAssert(false, "init computebuffer shaders");
                 var convexFillShaderCompute = GetShader("UIWidgets/canvas_convexFill_cb");
                 var fill0ShaderCompute = GetShader("UIWidgets/canvas_fill0_cb");
                 var fill1ShaderCompute = GetShader("UIWidgets/canvas_fill1_cb");
@@ -117,19 +75,6 @@ namespace Unity.UIWidgets.ui {
                 _filterMat = new Material(filterShaderCompute) {hideFlags = HideFlags.HideAndDontSave};
                 _shadowBox = new Material(shadowBoxShaderCompute) {hideFlags = HideFlags.HideAndDontSave};
                 _shadowRBox = new Material(shadowRBoxShaderCompute) {hideFlags = HideFlags.HideAndDontSave};
-            }
-        }
-
-        public static bool isReady() {
-            switch (initStage) {
-                case InitStage.NotPrepared:
-                    return OnNotPrepared();
-                case InitStage.Prepared:
-                    return OnPrepared();
-                case InitStage.Ready:
-                    return true;
-                default:
-                    throw new ArgumentOutOfRangeException();
             }
         }
     }

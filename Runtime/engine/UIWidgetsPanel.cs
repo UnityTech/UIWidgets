@@ -312,31 +312,29 @@ namespace Unity.UIWidgets.engine {
             ));
         }
 
-        public Vector2? getPointPosition(PointerEventData eventData) {
-            if (eventData.enterEventCamera == null && this.canvas.renderMode == RenderMode.ScreenSpaceCamera) {
-                return null;
+        Camera getActiveCamera() {
+            //refer to: https://zhuanlan.zhihu.com/p/37127981
+            Camera eventCamera = null;
+            if (this.canvas.renderMode != RenderMode.ScreenSpaceOverlay) {
+                eventCamera = this.canvas.GetComponent<GraphicRaycaster>().eventCamera;
             }
-            
+            return eventCamera;
+        }
+
+        Vector2? getPointPosition(PointerEventData eventData) {
+            Camera camera = this.getActiveCamera();
             Vector2 localPoint;
             RectTransformUtility.ScreenPointToLocalPointInRectangle(this.rectTransform, eventData.position,
-                eventData.enterEventCamera, out localPoint);
+                camera, out localPoint);
             var scaleFactor = this.canvas.scaleFactor;
             localPoint.x = (localPoint.x - this.rectTransform.rect.min.x) * scaleFactor;
             localPoint.y = (this.rectTransform.rect.max.y - localPoint.y) * scaleFactor;
             return localPoint;
         }
 
-        public Vector2? getPointPosition(Vector2 position) {
+        Vector2? getPointPosition(Vector2 position) {
             Vector2 localPoint;
-            Camera eventCamera = null;
-
-            if (this.canvas.renderMode != RenderMode.ScreenSpaceCamera) {
-                eventCamera = this.canvas.GetComponent<GraphicRaycaster>().eventCamera;
-            }
-
-            if (eventCamera == null && this.canvas.renderMode == RenderMode.ScreenSpaceCamera) {
-                return null;
-            }
+            Camera eventCamera = this.getActiveCamera();
 
             RectTransformUtility.ScreenPointToLocalPointInRectangle(this.rectTransform, position,
                 eventCamera, out localPoint);

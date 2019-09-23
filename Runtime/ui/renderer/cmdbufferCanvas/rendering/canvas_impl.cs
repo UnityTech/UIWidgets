@@ -42,9 +42,8 @@ namespace Unity.UIWidgets.ui {
                 this._lastScissor = null;
                 this._layers.Clear();
             }
-
-            _instanceNum--;
-            _releaseComputeBuffer();
+            
+            this._releaseComputeBuffer();
         }
 
         public PictureFlusher(RenderTexture renderTexture, float devicePixelRatio, MeshPool meshPool) {
@@ -60,8 +59,6 @@ namespace Unity.UIWidgets.ui {
             this.___drawTextDrawMeshCallback = this._drawTextDrawMeshCallback;
             this.___drawPathDrawMeshCallback2 = this._drawPathDrawMeshCallback2;
             this.___drawPathDrawMeshCallback = this._drawPathDrawMeshCallback;
-
-            _instanceNum++;
         }
 
         readonly _drawPathDrawMeshCallbackDelegate ___drawTextDrawMeshCallback;
@@ -284,7 +281,7 @@ namespace Unity.UIWidgets.ui {
 
         void _clipRect(Rect rect) {
             var path = uiPath.create();
-            path.addRect(uiRectHelper.fromRect(rect));
+            path.addRect(uiRectHelper.fromRect(rect).Value);
             this._clipPath(path);
             uiPathCacheManager.putToCache(path);
         }
@@ -774,7 +771,7 @@ namespace Unity.UIWidgets.ui {
                         break;
                     case DrawSaveLayer cmd: {
                         saveCount++;
-                        this._saveLayer(uiRectHelper.fromRect(cmd.rect), uiPaint.fromPaint(cmd.paint));
+                        this._saveLayer(uiRectHelper.fromRect(cmd.rect).Value, uiPaint.fromPaint(cmd.paint));
                         break;
                     }
 
@@ -852,14 +849,14 @@ namespace Unity.UIWidgets.ui {
                     }
 
                     case DrawImageRect cmd: {
-                        this._drawImageRect(cmd.image, uiRectHelper.fromRect(cmd.src), uiRectHelper.fromRect(cmd.dst),
+                        this._drawImageRect(cmd.image, uiRectHelper.fromRect(cmd.src), uiRectHelper.fromRect(cmd.dst).Value,
                             uiPaint.fromPaint(cmd.paint));
                         break;
                     }
 
                     case DrawImageNine cmd: {
                         this._drawImageNine(cmd.image, uiRectHelper.fromRect(cmd.src),
-                            uiRectHelper.fromRect(cmd.center), uiRectHelper.fromRect(cmd.dst),
+                            uiRectHelper.fromRect(cmd.center).Value, uiRectHelper.fromRect(cmd.dst).Value,
                             uiPaint.fromPaint(cmd.paint));
                         break;
                     }
@@ -1022,7 +1019,7 @@ namespace Unity.UIWidgets.ui {
             matrix.preTranslate(offset.dx, offset.dy);
 
             var mesh = TextBlobMesh.create(textBlob.Value, scale, matrix);
-            var textBlobBounds = matrix.mapRect(uiRectHelper.fromRect(textBlob.Value.boundsInText));
+            var textBlobBounds = matrix.mapRect(uiRectHelper.fromRect(textBlob.Value.boundsInText).Value);
 
             // request font texture so text mesh could be generated correctly
             var style = textBlob.Value.style;
@@ -1046,10 +1043,6 @@ namespace Unity.UIWidgets.ui {
         }
 
         public void flush(uiPicture picture) {
-            if (!CanvasShader.isReady()) {
-                return;
-            }
-            
             this._reset();
             this._resetRenderTextureId();
             this._resetComputeBuffer();
@@ -1174,11 +1167,11 @@ namespace Unity.UIWidgets.ui {
                         }
 
                         D.assert(mesh.vertices.Count > 0);
-                        if (CanvasShader.supportComputeBuffer) {
+                        if (this.supportComputeBuffer) {
                             this._addMeshToComputeBuffer(mesh.vertices?.data, mesh.uv?.data, mesh.triangles?.data);
-                            cmd.properties.SetBuffer(CmdDraw.vertexBufferId, _computeBuffer);
-                            cmd.properties.SetBuffer(CmdDraw.indexBufferId, _indexBuffer);
-                            cmd.properties.SetInt(CmdDraw.startIndexId, _startIndex);
+                            cmd.properties.SetBuffer(CmdDraw.vertexBufferId, this._computeBuffer);
+                            cmd.properties.SetBuffer(CmdDraw.indexBufferId, this._indexBuffer);
+                            cmd.properties.SetInt(CmdDraw.startIndexId, this._startIndex);
                             cmdBuf.DrawProcedural(Matrix4x4.identity, cmd.material, cmd.pass, MeshTopology.Triangles, mesh.triangles.Count, 1, cmd.properties.mpb);
                         }
                         else {
