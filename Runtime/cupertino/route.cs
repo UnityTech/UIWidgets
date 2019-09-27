@@ -42,6 +42,7 @@ namespace Unity.UIWidgets.cupertino {
         );
 
         public static readonly DecorationTween _kGradientShadowTween = new DecorationTween(
+            begin: _CupertinoEdgeShadowDecoration.none,
             end: new _CupertinoEdgeShadowDecoration(
                 edgeGradient: new LinearGradient(
                     begin: new Alignment(0.9f, 0.0f),
@@ -107,7 +108,8 @@ namespace Unity.UIWidgets.cupertino {
                 barrierDismissible: false,
                 barrierColor: _kModalBarrierColor,
                 transitionDuration: new TimeSpan(0, 0, 0, 0, 250),
-                pageBuilder: (BuildContext _context, Animation<float> animation, Animation<float> secondaryAnimation) => {
+                pageBuilder:
+                (BuildContext _context, Animation<float> animation, Animation<float> secondaryAnimation) => {
                     return builder(_context);
                 },
                 transitionBuilder: _buildCupertinoDialogTransitions
@@ -127,7 +129,7 @@ namespace Unity.UIWidgets.cupertino {
 
         public readonly LinearGradient edgeGradient;
 
-        static _CupertinoEdgeShadowDecoration lerp(
+        static _CupertinoEdgeShadowDecoration lerpCupertino(
             _CupertinoEdgeShadowDecoration a,
             _CupertinoEdgeShadowDecoration b,
             float t
@@ -143,18 +145,18 @@ namespace Unity.UIWidgets.cupertino {
 
         public override Decoration lerpFrom(Decoration a, float t) {
             if (!(a is _CupertinoEdgeShadowDecoration)) {
-                return lerp(null, this, t);
+                return lerpCupertino(null, this, t);
             }
 
-            return lerp(a, this, t);
+            return lerpCupertino((_CupertinoEdgeShadowDecoration) a, this, t);
         }
 
         public override Decoration lerpTo(Decoration b, float t) {
             if (!(b is _CupertinoEdgeShadowDecoration)) {
-                return lerp(this, null, t);
+                return lerpCupertino(this, null, t);
             }
 
-            return lerp(this, b, t);
+            return lerpCupertino(this, (_CupertinoEdgeShadowDecoration) b, t);
         }
 
         public override BoxPainter createBoxPainter(VoidCallback onChanged = null) {
