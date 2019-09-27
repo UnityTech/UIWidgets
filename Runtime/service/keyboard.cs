@@ -69,7 +69,7 @@ namespace Unity.UIWidgets.service {
             return true;
         }
 
-        bool isimeInput = false;
+        bool isIMEInput = false;
 
         public void OnGUI() {
             if (TouchScreenKeyboard.isSupported) {
@@ -105,7 +105,7 @@ namespace Unity.UIWidgets.service {
                     }
                 }
                 else if (!string.IsNullOrEmpty(Input.compositionString)) {
-                    this.isimeInput = true;
+                    this.isIMEInput = true;
                     this._value = this._value.compose(Input.compositionString);
                 }
                 
@@ -113,10 +113,10 @@ namespace Unity.UIWidgets.service {
             }
 
             if (this._value != oldValue) {
-                if (this.isimeInput) {
-                    var imeInput = this.isimeInput;
-                    Window.instance.run(() => { TextInput._updateEditingState(this._client, this._value, imeInput); });
-                    this.isimeInput = false;
+                if (this.isIMEInput) {
+                    var isIMEInput = this.isIMEInput;
+                    Window.instance.run(() => { TextInput._updateEditingState(this._client, this._value, isIMEInput); });
+                    this.isIMEInput = false;
                 }
                 else {
                     Window.instance.run(() => { TextInput._updateEditingState(this._client, this._value); });
