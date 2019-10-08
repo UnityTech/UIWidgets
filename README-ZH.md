@@ -49,7 +49,7 @@ https://github.com/UnityTech/DocCN 查看。
 ## 使用要求
 
 #### Unity
-安装 Unity 2019.1.14f1 或更高版本。 你可以从[https://unity3d.com/get-unity/download](https://unity3d.com/get-unity/download)下载最新的Unity。
+安装 Unity 2018.4.10f1(LTS) 或 2019.1.14f1 及其更高版本。 你可以从[https://unity3d.com/get-unity/download](https://unity3d.com/get-unity/download)下载最新的Unity。
 
 #### UIWidgets包
 
