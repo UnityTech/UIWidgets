@@ -576,6 +576,7 @@ namespace Unity.UIWidgets.material {
             Color backgroundColor = null;
             switch (this.widget.type) {
                 case BottomNavigationBarType.fix:
+                    backgroundColor = this.widget.backgroundColor;
                     break;
                 case BottomNavigationBarType.shifting:
                     backgroundColor = this._backgroundColor;
