@@ -348,7 +348,7 @@ namespace Unity.UIWidgets.material {
                     child: text
                 );
             }
-            else if (this.showUnselectedLabels) {
+            else if (!this.showUnselectedLabels) {
                 text = new FadeTransition(
                     opacity: this.animation,
                     child: text
