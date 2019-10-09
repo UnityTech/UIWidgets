@@ -348,7 +348,7 @@ namespace Unity.UIWidgets.material {
                     child: text
                 );
             }
-            else if (this.showUnselectedLabels) {
+            else if (!this.showUnselectedLabels) {
                 text = new FadeTransition(
                     opacity: this.animation,
                     child: text
@@ -576,6 +576,7 @@ namespace Unity.UIWidgets.material {
             Color backgroundColor = null;
             switch (this.widget.type) {
                 case BottomNavigationBarType.fix:
+                    backgroundColor = this.widget.backgroundColor;
                     break;
                 case BottomNavigationBarType.shifting:
                     backgroundColor = this._backgroundColor;
