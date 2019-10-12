@@ -81,6 +81,7 @@ namespace Unity.UIWidgets.widgets {
         }
 
         ParentDataElement _getChildElement() {
+            D.assert(this.mounted);
             Element element = (Element) this.context;
             Element childElement = null;
             element.visitChildren((Element child) => { childElement = child; });
