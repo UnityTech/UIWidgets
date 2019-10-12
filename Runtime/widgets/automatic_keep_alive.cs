@@ -67,6 +67,9 @@ namespace Unity.UIWidgets.widgets {
                 }
                 else {
                     SchedulerBinding.instance.addPostFrameCallback(timeStamp => {
+                        if (!this.mounted) {
+                            return;
+                        }
                         ParentDataElement childElement1 = this._getChildElement();
                         D.assert(childElement1 != null);
                         this._updateParentDataOfChild(childElement1);
@@ -78,6 +81,7 @@ namespace Unity.UIWidgets.widgets {
         }
 
         ParentDataElement _getChildElement() {
+            D.assert(this.mounted);
             Element element = (Element) this.context;
             Element childElement = null;
             element.visitChildren((Element child) => { childElement = child; });
