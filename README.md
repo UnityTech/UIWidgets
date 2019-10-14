@@ -55,10 +55,11 @@ and iOS (Searching for "Unity Connect" in App Store). This project is open-sourc
 The official website of Unity Chinese Documentation (https://connect.unity.com/doc) is powered by UIWidgets and
 open-sourced @https://github.com/UnityTech/DocCN.
 
-## Requirement
+## Requirements
 
 #### Unity
-Install **Unity 2018.3** or above. You can download the latest Unity on https://unity3d.com/get-unity/download.
+
+Install **Unity 2018.4.10f1 (LTS)** or **Unity 2019.1.14f1** and above. You can download the latest Unity on https://unity3d.com/get-unity/download.
 
 #### UIWidgets Package
 Visit our Github repository https://github.com/UnityTech/UIWidgets
