@@ -605,7 +605,7 @@ namespace Unity.UIWidgets.widgets {
             this._willPopCallbacks.Remove(callback);
         }
 
-        protected internal bool hasScopedWillPopCallback {
+        public bool hasScopedWillPopCallback {
             get { return this._willPopCallbacks.isNotEmpty(); }
         }
 
