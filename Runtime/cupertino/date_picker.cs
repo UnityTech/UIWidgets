@@ -38,16 +38,13 @@ namespace Unity.UIWidgets.cupertino {
 
     public class _DatePickerLayoutDelegate : MultiChildLayoutDelegate {
         public _DatePickerLayoutDelegate(
-            List<float> columnWidths,
-            int textDirectionFactor
+            List<float> columnWidths
         ) {
             D.assert(columnWidths != null);
             this.columnWidths = columnWidths;
-            this.textDirectionFactor = textDirectionFactor;
         }
 
         public readonly List<float> columnWidths;
-        public readonly int textDirectionFactor;
 
         public override void performLayout(Size size) {
             float remainingWidth = size.width;
@@ -57,21 +54,19 @@ namespace Unity.UIWidgets.cupertino {
 
             float currentHorizontalOffset = 0.0f;
             for (int i = 0; i < this.columnWidths.Count; i++) {
-                int index = this.textDirectionFactor == 1 ? i : this.columnWidths.Count - i - 1;
-                float childWidth = this.columnWidths[index] + CupertinoDatePickerUtils._kDatePickerPadSize * 2;
-                if (index == 0 || index == this.columnWidths.Count - 1) {
+                float childWidth = this.columnWidths[i] + CupertinoDatePickerUtils._kDatePickerPadSize * 2;
+                if (i == 0 || i == this.columnWidths.Count - 1) {
                     childWidth += remainingWidth / 2;
                 }
 
-                this.layoutChild(index, BoxConstraints.tight(new Size(childWidth, size.height)));
-                this.positionChild(index, new Offset(currentHorizontalOffset, 0.0f));
+                this.layoutChild(i, BoxConstraints.tight(new Size(childWidth, size.height)));
+                this.positionChild(i, new Offset(currentHorizontalOffset, 0.0f));
                 currentHorizontalOffset += childWidth;
             }
         }
 
         public override bool shouldRelayout(MultiChildLayoutDelegate oldDelegate) {
-            return this.columnWidths != ((_DatePickerLayoutDelegate) oldDelegate).columnWidths
-                   || this.textDirectionFactor != ((_DatePickerLayoutDelegate) oldDelegate).textDirectionFactor;
+            return this.columnWidths != ((_DatePickerLayoutDelegate) oldDelegate).columnWidths;
         }
     }
 
@@ -231,8 +226,7 @@ namespace Unity.UIWidgets.cupertino {
                 text: new TextSpan(
                     style: DefaultTextStyle.of(context).style,
                     text: longestText
-                ),
-                textDirection: Directionality.of(context)
+                )
             );
 
 
@@ -244,7 +238,6 @@ namespace Unity.UIWidgets.cupertino {
     delegate Widget _ColumnBuilder(float offAxisFraction, TransitionBuilder itemPositioningBuilder);
 
     class _CupertinoDatePickerDateTimeState : State<CupertinoDatePicker> {
-        public int textDirectionFactor;
         public CupertinoLocalizations localizations;
         public Alignment alignCenterLeft;
         public Alignment alignCenterRight;
@@ -288,11 +281,10 @@ namespace Unity.UIWidgets.cupertino {
 
         public override void didChangeDependencies() {
             base.didChangeDependencies();
-            this.textDirectionFactor = Directionality.of(this.context) == TextDirection.ltr ? 1 : -1;
 
             this.localizations = CupertinoLocalizations.of(this.context);
-            this.alignCenterLeft = this.textDirectionFactor == 1 ? Alignment.centerLeft : Alignment.centerRight;
-            this.alignCenterRight = this.textDirectionFactor == 1 ? Alignment.centerRight : Alignment.centerLeft;
+            this.alignCenterLeft = Alignment.centerLeft;
+            this.alignCenterRight = Alignment.centerRight;
             estimatedColumnWidths.Clear();
         }
 
@@ -486,18 +478,14 @@ namespace Unity.UIWidgets.cupertino {
                 var _i = i;
                 float offAxisFraction = 0.0f;
                 if (_i == 0) {
-                    offAxisFraction = -0.5f * this.textDirectionFactor;
+                    offAxisFraction = -0.5f;
                 }
                 else if (_i >= 2 || columnWidths.Count == 2) {
-                    offAxisFraction = 0.5f * this.textDirectionFactor;
+                    offAxisFraction = 0.5f;
                 }
 
                 EdgeInsets padding = EdgeInsets.only(right: CupertinoDatePickerUtils._kDatePickerPadSize);
                 if (_i == columnWidths.Count - 1) {
-                    padding = padding.flipped;
-                }
-
-                if (this.textDirectionFactor == -1) {
                     padding = padding.flipped;
                 }
 
@@ -532,8 +520,7 @@ namespace Unity.UIWidgets.cupertino {
                     style: CupertinoDatePickerUtils._kDefaultPickerTextStyle,
                     child: new CustomMultiChildLayout(
                         layoutDelegate: new _DatePickerLayoutDelegate(
-                            columnWidths: columnWidths,
-                            textDirectionFactor: this.textDirectionFactor
+                            columnWidths: columnWidths
                         ),
                         children: pickers
                     )
@@ -543,7 +530,6 @@ namespace Unity.UIWidgets.cupertino {
     }
 
     class _CupertinoDatePickerDateState : State<CupertinoDatePicker> {
-        int textDirectionFactor;
         CupertinoLocalizations localizations;
 
         Alignment alignCenterLeft;
@@ -566,10 +552,9 @@ namespace Unity.UIWidgets.cupertino {
 
         public override void didChangeDependencies() {
             base.didChangeDependencies();
-            this.textDirectionFactor = Directionality.of(this.context) == TextDirection.ltr ? 1 : -1;
             this.localizations = CupertinoLocalizations.of(this.context);
-            this.alignCenterLeft = this.textDirectionFactor == 1 ? Alignment.centerLeft : Alignment.centerRight;
-            this.alignCenterRight = this.textDirectionFactor == 1 ? Alignment.centerRight : Alignment.centerLeft;
+            this.alignCenterLeft = Alignment.centerLeft;
+            this.alignCenterRight = Alignment.centerRight;
             this.estimatedColumnWidths[(int) _PickerColumnType.dayOfMonth] = CupertinoDatePicker._getColumnWidth(
                 _PickerColumnType.dayOfMonth, this.localizations, this.context);
 
@@ -747,11 +732,8 @@ namespace Unity.UIWidgets.cupertino {
             List<Widget> pickers = new List<Widget>();
             for (int i = 0; i < columnWidths.Count; i++) {
                 var _i = i;
-                float offAxisFraction = (_i - 1) * 0.3f * this.textDirectionFactor;
+                float offAxisFraction = (_i - 1) * 0.3f;
                 EdgeInsets padding = EdgeInsets.only(right: CupertinoDatePickerUtils._kDatePickerPadSize);
-                if (this.textDirectionFactor == -1) {
-                    padding = EdgeInsets.only(left: CupertinoDatePickerUtils._kDatePickerPadSize);
-                }
 
                 pickers.Add(new LayoutId(
                     id: _i,
@@ -782,8 +764,7 @@ namespace Unity.UIWidgets.cupertino {
                         style: CupertinoDatePickerUtils._kDefaultPickerTextStyle,
                         child: new CustomMultiChildLayout(
                             layoutDelegate: new _DatePickerLayoutDelegate(
-                                columnWidths: columnWidths,
-                                textDirectionFactor: this.textDirectionFactor
+                                columnWidths: columnWidths
                             ),
                             children:
                             pickers
@@ -834,7 +815,6 @@ namespace Unity.UIWidgets.cupertino {
     }
 
     class _CupertinoTimerPickerState : State<CupertinoTimerPicker> {
-        int textDirectionFactor;
         CupertinoLocalizations localizations;
         Alignment alignCenterLeft;
         Alignment alignCenterRight;
@@ -864,16 +844,15 @@ namespace Unity.UIWidgets.cupertino {
 
         public override void didChangeDependencies() {
             base.didChangeDependencies();
-            this.textDirectionFactor = Directionality.of(this.context) == TextDirection.ltr ? 1 : -1;
             this.localizations = CupertinoLocalizations.of(this.context);
-            this.alignCenterLeft = this.textDirectionFactor == 1 ? Alignment.centerLeft : Alignment.centerRight;
-            this.alignCenterRight = this.textDirectionFactor == 1 ? Alignment.centerRight : Alignment.centerLeft;
+            this.alignCenterLeft = Alignment.centerLeft;
+            this.alignCenterRight = Alignment.centerRight;
         }
 
         Widget _buildHourPicker() {
             return new CupertinoPicker(
                 scrollController: new FixedExtentScrollController(initialItem: this.selectedHour),
-                offAxisFraction: -0.5f * this.textDirectionFactor,
+                offAxisFraction: -0.5f,
                 itemExtent: CupertinoDatePickerUtils._kItemExtent,
                 backgroundColor: CupertinoDatePickerUtils._kBackgroundColor,
                 onSelectedItemChanged: (int index) => {
@@ -890,14 +869,9 @@ namespace Unity.UIWidgets.cupertino {
                     float hourLabelWidth = this.widget.mode == CupertinoTimerPickerMode.hm
                         ? CupertinoDatePickerUtils._kPickerWidth / 4
                         : CupertinoDatePickerUtils._kPickerWidth / 6;
-                    string semanticsLabel = this.textDirectionFactor == 1
-                        ? this.localizations.timerPickerHour(index) + this.localizations.timerPickerHourLabel(index)
-                        : this.localizations.timerPickerHourLabel(index) + this.localizations.timerPickerHour(index);
                     return new Container(
                         alignment: this.alignCenterRight,
-                        padding: this.textDirectionFactor == 1
-                            ? EdgeInsets.only(right: hourLabelWidth)
-                            : EdgeInsets.only(left: hourLabelWidth),
+                        padding: EdgeInsets.only(right: hourLabelWidth),
                         child: new Container(
                             alignment: this.alignCenterRight,
                             padding: EdgeInsets.symmetric(horizontal: 2.0f),
@@ -933,13 +907,13 @@ namespace Unity.UIWidgets.cupertino {
         Widget _buildMinutePicker() {
             float offAxisFraction;
             if (this.widget.mode == CupertinoTimerPickerMode.hm) {
-                offAxisFraction = 0.5f * this.textDirectionFactor;
+                offAxisFraction = 0.5f;
             }
             else if (this.widget.mode == CupertinoTimerPickerMode.hms) {
                 offAxisFraction = 0.0f;
             }
             else {
-                offAxisFraction = -0.5f * this.textDirectionFactor;
+                offAxisFraction = -0.5f;
             }
 
             return new CupertinoPicker(
@@ -961,17 +935,10 @@ namespace Unity.UIWidgets.cupertino {
                 },
                 children: CupertinoDatePickerUtils.listGenerate(60 / this.widget.minuteInterval, (int index) => {
                     int minute = index * this.widget.minuteInterval;
-                    string semanticsLabel = this.textDirectionFactor == 1
-                        ? this.localizations.timerPickerMinute(minute) +
-                          this.localizations.timerPickerMinuteLabel(minute)
-                        : this.localizations.timerPickerMinuteLabel(minute) +
-                          this.localizations.timerPickerMinute(minute);
                     if (this.widget.mode == CupertinoTimerPickerMode.ms) {
                         return new Container(
                             alignment: this.alignCenterRight,
-                            padding: this.textDirectionFactor == 1
-                                ? EdgeInsets.only(right: CupertinoDatePickerUtils._kPickerWidth / 4)
-                                : EdgeInsets.only(left: CupertinoDatePickerUtils._kPickerWidth / 4),
+                            padding: EdgeInsets.only(right: CupertinoDatePickerUtils._kPickerWidth / 4),
                             child: new Container(
                                 alignment: this.alignCenterRight,
                                 padding: EdgeInsets.symmetric(horizontal: 2.0f),
@@ -1003,9 +970,7 @@ namespace Unity.UIWidgets.cupertino {
                 minuteLabel = new IgnorePointer(
                     child: new Container(
                         alignment: this.alignCenterLeft,
-                        padding: this.textDirectionFactor == 1
-                            ? EdgeInsets.only(left: CupertinoDatePickerUtils._kPickerWidth / 10)
-                            : EdgeInsets.only(right: CupertinoDatePickerUtils._kPickerWidth / 10),
+                        padding: EdgeInsets.only(left: CupertinoDatePickerUtils._kPickerWidth / 10),
                         child: new Container(
                             alignment: this.alignCenterLeft,
                             padding: EdgeInsets.symmetric(horizontal: 2.0f),
@@ -1039,7 +1004,7 @@ namespace Unity.UIWidgets.cupertino {
         }
 
         Widget _buildSecondPicker() {
-            float offAxisFraction = 0.5f * this.textDirectionFactor;
+            float offAxisFraction = 0.5f;
             float secondPickerWidth = this.widget.mode == CupertinoTimerPickerMode.ms
                 ? CupertinoDatePickerUtils._kPickerWidth / 10
                 : CupertinoDatePickerUtils._kPickerWidth / 6;
@@ -1062,11 +1027,6 @@ namespace Unity.UIWidgets.cupertino {
                 },
                 children: CupertinoDatePickerUtils.listGenerate(60 / this.widget.secondInterval, (int index) => {
                     int second = index * this.widget.secondInterval;
-                    string semanticsLabel = this.textDirectionFactor == 1
-                        ? this.localizations.timerPickerSecond(second) +
-                          this.localizations.timerPickerSecondLabel(second)
-                        : this.localizations.timerPickerSecondLabel(second) +
-                          this.localizations.timerPickerSecond(second);
                     return new Container(
                         alignment: this.alignCenterLeft,
                         child: new Container(
@@ -1087,9 +1047,7 @@ namespace Unity.UIWidgets.cupertino {
             Widget secondLabel = new IgnorePointer(
                 child: new Container(
                     alignment: this.alignCenterLeft,
-                    padding: this.textDirectionFactor == 1
-                        ? EdgeInsets.only(left: secondPickerWidth)
-                        : EdgeInsets.only(right: secondPickerWidth),
+                    padding: EdgeInsets.only(left: secondPickerWidth),
                     child: new Container(
                         alignment: this.alignCenterLeft,
                         padding: EdgeInsets.symmetric(horizontal: 2.0f),
