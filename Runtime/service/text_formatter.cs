@@ -81,6 +81,32 @@ namespace Unity.UIWidgets.service {
         }
     }
 
+    public class WhitelistingTextInputFormatter : TextInputFormatter {
+        public WhitelistingTextInputFormatter(Regex whitelistedPattern) {
+            D.assert(whitelistedPattern != null);
+            this.whitelistedPattern = whitelistedPattern;
+        }
+
+        readonly Regex whitelistedPattern;
+
+        public override TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
+            return Util._selectionAwareTextManipulation(
+                value: newValue,
+                substringManipulation: substring => {
+                    string groups = "";
+                    foreach (Match match in this.whitelistedPattern.Matches(input: substring)) {
+                        groups += match.Groups[0].Value;
+                    }
+
+                    return groups;
+                }
+            );
+        }
+
+        public static readonly WhitelistingTextInputFormatter digitsOnly
+            = new WhitelistingTextInputFormatter(new Regex(@"\d+"));
+    }
+
     static class Util {
         internal static TextEditingValue _selectionAwareTextManipulation(TextEditingValue value,
             Func<string, string> substringManipulation) {
