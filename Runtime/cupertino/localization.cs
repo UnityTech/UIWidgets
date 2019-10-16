@@ -169,7 +169,7 @@ namespace Unity.UIWidgets.cupertino {
         public override string datePickerMediumDate(DateTime date) {
             var day = _shortWeekdays[((int) date.DayOfWeek + 6) % 7];
             var month = _shortMonths[date.Month - 1];
-            return $"{day}, {month} {date.Day.ToString().PadRight(2)} ";
+            return $"{day} {month} {date.Day.ToString().PadRight(2)} ";
         }
 
         public override DatePickerDateOrder datePickerDateOrder {

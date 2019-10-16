@@ -73,10 +73,9 @@ namespace Unity.UIWidgets.widgets {
             }
         }
 
-        // todo: Handle the case of the device pixel ratio changing. use 1 as devicePixelRatio for now.
         static readonly Tolerance _kDefaultTolerance = new Tolerance(
-            velocity: 1.0f / (0.050f * 1),
-            distance: 1.0f / 1
+            velocity: 1.0f / (0.050f * Window.instance.devicePixelRatio),
+            distance: 1.0f / Window.instance.devicePixelRatio
         );
 
         public virtual Tolerance tolerance {
