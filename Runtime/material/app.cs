@@ -1,9 +1,12 @@
 using System.Collections.Generic;
 using Unity.UIWidgets.animation;
+using Unity.UIWidgets.cupertino;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.service;
 using Unity.UIWidgets.ui;
 using Unity.UIWidgets.widgets;
+using Color = Unity.UIWidgets.ui.Color;
+using Rect = Unity.UIWidgets.ui.Rect;
 using TextStyle = Unity.UIWidgets.painting.TextStyle;
 
 namespace Unity.UIWidgets.material {
@@ -143,12 +146,12 @@ namespace Unity.UIWidgets.material {
 
         List<LocalizationsDelegate> _localizationsDelegates {
             get {
-                List<LocalizationsDelegate<MaterialLocalizations>> _delegates =
-                    new List<LocalizationsDelegate<MaterialLocalizations>>();
+                var _delegates = new List<LocalizationsDelegate>();
                 if (this.widget.localizationsDelegates != null) {
                     _delegates.AddRange(this.widget.localizationsDelegates);
                 }
-
+                
+                _delegates.Add(DefaultCupertinoLocalizations.del);
                 _delegates.Add(DefaultMaterialLocalizations.del);
                 return new List<LocalizationsDelegate>(_delegates);
             }

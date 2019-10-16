@@ -341,7 +341,7 @@ namespace Unity.UIWidgets.widgets {
 
         TextEditingValue _lastKnownRemoteTextEditingValue;
 
-        public void updateEditingValue(TextEditingValue value) {
+        public void updateEditingValue(TextEditingValue value, bool isIMEInput) {
             if (value.text != this._value.text) {
                 this._hideSelectionOverlayIfNeeded();
                 this._showCaretOnScreen();
@@ -352,7 +352,7 @@ namespace Unity.UIWidgets.widgets {
             }
 
             this._lastKnownRemoteTextEditingValue = value;
-            this._formatAndSetValue(value);
+            this._formatAndSetValue(value, isIMEInput);
 
             this._stopCursorTimer(resetCharTicks: false);
             this._startCursorTimer();
@@ -723,8 +723,8 @@ namespace Unity.UIWidgets.widgets {
             return Promise<bool>.Resolved(false);
         }
 
-        void _formatAndSetValue(TextEditingValue value) {
-            var textChanged = this._value?.text != value?.text;
+        void _formatAndSetValue(TextEditingValue value, bool isIMEInput = false) {
+            var textChanged = this._value?.text != value?.text || isIMEInput;
             if (textChanged && this.widget.inputFormatters != null && this.widget.inputFormatters.isNotEmpty()) {
                 foreach (var formatter in this.widget.inputFormatters) {
                     value = formatter.formatEditUpdate(this._value, value);

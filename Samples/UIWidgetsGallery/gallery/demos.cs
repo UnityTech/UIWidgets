@@ -507,14 +507,14 @@ namespace UIWidgetsGallery.gallery {
                     documentationUrl: "https://docs.flutter.io/flutter/cupertino/CupertinoTabScaffold-class.html",
                     buildRoute: (BuildContext context) => new CupertinoNavigationDemo()
                 ),
-                // new GalleryDemo(
-                //     title: "Pickers",
-                //     icon: GalleryIcons.@event,
-                //     category: GalleryDemoCategory._kCupertinoComponents,
-                //     routeName: CupertinoPickerDemo.routeName,
-                //     documentationUrl: "https://docs.flutter.io/flutter/cupertino/CupertinoPicker-class.html",
-                //     buildRoute: (BuildContext context) => CupertinoPickerDemo()
-                // ),
+                new GalleryDemo(
+                    title: "Pickers",
+                    icon: GalleryIcons.@event,
+                    category: _kCupertinoComponents,
+                    routeName: CupertinoPickerDemo.routeName,
+                    documentationUrl: "https://docs.flutter.io/flutter/cupertino/CupertinoPicker-class.html",
+                    buildRoute: (BuildContext context) => new CupertinoPickerDemo()
+                ),
                 // new GalleryDemo(
                 //     title: "Pull to refresh",
                 //     icon: GalleryIcons.cupertino_pull_to_refresh,

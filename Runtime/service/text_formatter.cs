@@ -60,6 +60,10 @@ namespace Unity.UIWidgets.service {
 
         public override TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
             if (this.maxLength != null && this.maxLength > 0 && newValue.text.Length > this.maxLength) {
+                if (Input.compositionString.Length > 0) {
+                    return newValue;
+                }
+
                 TextSelection newSelection = newValue.selection.copyWith(
                     baseOffset: Mathf.Min(newValue.selection.start, this.maxLength.Value),
                     extentOffset: Mathf.Min(newValue.selection.end, this.maxLength.Value)
@@ -72,9 +76,10 @@ namespace Unity.UIWidgets.service {
                     composing: TextRange.empty
                 );
             }
+
             return newValue;
         }
-}
+    }
 
     static class Util {
         internal static TextEditingValue _selectionAwareTextManipulation(TextEditingValue value,
