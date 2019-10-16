@@ -6,7 +6,7 @@ using Unity.UIWidgets.ui;
 using Unity.UIWidgets.widgets;
 
 namespace Unity.UIWidgets.cupertino {
-    class CupertinoPickerUtils {
+    static class CupertinoPickerUtils {
         public static Color _kHighlighterBorder = new Color(0xFF7F7F7F);
         public static Color _kDefaultBackground = new Color(0xFFD2D4DB);
         public const float _kDefaultDiameterRatio = 1.35f;
@@ -97,7 +97,6 @@ namespace Unity.UIWidgets.cupertino {
     }
 
     class _CupertinoPickerState : State<CupertinoPicker> {
-        int _lastHapticIndex;
         FixedExtentScrollController _controller;
 
         public override void initState() {
@@ -125,13 +124,6 @@ namespace Unity.UIWidgets.cupertino {
         }
 
         void _handleSelectedItemChanged(int index) {
-            // if (defaultTargetPlatform == TargetPlatform.iOS && index != _lastHapticIndex) {
-            //     _lastHapticIndex = index;
-            //     // HapticFeedback.selectionClick();
-            // }
-
-            this._lastHapticIndex = index;
-
             if (this.widget.onSelectedItemChanged != null) {
                 this.widget.onSelectedItemChanged(index);
             }
@@ -236,20 +228,17 @@ namespace Unity.UIWidgets.cupertino {
             Widget result = new Stack(
                 children: new List<Widget> {
                     Positioned.fill(
-                        child: new _CupertinoPickerSemantics(
-                            scrollController: this.widget.scrollController ?? this._controller,
-                            child: ListWheelScrollView.useDelegate(
-                                controller: this.widget.scrollController ?? this._controller,
-                                physics: new FixedExtentScrollPhysics(),
-                                diameterRatio: this.widget.diameterRatio,
-                                perspective: CupertinoPickerUtils._kDefaultPerspective,
-                                offAxisFraction: this.widget.offAxisFraction,
-                                useMagnifier: this.widget.useMagnifier,
-                                magnification: this.widget.magnification,
-                                itemExtent: this.widget.itemExtent,
-                                onSelectedItemChanged: this._handleSelectedItemChanged,
-                                childDelegate: this.widget.childDelegate
-                            )
+                        child: ListWheelScrollView.useDelegate(
+                            controller: this.widget.scrollController ?? this._controller,
+                            physics: new FixedExtentScrollPhysics(),
+                            diameterRatio: this.widget.diameterRatio,
+                            perspective: CupertinoPickerUtils._kDefaultPerspective,
+                            offAxisFraction: this.widget.offAxisFraction,
+                            useMagnifier: this.widget.useMagnifier,
+                            magnification: this.widget.magnification,
+                            itemExtent: this.widget.itemExtent,
+                            onSelectedItemChanged: this._handleSelectedItemChanged,
+                            childDelegate: this.widget.childDelegate
                         )
                     ),
                     this._buildGradientScreen(),
@@ -268,90 +257,6 @@ namespace Unity.UIWidgets.cupertino {
             }
 
             return result;
-        }
-    }
-
-    class _CupertinoPickerSemantics : SingleChildRenderObjectWidget {
-        public _CupertinoPickerSemantics(
-            FixedExtentScrollController scrollController,
-            Key key = null,
-            Widget child = null
-        ) : base(key: key, child: child) {
-            this.scrollController = scrollController;
-        }
-
-        public readonly FixedExtentScrollController scrollController;
-
-        public override RenderObject createRenderObject(BuildContext context) {
-            return new _RenderCupertinoPickerSemantics(this.scrollController, Directionality.of(context));
-        }
-
-        public override void updateRenderObject(BuildContext context, RenderObject renderObject) {
-            ((_RenderCupertinoPickerSemantics) renderObject).textDirection = Directionality.of(context);
-            ((_RenderCupertinoPickerSemantics) renderObject).controller = this.scrollController;
-        }
-    }
-
-    class _RenderCupertinoPickerSemantics : RenderProxyBox {
-        public _RenderCupertinoPickerSemantics(FixedExtentScrollController controller, TextDirection _textDirection) {
-            this.controller = controller;
-            this._textDirection = _textDirection;
-        }
-
-        public FixedExtentScrollController controller {
-            get { return this._controller; }
-            set {
-                if (value == this._controller) {
-                    return;
-                }
-
-                if (this._controller != null) {
-                    this._controller.removeListener(this._handleScrollUpdate);
-                }
-                else {
-                    this._currentIndex = value.initialItem;
-                }
-
-                value.addListener(this._handleScrollUpdate);
-                this._controller = value;
-            }
-        }
-
-        FixedExtentScrollController _controller;
-
-        public TextDirection textDirection {
-            get { return this._textDirection; }
-            set {
-                if (this.textDirection == value) {
-                    return;
-                }
-
-                this._textDirection = value;
-            }
-        }
-
-        TextDirection _textDirection;
-
-        int _currentIndex = 0;
-
-        void _handleIncrease() {
-            this.controller.jumpToItem(this._currentIndex + 1);
-        }
-
-        void _handleDecrease() {
-            if (this._currentIndex == 0) {
-                return;
-            }
-
-            this.controller.jumpToItem(this._currentIndex - 1);
-        }
-
-        void _handleScrollUpdate() {
-            if (this.controller.selectedItem == this._currentIndex) {
-                return;
-            }
-
-            this._currentIndex = this.controller.selectedItem;
         }
     }
 }
