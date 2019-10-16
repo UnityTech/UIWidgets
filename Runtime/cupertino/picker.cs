@@ -6,7 +6,7 @@ using Unity.UIWidgets.ui;
 using Unity.UIWidgets.widgets;
 
 namespace Unity.UIWidgets.cupertino {
-    class CupertinoPickerUtils {
+    static class CupertinoPickerUtils {
         public static Color _kHighlighterBorder = new Color(0xFF7F7F7F);
         public static Color _kDefaultBackground = new Color(0xFFD2D4DB);
         public const float _kDefaultDiameterRatio = 1.35f;
