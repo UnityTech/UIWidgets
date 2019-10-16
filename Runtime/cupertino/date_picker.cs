@@ -10,7 +10,7 @@ using Unity.UIWidgets.widgets;
 using TextStyle = Unity.UIWidgets.painting.TextStyle;
 
 namespace Unity.UIWidgets.cupertino {
-    class CupertinoDatePickerUtils {
+    static class CupertinoDatePickerUtils {
         public const float _kItemExtent = 32.0f;
         public const float _kPickerWidth = 330.0f;
         public const bool _kUseMagnifier = true;
