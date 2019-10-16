@@ -29,9 +29,12 @@ namespace Unity.UIWidgets.flow {
             D.assert(() => {
                 var textureWidth = Mathf.CeilToInt(bounds.width * this.devicePixelRatio);
                 var textureHeight = Mathf.CeilToInt(bounds.height * this.devicePixelRatio);
-
-                D.assert(this.image.width == textureWidth);
-                D.assert(this.image.height == textureHeight);
+                
+                //it is possible that there is a minor difference between the bound size and the image size (1 pixel at
+                //most) due to the roundOut operation when calculating the bounds if the elements in the canvas transform
+                //is not all integer
+                D.assert(Mathf.Abs(this.image.width - textureWidth) <= 1);
+                D.assert(Mathf.Abs(this.image.height - textureHeight) <= 1);
                 return true;
             });
 
