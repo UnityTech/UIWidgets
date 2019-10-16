@@ -1527,6 +1527,7 @@ namespace Unity.UIWidgets.rendering {
                 else if (!this._selection.isCollapsed && this._selectionColor != null) {
                     showSelection = true;
                 }
+                this._updateSelectionExtentsVisibility(effectiveOffset);
             }
 
             if (showSelection) {
