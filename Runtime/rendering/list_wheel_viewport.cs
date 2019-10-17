@@ -650,41 +650,6 @@ namespace Unity.UIWidgets.rendering {
             );
         }
 
-        Matrix4x4 _magnifyTransform() {
-            Matrix4x4 magnify = Matrix4x4.identity;
-            magnify.translate(this.size.width * (-this._offAxisFraction + 0.5f), this.size.height / 2f);
-            magnify.scale(this._magnification, this._magnification, this._magnification);
-            magnify.translate(-this.size.width * (-this._offAxisFraction + 0.5f), -this.size.height / 2f);
-            return magnify;
-        }
-
-        Matrix3 _centerOriginTransform(Matrix3 originalMatrix) {
-            Matrix3 result = Matrix3.I();
-            Offset centerOriginTranslation = Alignment.center.alongSize(this.size);
-            result.setTranslate(centerOriginTranslation.dx * (-this._offAxisFraction * 2 + 1),
-                centerOriginTranslation.dy);
-            result.multiply(originalMatrix);
-            result.setTranslate(-centerOriginTranslation.dx * (-this._offAxisFraction * 2 + 1),
-                -centerOriginTranslation.dy);
-            return result;
-        }
-
-        Matrix4x4 _centerOriginTransform(Matrix4x4 originalMatrix) {
-            Matrix4x4 result = Matrix4x4.identity;
-            Offset centerOriginTranslation = Alignment.center.alongSize(this.size);
-            result.translate(centerOriginTranslation.dx * (-this._offAxisFraction * 2 + 1),
-                centerOriginTranslation.dy);
-            result.multiply(originalMatrix);
-            result.translate(-centerOriginTranslation.dx * (-this._offAxisFraction * 2 + 1),
-                -centerOriginTranslation.dy);
-            return result;
-        }
-
-        public void applyPaintTransform(RenderBox child, Matrix4x4 transform) {
-            ListWheelParentData parentData = (ListWheelParentData) child?.parentData;
-            transform.translate(0.0f, this._getUntransformedPaintingCoordinateY(parentData.offset.dy));
-        }
-
         public override Rect describeApproximatePaintClip(RenderObject child) {
             if (child != null && this._shouldClipAtCurrentOffset()) {
                 return Offset.zero & this.size;
