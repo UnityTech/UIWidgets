@@ -8,6 +8,7 @@ using Unity.UIWidgets.rendering;
 using Unity.UIWidgets.scheduler;
 using Unity.UIWidgets.service;
 using Unity.UIWidgets.ui;
+using Rect = Unity.UIWidgets.ui.Rect;
 
 namespace Unity.UIWidgets.widgets {
     static class TextSelectionUtils {
@@ -96,10 +97,10 @@ namespace Unity.UIWidgets.widgets {
                             offset: value.selection.start + data.text.Length
                         )
                     );
+                    
+                    selectionDelegate.bringIntoView(selectionDelegate.textEditingValue.selection.extendPos);
+                    selectionDelegate.hideToolbar();
                 }
-
-                selectionDelegate.bringIntoView(selectionDelegate.textEditingValue.selection.extendPos);
-                selectionDelegate.hideToolbar();
             });
         }
 
