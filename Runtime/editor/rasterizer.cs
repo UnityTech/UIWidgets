@@ -63,7 +63,7 @@ namespace Unity.UIWidgets.editor {
             D.assert(this._surface != null);
 
             var frame = this._surface.acquireFrame(
-                layerTree.frameSize, layerTree.devicePixelRatio);
+                layerTree.frameSize, layerTree.devicePixelRatio, layerTree.antiAliasing);
             if (frame == null) {
                 return false;
             }

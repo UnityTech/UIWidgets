@@ -65,6 +65,10 @@ namespace Unity.UIWidgets.engine {
         protected override float queryDevicePixelRatio() {
             return this._uiWidgetsPanel.devicePixelRatio;
         }
+        
+        protected override int queryAntiAliasing() {
+            return this._uiWidgetsPanel.antiAliasing;
+        }
 
         protected override Vector2 queryWindowSize() {
             var rect = this._uiWidgetsPanel.rectTransform.rect;
@@ -106,7 +110,13 @@ namespace Unity.UIWidgets.engine {
         IPointerEnterHandler, IPointerExitHandler, WindowHost {
         static Event _repaintEvent;
 
+        [Tooltip("set to zero if you want to use the default device pixel ratio of the target platforms; otherwise the " +
+                 "device pixel ratio will be forced to the given value on all devices.")]
         [SerializeField] protected float devicePixelRatioOverride;
+        
+        [Tooltip("set to true will enable the hardware anti-alias feature, which will improve the appearance of the UI greatly but " +
+                 "making it much slower. Enable it only when seriously required.")]
+        [SerializeField] protected bool hardwareAntiAliasing = false;
         WindowAdapter _windowAdapter;
         Texture _texture;
         Vector2 _lastMouseMove;
@@ -163,6 +173,10 @@ namespace Unity.UIWidgets.engine {
                     ? this.devicePixelRatioOverride
                     : this._displayMetrics.devicePixelRatio;
             }
+        }
+        
+        public int antiAliasing {
+            get { return this.hardwareAntiAliasing ? Window.defaultAntiAliasing : 0; }
         }
 
         public WindowPadding viewPadding {
