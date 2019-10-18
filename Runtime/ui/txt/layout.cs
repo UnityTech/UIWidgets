@@ -226,9 +226,9 @@ namespace Unity.UIWidgets.ui {
 
 
                     var minX = x;
-                    var maxX = metrics.descent - metrics.ascent + x;
-                    var minY = metrics.ascent;
-                    var maxY = metrics.descent;
+                    var maxX = style.fontSize + x;
+                    var minY = metrics.descent/2 - style.fontSize;
+                    var maxY = metrics.descent/2;
                     _updateBounds(minX, maxX, minY, maxY, ref bounds);
 
                     positions[i] = x;
