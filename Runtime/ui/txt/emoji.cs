@@ -233,9 +233,14 @@ namespace Unity.UIWidgets.ui {
 
         public const int rowCount = 36;
         public const int colCount = 37;
+        public static float advanceFactor = 1.3f;
+        public static float sizeFactor = 1.2f;
 
         public static Rect getMinMaxRect(float fontSize, float ascent, float descent) {
-            return Rect.fromLTWH(0, descent/2-fontSize, fontSize, fontSize);
+            return Rect.fromLTWH((advanceFactor - sizeFactor) / 2 * fontSize,
+                descent - fontSize * sizeFactor,
+                fontSize * sizeFactor,
+                fontSize * sizeFactor);
         }
 
         public static Rect getUVRect(int code) {
