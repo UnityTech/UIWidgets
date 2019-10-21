@@ -38,7 +38,7 @@ namespace Unity.UIWidgets.flow {
                 ctm[5] = ctm[5].alignToPixel(context.devicePixelRatio);
 
                 this._rasterCacheResult = context.rasterCache.getPrerolledImage(
-                    this._picture, ctm, context.devicePixelRatio, this._isComplex,
+                    this._picture, ctm, context.devicePixelRatio, context.antiAliasing, this._isComplex,
                     this._willChange);
             }
             else {

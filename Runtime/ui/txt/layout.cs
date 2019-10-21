@@ -8,7 +8,7 @@ namespace Unity.UIWidgets.ui {
             char startingChar = text[0];
             float totalWidth = 0;
             if (char.IsHighSurrogate(startingChar) || EmojiUtils.isSingleCharEmoji(startingChar)) {
-                float advance = style.fontSize + style.letterSpacing;
+                float advance = style.fontSize * EmojiUtils.advanceFactor + style.letterSpacing;
                 for (int i = 0; i < text.Length; i++) {
                     char ch = text[i];
                     if (char.IsHighSurrogate(ch) || EmojiUtils.isSingleCharNonEmptyEmoji(ch)) {
@@ -42,7 +42,7 @@ namespace Unity.UIWidgets.ui {
             char startingChar = text[start];
             float currentAdvance = offset;
             if (char.IsHighSurrogate(startingChar) || EmojiUtils.isSingleCharEmoji(startingChar)) {
-                float advance = style.fontSize + style.letterSpacing;
+                float advance = style.fontSize * EmojiUtils.advanceFactor + style.letterSpacing;
                 for (int i = 0; i < count; i++) {
                     char ch = text[start + i];
                     if (char.IsHighSurrogate(ch) || EmojiUtils.isSingleCharNonEmptyEmoji(ch)) {
@@ -85,7 +85,7 @@ namespace Unity.UIWidgets.ui {
             char startingChar = text[start];
             float totalWidths = 0;
             if (char.IsHighSurrogate(startingChar) || EmojiUtils.isSingleCharEmoji(startingChar)) {
-                float advance = style.fontSize + style.letterSpacing;
+                float advance = style.fontSize * EmojiUtils.advanceFactor + style.letterSpacing;
                 for (int i = 0; i < count; i++) {
                     char ch = text[start + i];
                     if (char.IsHighSurrogate(ch) || EmojiUtils.isSingleCharNonEmptyEmoji(ch)) {
@@ -224,16 +224,15 @@ namespace Unity.UIWidgets.ui {
                     x += letterSpaceHalfLeft;
                     advances[i] = letterSpaceHalfLeft;
 
-
+                    float advance = style.fontSize * EmojiUtils.advanceFactor;
                     var minX = x;
-                    var maxX = metrics.descent - metrics.ascent + x;
-                    var minY = metrics.ascent;
+                    var maxX = advance + x;
+                    var minY = -style.fontSize * EmojiUtils.sizeFactor;
                     var maxY = metrics.descent;
                     _updateBounds(minX, maxX, minY, maxY, ref bounds);
 
                     positions[i] = x;
 
-                    float advance = style.fontSize;
                     x += advance;
 
                     advances[i] += advance;

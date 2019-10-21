@@ -42,6 +42,8 @@ namespace Unity.UIWidgets.ui {
                 this._lastScissor = null;
                 this._layers.Clear();
             }
+            
+            this._releaseComputeBuffer();
         }
 
         public PictureFlusher(RenderTexture renderTexture, float devicePixelRatio, MeshPool meshPool) {
@@ -94,7 +96,7 @@ namespace Unity.UIWidgets.ui {
             layer.clipStack.save();
         }
 
-        readonly uiOffset[] _saveLayer_Points = new uiOffset[4];
+        static uiOffset[] _cachedPoints = new uiOffset[4];
 
         void _saveLayer(uiRect bounds, uiPaint paint) {
             D.assert(bounds.width > 0);
@@ -127,30 +129,31 @@ namespace Unity.UIWidgets.ui {
             this._currentLayer = layer;
 
             if (paint.backdrop != null) {
-                if (paint.backdrop is _BlurImageFilter) {
-                    var filter = (_BlurImageFilter) paint.backdrop;
+                
+                if (paint.backdrop is _uiBlurImageFilter) {
+                    var filter = (_uiBlurImageFilter) paint.backdrop;
                     if (!(filter.sigmaX == 0 && filter.sigmaY == 0)) {
-                        this._saveLayer_Points[0] = bounds.topLeft;
-                        this._saveLayer_Points[1] = bounds.bottomLeft;
-                        this._saveLayer_Points[2] = bounds.bottomRight;
-                        this._saveLayer_Points[3] = bounds.topRight;
+                        _cachedPoints[0] = bounds.topLeft;
+                        _cachedPoints[1] = bounds.bottomLeft;
+                        _cachedPoints[2] = bounds.bottomRight;
+                        _cachedPoints[3] = bounds.topRight;
 
-                        state.matrix.Value.mapPoints(this._saveLayer_Points);
+                        state.matrix.Value.mapPoints(ref _cachedPoints);
 
                         var parentBounds = parentLayer.layerBounds;
                         for (int i = 0; i < 4; i++) {
-                            this._saveLayer_Points[i] = new uiOffset(
-                                (this._saveLayer_Points[i].dx - parentBounds.left) / parentBounds.width,
-                                (this._saveLayer_Points[i].dy - parentBounds.top) / parentBounds.height
+                            _cachedPoints[i] = new uiOffset(
+                                (_cachedPoints[i].dx - parentBounds.left) / parentBounds.width,
+                                (_cachedPoints[i].dy - parentBounds.top) / parentBounds.height
                             );
                         }
 
                         var mesh = ImageMeshGenerator.imageMesh(
                             null,
-                            this._saveLayer_Points[0],
-                            this._saveLayer_Points[1],
-                            this._saveLayer_Points[2],
-                            this._saveLayer_Points[3],
+                            _cachedPoints[0],
+                            _cachedPoints[1],
+                            _cachedPoints[2],
+                            _cachedPoints[3],
                             bounds);
                         var renderDraw = CanvasShader.texRT(layer, layer.layerPaint.Value, mesh, parentLayer);
                         layer.draws.Add(renderDraw);
@@ -160,35 +163,36 @@ namespace Unity.UIWidgets.ui {
                         layer.draws.Add(CanvasShader.texRT(layer, paint, blurMesh, blurLayer));
                     }
                 }
-                else if (paint.backdrop is _MatrixImageFilter) {
-                    var filter = (_MatrixImageFilter) paint.backdrop;
+                else if (paint.backdrop is _uiMatrixImageFilter) {
+                    var filter = (_uiMatrixImageFilter) paint.backdrop;
                     if (!filter.transform.isIdentity()) {
                         layer.filterMode = filter.filterMode;
 
-                        this._saveLayer_Points[0] = bounds.topLeft;
-                        this._saveLayer_Points[1] = bounds.bottomLeft;
-                        this._saveLayer_Points[2] = bounds.bottomRight;
-                        this._saveLayer_Points[3] = bounds.topRight;
-                        state.matrix.Value.mapPoints(this._saveLayer_Points);
+                        _cachedPoints[0] = bounds.topLeft;
+                        _cachedPoints[1] = bounds.bottomLeft;
+                        _cachedPoints[2] = bounds.bottomRight;
+                        _cachedPoints[3] = bounds.topRight;
+                        
+                        state.matrix.Value.mapPoints(ref _cachedPoints);
 
                         var parentBounds = parentLayer.layerBounds;
                         for (int i = 0; i < 4; i++) {
-                            this._saveLayer_Points[i] = new uiOffset(
-                                (this._saveLayer_Points[i].dx - parentBounds.left) / parentBounds.width,
-                                (this._saveLayer_Points[i].dy - parentBounds.top) / parentBounds.height
+                            _cachedPoints[i] = new uiOffset(
+                                (_cachedPoints[i].dx - parentBounds.left) / parentBounds.width,
+                                (_cachedPoints[i].dy - parentBounds.top) / parentBounds.height
                             );
                         }
 
                         var matrix = uiMatrix3.makeTrans(-bounds.left, -bounds.top);
-                        matrix.postConcat(uiMatrix3.fromMatrix3(filter.transform));
+                        matrix.postConcat(filter.transform);
                         matrix.postTranslate(bounds.left, bounds.top);
 
                         var mesh = ImageMeshGenerator.imageMesh(
                             matrix,
-                            this._saveLayer_Points[0],
-                            this._saveLayer_Points[1],
-                            this._saveLayer_Points[2],
-                            this._saveLayer_Points[3],
+                            _cachedPoints[0],
+                            _cachedPoints[1],
+                            _cachedPoints[2],
+                            _cachedPoints[3],
                             bounds);
                         var renderDraw = CanvasShader.texRT(layer, layer.layerPaint.Value, mesh, parentLayer);
                         layer.draws.Add(renderDraw);
@@ -277,7 +281,7 @@ namespace Unity.UIWidgets.ui {
 
         void _clipRect(Rect rect) {
             var path = uiPath.create();
-            path.addRect(uiRectHelper.fromRect(rect));
+            path.addRect(uiRectHelper.fromRect(rect).Value);
             this._clipPath(path);
             uiPathCacheManager.putToCache(path);
         }
@@ -408,7 +412,8 @@ namespace Unity.UIWidgets.ui {
                 width: textureWidth,
                 height: textureHeight,
                 layerBounds: maskBounds,
-                filterMode: FilterMode.Bilinear
+                filterMode: FilterMode.Bilinear,
+                noMSAA: true
             );
 
             parentLayer.addLayer(maskLayer);
@@ -448,7 +453,8 @@ namespace Unity.UIWidgets.ui {
                 width: textureWidth,
                 height: textureHeight,
                 layerBounds: maskLayer.layerBounds,
-                filterMode: FilterMode.Bilinear
+                filterMode: FilterMode.Bilinear,
+                noMSAA: true
             );
 
             parentLayer.addLayer(blurXLayer);
@@ -458,7 +464,8 @@ namespace Unity.UIWidgets.ui {
                 width: textureWidth,
                 height: textureHeight,
                 layerBounds: maskLayer.layerBounds,
-                filterMode: FilterMode.Bilinear
+                filterMode: FilterMode.Bilinear,
+                noMSAA: true
             );
 
             parentLayer.addLayer(blurYLayer);
@@ -679,7 +686,11 @@ namespace Unity.UIWidgets.ui {
         }
 
         void _drawImage(Image image, uiOffset offset, uiPaint paint) {
-            D.assert(image != null);
+            D.assert(image != null && image.valid);
+
+            if (image == null || !image.valid) {
+                return;
+            }
 
             this._drawImageRect(image,
                 null,
@@ -691,7 +702,11 @@ namespace Unity.UIWidgets.ui {
         }
 
         void _drawImageRect(Image image, uiRect? src, uiRect dst, uiPaint paint) {
-            D.assert(image != null);
+            D.assert(image != null && image.valid);
+
+            if (image == null || !image.valid) {
+                return;
+            }
 
             if (src == null) {
                 src = uiRectHelper.one;
@@ -712,7 +727,11 @@ namespace Unity.UIWidgets.ui {
         }
 
         void _drawImageNine(Image image, uiRect? src, uiRect center, uiRect dst, uiPaint paint) {
-            D.assert(image != null);
+            D.assert(image != null && image.valid);
+
+            if (image == null || !image.valid) {
+                return;
+            }
 
             var scaleX = 1f / image.width;
             var scaleY = 1f / image.height;
@@ -755,7 +774,7 @@ namespace Unity.UIWidgets.ui {
                         break;
                     case DrawSaveLayer cmd: {
                         saveCount++;
-                        this._saveLayer(uiRectHelper.fromRect(cmd.rect), uiPaint.fromPaint(cmd.paint));
+                        this._saveLayer(uiRectHelper.fromRect(cmd.rect).Value, uiPaint.fromPaint(cmd.paint));
                         break;
                     }
 
@@ -833,14 +852,14 @@ namespace Unity.UIWidgets.ui {
                     }
 
                     case DrawImageRect cmd: {
-                        this._drawImageRect(cmd.image, uiRectHelper.fromRect(cmd.src), uiRectHelper.fromRect(cmd.dst),
+                        this._drawImageRect(cmd.image, uiRectHelper.fromRect(cmd.src), uiRectHelper.fromRect(cmd.dst).Value,
                             uiPaint.fromPaint(cmd.paint));
                         break;
                     }
 
                     case DrawImageNine cmd: {
                         this._drawImageNine(cmd.image, uiRectHelper.fromRect(cmd.src),
-                            uiRectHelper.fromRect(cmd.center), uiRectHelper.fromRect(cmd.dst),
+                            uiRectHelper.fromRect(cmd.center).Value, uiRectHelper.fromRect(cmd.dst).Value,
                             uiPaint.fromPaint(cmd.paint));
                         break;
                     }
@@ -1003,7 +1022,7 @@ namespace Unity.UIWidgets.ui {
             matrix.preTranslate(offset.dx, offset.dy);
 
             var mesh = TextBlobMesh.create(textBlob.Value, scale, matrix);
-            var textBlobBounds = matrix.mapRect(uiRectHelper.fromRect(textBlob.Value.boundsInText));
+            var textBlobBounds = matrix.mapRect(uiRectHelper.fromRect(textBlob.Value.boundsInText).Value);
 
             // request font texture so text mesh could be generated correctly
             var style = textBlob.Value.style;
@@ -1029,6 +1048,7 @@ namespace Unity.UIWidgets.ui {
         public void flush(uiPicture picture) {
             this._reset();
             this._resetRenderTextureId();
+            this._resetComputeBuffer();
 
             this._drawUIPicture(picture, false);
 
@@ -1045,6 +1065,7 @@ namespace Unity.UIWidgets.ui {
                 // this is necessary for webgl2. not sure why... just to be safe to disable the scissor.
                 cmdBuf.DisableScissorRect();
 
+                this._bindComputeBuffer();
                 Graphics.ExecuteCommandBuffer(cmdBuf);
             }
 
@@ -1097,6 +1118,10 @@ namespace Unity.UIWidgets.ui {
                             useMipMap = false,
                             autoGenerateMips = false
                         };
+                        
+                        if (this._renderTexture.antiAliasing != 0 && !subLayer.noMSAA) {
+                            desc.msaaSamples = this._renderTexture.antiAliasing;
+                        }
 
                         cmdBuf.GetTemporaryRT(subLayer.rtID, desc, subLayer.filterMode);
                         this._drawLayer(subLayer, cmdBuf);
@@ -1129,12 +1154,7 @@ namespace Unity.UIWidgets.ui {
                         if (mesh == null) {
                             continue;
                         }
-
-                        D.assert(mesh.vertices.Count > 0);
-                        cmd.meshObj.SetVertices(mesh.vertices?.data);
-                        cmd.meshObj.SetTriangles(mesh.triangles?.data, 0, false);
-                        cmd.meshObj.SetUVs(0, mesh.uv?.data);
-
+                        
                         if (mesh.matrix == null) {
                             cmd.properties.SetFloatArray(CmdDraw.matId, CmdDraw.idMat3.fMat);
                         }
@@ -1153,7 +1173,22 @@ namespace Unity.UIWidgets.ui {
                             cmd.properties.SetFloatArray(CmdDraw.matId, this._drawLayer_matArray);
                         }
 
-                        cmdBuf.DrawMesh(cmd.meshObj, CmdDraw.idMat, cmd.material, 0, cmd.pass, cmd.properties.mpb);
+                        D.assert(mesh.vertices.Count > 0);
+                        if (this.supportComputeBuffer) {
+                            this._addMeshToComputeBuffer(mesh.vertices?.data, mesh.uv?.data, mesh.triangles?.data);
+                            cmd.properties.SetBuffer(CmdDraw.vertexBufferId, this._computeBuffer);
+                            cmd.properties.SetBuffer(CmdDraw.indexBufferId, this._indexBuffer);
+                            cmd.properties.SetInt(CmdDraw.startIndexId, this._startIndex);
+                            cmdBuf.DrawProcedural(Matrix4x4.identity, cmd.material, cmd.pass, MeshTopology.Triangles, mesh.triangles.Count, 1, cmd.properties.mpb);
+                        }
+                        else {
+                            cmd.meshObj.SetVertices(mesh.vertices?.data);
+                            cmd.meshObj.SetTriangles(mesh.triangles?.data, 0, false);
+                            cmd.meshObj.SetUVs(0, mesh.uv?.data);
+
+                            cmdBuf.DrawMesh(cmd.meshObj, CmdDraw.idMat, cmd.material, 0, cmd.pass, cmd.properties.mpb);
+                        }
+
                         if (cmd.layerId != null) {
                             cmdBuf.SetGlobalTexture(CmdDraw.texId, BuiltinRenderTextureType.None);
                         }

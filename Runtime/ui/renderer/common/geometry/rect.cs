@@ -95,7 +95,10 @@ namespace Unity.UIWidgets.ui {
     }
 
     public static class uiRectHelper {
-        public static uiRect fromRect(Rect rect) {
+        public static uiRect? fromRect(Rect rect) {
+            if (rect == null) {
+                return null;
+            }
             return new uiRect(rect.left, rect.top, rect.right, rect.bottom);
         }
 

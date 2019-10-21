@@ -147,18 +147,18 @@ namespace Unity.UIWidgets.ui {
         }
     }
 
-    static class CanvasShader {
-        static readonly MaterialByBlendModeStencilComp _convexFillMat;
-        static readonly MaterialByStencilComp _fill0Mat;
-        static readonly MaterialByBlendMode _fill1Mat;
-        static readonly MaterialByBlendModeStencilComp _stroke0Mat;
-        static readonly Material _stroke1Mat;
-        static readonly MaterialByBlendModeStencilComp _texMat;
-        static readonly Material _stencilMat;
-        static readonly Material _filterMat;
-        static readonly MaterialByBlendModeStencilComp _strokeAlphaMat;
-        static readonly Material _shadowBox;
-        static readonly Material _shadowRBox;
+    static partial class CanvasShader {
+        static MaterialByBlendModeStencilComp _convexFillMat;
+        static MaterialByStencilComp _fill0Mat;
+        static MaterialByBlendMode _fill1Mat;
+        static MaterialByBlendModeStencilComp _stroke0Mat;
+        static Material _stroke1Mat;
+        static MaterialByBlendModeStencilComp _texMat;
+        static Material _stencilMat;
+        static Material _filterMat;
+        static MaterialByBlendModeStencilComp _strokeAlphaMat;
+        static Material _shadowBox;
+        static Material _shadowRBox;
 
         static Shader GetShader(string shaderName) {
             var shader = Shader.Find(shaderName);
@@ -170,32 +170,8 @@ namespace Unity.UIWidgets.ui {
         }
 
         static CanvasShader() {
-            var convexFillShader = GetShader("UIWidgets/canvas_convexFill");
-            var fill0Shader = GetShader("UIWidgets/canvas_fill0");
-            var fill1Shader = GetShader("UIWidgets/canvas_fill1");
-            var stroke0Shader = GetShader("UIWidgets/canvas_stroke0");
-            var stroke1Shader = GetShader("UIWidgets/canvas_stroke1");
-            var texShader = GetShader("UIWidgets/canvas_tex");
-            var stencilShader = GetShader("UIWidgets/canvas_stencil");
-            var filterShader = GetShader("UIWidgets/canvas_filter");
-            var shadowBoxShader = GetShader("UIWidgets/ShadowBox");
-            var shadowRBoxShader = GetShader("UIWidgets/ShadowRBox");
-            var strokeAlphaShader = GetShader("UIWidgets/canvas_strokeAlpha");
-
-            _convexFillMat = new MaterialByBlendModeStencilComp(convexFillShader);
-            _fill0Mat = new MaterialByStencilComp(fill0Shader);
-            _fill1Mat = new MaterialByBlendMode(fill1Shader);
-            _stroke0Mat = new MaterialByBlendModeStencilComp(stroke0Shader);
-            _stroke1Mat = new Material(stroke1Shader) {hideFlags = HideFlags.HideAndDontSave};
-            _strokeAlphaMat = new MaterialByBlendModeStencilComp(strokeAlphaShader);
-            _texMat = new MaterialByBlendModeStencilComp(texShader);
-            _stencilMat = new Material(stencilShader) {hideFlags = HideFlags.HideAndDontSave};
-            _filterMat = new Material(filterShader) {hideFlags = HideFlags.HideAndDontSave};
-            _shadowBox = new Material(shadowBoxShader) {hideFlags = HideFlags.HideAndDontSave};
-            _shadowRBox = new Material(shadowRBoxShader) {hideFlags = HideFlags.HideAndDontSave};
+            InitShaders();
         }
-
-        public static Material shadowBox => _shadowBox;
 
         static readonly int _viewportId = Shader.PropertyToID("_viewport");
         static readonly int _alphaId = Shader.PropertyToID("_alpha");
@@ -309,6 +285,7 @@ namespace Unity.UIWidgets.ui {
         public static PictureFlusher.CmdDraw convexFill(PictureFlusher.RenderLayer layer, uiPaint paint,
             uiMeshMesh mesh) {
             var mat = _convexFillMat.getMaterial(paint.blendMode, layer.ignoreClip);
+            
             _getShaderPassAndProps(layer, paint, mesh.matrix, 1.0f, 0.0f, out var pass, out var props);
 
             return PictureFlusher.CmdDraw.create(

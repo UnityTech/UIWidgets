@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.material;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.ui;
 using Unity.UIWidgets.widgets;
@@ -122,21 +123,15 @@ namespace Unity.UIWidgets.cupertino {
             }
         }
         
-        // Iterable<LocalizationsDelegate<dynamic>> get _localizationsDelegates sync* {
-        //     if (widget.localizationsDelegates != null)
-        //         yield* widget.localizationsDelegates;
-        //     yield DefaultCupertinoLocalizations.delegate; 
-        // }
-        
         List<LocalizationsDelegate> _localizationsDelegates {
             get {
-                List<LocalizationsDelegate<CupertinoLocalizations>> _delegates =
-                    new List<LocalizationsDelegate<CupertinoLocalizations>>();
+                var _delegates = new List<LocalizationsDelegate>();
                 if (this.widget.localizationsDelegates != null) {
                     _delegates.AddRange(this.widget.localizationsDelegates);
                 }
 
                 _delegates.Add(DefaultCupertinoLocalizations.del);
+                _delegates.Add(DefaultMaterialLocalizations.del);
                 return new List<LocalizationsDelegate>(_delegates);
             }
         }

@@ -375,15 +375,15 @@ namespace UIWidgetsGallery.gallery {
                 //     documentationUrl: "https://docs.flutter.io/flutter/material/TabBarView-class.html",
                 //     buildRoute: (BuildContext context) => PageSelectorDemo()
                 // ),
-                // new GalleryDemo(
-                //     title: "Pickers",
-                //     subtitle: "Date and time selection widgets",
-                //     icon: GalleryIcons.@event,
-                //     category: GalleryDemoCategory._kMaterialComponents,
-                //     routeName: DateAndTimePickerDemo.routeName,
-                //     documentationUrl: "https://docs.flutter.io/flutter/material/showDatePicker.html",
-                //     buildRoute: (BuildContext context) => DateAndTimePickerDemo()
-                // ),
+                new GalleryDemo(
+                    title: "Pickers",
+                    subtitle: "Date and time selection widgets",
+                    icon: GalleryIcons.@event,
+                    category: _kMaterialComponents,
+                    routeName: DateAndTimePickerDemo.routeName,
+                    documentationUrl: "https://docs.flutter.io/flutter/material/showDatePicker.html",
+                    buildRoute: (BuildContext context) => new DateAndTimePickerDemo()
+                ),
                 // new GalleryDemo(
                 //     title: "Progress indicators",
                 //     subtitle: "Linear, circular, indeterminate",
@@ -499,22 +499,22 @@ namespace UIWidgetsGallery.gallery {
                     documentationUrl: "https://docs.flutter.io/flutter/cupertino/CupertinoButton-class.html",
                     buildRoute: (BuildContext context) => new CupertinoButtonsDemo()
                 ),
-                // new GalleryDemo(
-                //     title: "Navigation",
-                //     icon: GalleryIcons.bottom_navigation,
-                //     category: _kCupertinoComponents,
-                //     routeName: CupertinoNavigationDemo.routeName,
-                //     documentationUrl: "https://docs.flutter.io/flutter/cupertino/CupertinoTabScaffold-class.html",
-                //     buildRoute: (BuildContext context) => new CupertinoNavigationDemo()
-                // ),
-                // new GalleryDemo(
-                //     title: "Pickers",
-                //     icon: GalleryIcons.@event,
-                //     category: GalleryDemoCategory._kCupertinoComponents,
-                //     routeName: CupertinoPickerDemo.routeName,
-                //     documentationUrl: "https://docs.flutter.io/flutter/cupertino/CupertinoPicker-class.html",
-                //     buildRoute: (BuildContext context) => CupertinoPickerDemo()
-                // ),
+                new GalleryDemo(
+                    title: "Navigation",
+                    icon: GalleryIcons.bottom_navigation,
+                    category: _kCupertinoComponents,
+                    routeName: CupertinoNavigationDemo.routeName,
+                    documentationUrl: "https://docs.flutter.io/flutter/cupertino/CupertinoTabScaffold-class.html",
+                    buildRoute: (BuildContext context) => new CupertinoNavigationDemo()
+                ),
+                new GalleryDemo(
+                    title: "Pickers",
+                    icon: GalleryIcons.@event,
+                    category: _kCupertinoComponents,
+                    routeName: CupertinoPickerDemo.routeName,
+                    documentationUrl: "https://docs.flutter.io/flutter/cupertino/CupertinoPicker-class.html",
+                    buildRoute: (BuildContext context) => new CupertinoPickerDemo()
+                ),
                 // new GalleryDemo(
                 //     title: "Pull to refresh",
                 //     icon: GalleryIcons.cupertino_pull_to_refresh,

@@ -355,28 +355,26 @@ namespace Unity.UIWidgets.widgets {
             this._currentBeforeChild = null;
             D.assert(this._currentlyUpdatingChildIndex == null);
             try {
-                int firstIndex = 0;
-                int lastIndex = 0;
-
-                if (!this._childElements.isEmpty()) {
-                    firstIndex = this._childElements.First().Key;
-                    lastIndex = this._childElements.Last().Key;
-                    if (this._didUnderflow) {
-                        lastIndex += 1;
-                    }
-                }
-
-                for (int index = firstIndex; index <= lastIndex; ++index) {
+                void processElement(int index) {
                     this._currentlyUpdatingChildIndex = index;
                     Element newChild = this.updateChild(this._childElements.getOrDefault(index), this._build(index),
                         index);
                     if (newChild != null) {
                         this._childElements[index] = newChild;
-                        this._currentBeforeChild = (RenderBox) newChild.renderObject;
+                        var parentData = (SliverMultiBoxAdaptorParentData) newChild.renderObject.parentData;
+                        if (!parentData.keptAlive) {
+                            this._currentBeforeChild = (RenderBox) newChild.renderObject;
+                        }
                     }
                     else {
                         this._childElements.Remove(index);
                     }
+                }
+                // processElement may modify the Map - need to do a .toList() here.
+                this._childElements.Keys.ToList().ForEach(action: processElement);
+                if (this._didUnderflow) {
+                    var lastKey = this._childElements?.Last().Key ?? -1;
+                    processElement(lastKey + 1);
                 }
             }
             finally {

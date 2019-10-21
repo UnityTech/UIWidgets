@@ -109,7 +109,7 @@ namespace Unity.UIWidgets.gestures {
             foreach (int deviceId in trackedAnnotation.activeDevices) {
                 if (annotation.onExit != null) {
                     annotation.onExit(
-                        PointerExitEvent.fromHoverEvent((PointerHoverEvent) this._lastMouseEvent[deviceId]));
+                        PointerExitEvent.fromMouseEvent(this._lastMouseEvent[deviceId]));
                 }
 #if UNITY_EDITOR
                 this.detachDragFromEditorAnnotation(annotation, deviceId);
@@ -248,7 +248,7 @@ namespace Unity.UIWidgets.gestures {
                     if (trackedAnnotation.activeDevices.Contains(deviceId)) {
                         if (trackedAnnotation.annotation?.onExit != null) {
                             trackedAnnotation.annotation.onExit(
-                                PointerExitEvent.fromHoverEvent((PointerHoverEvent) lastEvent));
+                                PointerExitEvent.fromMouseEvent(lastEvent));
                         }
 
                         trackedAnnotation.activeDevices.Remove(deviceId);

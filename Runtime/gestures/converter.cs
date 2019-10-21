@@ -185,6 +185,7 @@ namespace Unity.UIWidgets.gestures {
                         Offset scrollDelta = new Offset(_scrollData.scrollX, _scrollData.scrollY) / devicePixelRatio;
                         yield return new PointerScrollEvent(
                             timeStamp: timeStamp,
+                            pointer: state.pointer,
                             kind: kind,
                             device: _scrollData.device,
                             position: position,

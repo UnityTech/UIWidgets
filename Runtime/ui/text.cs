@@ -97,6 +97,7 @@ namespace Unity.UIWidgets.ui {
         public readonly Color decorationColor;
         public readonly TextDecorationStyle decorationStyle = kDefaultDecorationStyle;
         public readonly string fontFamily = kDefaultFontFamily;
+        public readonly Paint foreground;
         public readonly Paint background;
 
         internal UnityEngine.Color UnityColor {
@@ -140,6 +141,7 @@ namespace Unity.UIWidgets.ui {
                     decoration: style.decoration ?? currentStyle.decoration,
                     decorationColor: style.decorationColor ?? currentStyle.decorationColor,
                     fontFamily: style.fontFamily ?? currentStyle.fontFamily,
+                    foreground: style.foreground ?? currentStyle.foreground,
                     background: style.background ?? currentStyle.background
                 );
             }
@@ -156,6 +158,7 @@ namespace Unity.UIWidgets.ui {
                 decoration: style.decoration,
                 decorationColor: style.decorationColor,
                 fontFamily: style.fontFamily,
+                foreground: style.foreground,
                 background: style.background
             );
         }
@@ -227,6 +230,7 @@ namespace Unity.UIWidgets.ui {
             float? wordSpacing = null, TextBaseline? textBaseline = null, float? height = null,
             TextDecoration decoration = null, TextDecorationStyle? decorationStyle = null, Color decorationColor = null,
             string fontFamily = null,
+            Paint foreground = null,
             Paint background = null
         ) {
             this.color = color ?? this.color;
@@ -242,6 +246,7 @@ namespace Unity.UIWidgets.ui {
             this.decorationStyle = decorationStyle ?? this.decorationStyle;
             this.decorationColor = decorationColor ?? this.decorationColor;
             this.fontFamily = fontFamily ?? this.fontFamily;
+            this.foreground = foreground ?? this.foreground;
             this.background = background ?? this.background;
         }
     }

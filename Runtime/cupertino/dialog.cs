@@ -13,7 +13,7 @@ using TextStyle = Unity.UIWidgets.painting.TextStyle;
 
 namespace Unity.UIWidgets.cupertino {
     class CupertinoDialogUtils {
-        public static TextStyle _kCupertinoDialogTitleStyle = new TextStyle(
+        public static readonly TextStyle _kCupertinoDialogTitleStyle = new TextStyle(
             fontFamily: ".SF UI Display",
             fontSize: 18.0f,
             fontWeight: FontWeight.w600,
@@ -22,7 +22,7 @@ namespace Unity.UIWidgets.cupertino {
             textBaseline: TextBaseline.alphabetic
         );
 
-        public static TextStyle _kCupertinoDialogContentStyle = new TextStyle(
+        public static readonly TextStyle _kCupertinoDialogContentStyle = new TextStyle(
             fontFamily: ".SF UI Text",
             fontSize: 13.4f,
             fontWeight: FontWeight.w400,
@@ -32,7 +32,7 @@ namespace Unity.UIWidgets.cupertino {
             textBaseline: TextBaseline.alphabetic
         );
 
-        public static TextStyle _kCupertinoDialogActionStyle = new TextStyle(
+        public static readonly TextStyle _kCupertinoDialogActionStyle = new TextStyle(
             fontFamily: ".SF UI Text",
             fontSize: 16.8f,
             fontWeight: FontWeight.w400,
@@ -43,7 +43,7 @@ namespace Unity.UIWidgets.cupertino {
         public const float _kCupertinoDialogWidth = 270.0f;
         public const float _kAccessibilityCupertinoDialogWidth = 310.0f;
 
-        public static BoxDecoration _kCupertinoDialogBlurOverlayDecoration = new BoxDecoration(
+        public static readonly BoxDecoration _kCupertinoDialogBlurOverlayDecoration = new BoxDecoration(
             color: CupertinoColors.white,
             backgroundBlendMode: BlendMode.overlay
         );
@@ -54,13 +54,11 @@ namespace Unity.UIWidgets.cupertino {
         public const float _kMinButtonFontSize = 10.0f;
         public const float _kDialogCornerRadius = 12.0f;
         public const float _kDividerThickness = 1.0f;
-
-        public static Color _kDialogColor = new Color(0xC0FFFFFF);
-        public static Color _kDialogPressedColor = new Color(0x90FFFFFF);
-        public static Color _kButtonDividerColor = new Color(0x40FFFFFF);
-
-
         public const float _kMaxRegularTextScaleFactor = 1.4f;
+
+        public static readonly Color _kDialogColor = new Color(0xC0FFFFFF);
+        public static readonly Color _kDialogPressedColor = new Color(0x90FFFFFF);
+        public static readonly Color _kButtonDividerColor = new Color(0x40FFFFFF);
 
         public static bool _isInAccessibilityMode(BuildContext context) {
             MediaQueryData data = MediaQuery.of(context, nullOk: true);
@@ -244,7 +242,8 @@ namespace Unity.UIWidgets.cupertino {
     }
 
     class _CupertinoDialogRenderElement : RenderObjectElement {
-        public _CupertinoDialogRenderElement(_CupertinoDialogRenderWidget widget) : base(widget) { }
+        public _CupertinoDialogRenderElement(_CupertinoDialogRenderWidget widget) : base(widget) {
+        }
 
         Element _contentElement;
         Element _actionsElement;
@@ -708,7 +707,7 @@ namespace Unity.UIWidgets.cupertino {
             List<Widget> interactiveButtons = new List<Widget>();
             for (int i = 0; i < this.widget.children.Count; i += 1) {
                 interactiveButtons.Add(
-                    new _PressableActionButton(
+                    new _PressableDialogActionButton(
                         child: this.widget.children[i]
                     )
                 );
@@ -726,8 +725,8 @@ namespace Unity.UIWidgets.cupertino {
         }
     }
 
-    class _PressableActionButton : StatefulWidget {
-        public _PressableActionButton(
+    class _PressableDialogActionButton : StatefulWidget {
+        public _PressableDialogActionButton(
             Widget child
         ) {
             this.child = child;
@@ -736,15 +735,15 @@ namespace Unity.UIWidgets.cupertino {
         public readonly Widget child;
 
         public override State createState() {
-            return new _PressableActionButtonState();
+            return new _PressableDialogActionButtonState();
         }
     }
 
-    class _PressableActionButtonState : State<_PressableActionButton> {
+    class _PressableDialogActionButtonState : State<_PressableDialogActionButton> {
         bool _isPressed = false;
 
         public override Widget build(BuildContext context) {
-            return new _ActionButtonParentDataWidget(
+            return new _DialogActionButtonParentDataWidget(
                 isPressed: this._isPressed,
                 child: new GestureDetector(
                     behavior: HitTestBehavior.opaque,
@@ -757,8 +756,8 @@ namespace Unity.UIWidgets.cupertino {
         }
     }
 
-    class _ActionButtonParentDataWidget : ParentDataWidget<_CupertinoDialogActionsRenderWidget> {
-        public _ActionButtonParentDataWidget(
+    class _DialogActionButtonParentDataWidget : ParentDataWidget<_CupertinoDialogActionsRenderWidget> {
+        public _DialogActionButtonParentDataWidget(
             Widget child,
             bool isPressed = false,
             Key key = null
@@ -769,8 +768,8 @@ namespace Unity.UIWidgets.cupertino {
         public readonly bool isPressed;
 
         public override void applyParentData(RenderObject renderObject) {
-            D.assert(renderObject.parentData is _ActionButtonParentData);
-            _ActionButtonParentData parentData = renderObject.parentData as _ActionButtonParentData;
+            D.assert(renderObject.parentData is _DialogActionButtonParentData);
+            _DialogActionButtonParentData parentData = renderObject.parentData as _DialogActionButtonParentData;
             if (parentData.isPressed != this.isPressed) {
                 parentData.isPressed = this.isPressed;
                 AbstractNodeMixinDiagnosticableTree targetParent = renderObject.parent;
@@ -781,8 +780,8 @@ namespace Unity.UIWidgets.cupertino {
         }
     }
 
-    class _ActionButtonParentData : MultiChildLayoutParentData {
-        public _ActionButtonParentData(
+    class _DialogActionButtonParentData : MultiChildLayoutParentData {
+        public _DialogActionButtonParentData(
             bool isPressed = false
         ) {
             this.isPressed = isPressed;
@@ -993,8 +992,8 @@ namespace Unity.UIWidgets.cupertino {
 
                 RenderBox currentChild = this.firstChild;
                 while (currentChild != null) {
-                    D.assert(currentChild.parentData is _ActionButtonParentData);
-                    _ActionButtonParentData parentData = currentChild.parentData as _ActionButtonParentData;
+                    D.assert(currentChild.parentData is _DialogActionButtonParentData);
+                    _DialogActionButtonParentData parentData = currentChild.parentData as _DialogActionButtonParentData;
                     if (parentData.isPressed) {
                         childList.Add(currentChild);
                     }
@@ -1010,8 +1009,8 @@ namespace Unity.UIWidgets.cupertino {
             get {
                 RenderBox currentChild = this.firstChild;
                 while (currentChild != null) {
-                    D.assert(currentChild.parentData is _ActionButtonParentData);
-                    _ActionButtonParentData parentData = currentChild.parentData as _ActionButtonParentData;
+                    D.assert(currentChild.parentData is _DialogActionButtonParentData);
+                    _DialogActionButtonParentData parentData = currentChild.parentData as _DialogActionButtonParentData;
                     if (parentData.isPressed) {
                         return true;
                     }
@@ -1024,8 +1023,8 @@ namespace Unity.UIWidgets.cupertino {
         }
 
         public override void setupParentData(RenderObject child) {
-            if (!(child.parentData is _ActionButtonParentData)) {
-                child.parentData = new _ActionButtonParentData();
+            if (!(child.parentData is _DialogActionButtonParentData)) {
+                child.parentData = new _DialogActionButtonParentData();
             }
         }
 
@@ -1281,13 +1280,15 @@ namespace Unity.UIWidgets.cupertino {
             RenderBox prevChild = null;
 
             while (child != null) {
-                D.assert(child.parentData is _ActionButtonParentData);
-                _ActionButtonParentData currentButtonParentData = child.parentData as _ActionButtonParentData;
+                D.assert(child.parentData is _DialogActionButtonParentData);
+                _DialogActionButtonParentData currentButtonParentData =
+                    child.parentData as _DialogActionButtonParentData;
                 bool isButtonPressed = currentButtonParentData.isPressed;
                 bool isPrevButtonPressed = false;
                 if (prevChild != null) {
-                    D.assert(prevChild.parentData is _ActionButtonParentData);
-                    _ActionButtonParentData previousButtonParentData = prevChild.parentData as _ActionButtonParentData;
+                    D.assert(prevChild.parentData is _DialogActionButtonParentData);
+                    _DialogActionButtonParentData previousButtonParentData =
+                        prevChild.parentData as _DialogActionButtonParentData;
                     isPrevButtonPressed = previousButtonParentData.isPressed;
                 }
 

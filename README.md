@@ -55,10 +55,11 @@ and iOS (Searching for "Unity Connect" in App Store). This project is open-sourc
 The official website of Unity Chinese Documentation (https://connect.unity.com/doc) is powered by UIWidgets and
 open-sourced @https://github.com/UnityTech/DocCN.
 
-## Requirement
+## Requirements
 
 #### Unity
-Install **Unity 2018.3** or above. You can download the latest Unity on https://unity3d.com/get-unity/download.
+
+Install **Unity 2018.4.10f1 (LTS)** or **Unity 2019.1.14f1** and above. You can download the latest Unity on https://unity3d.com/get-unity/download.
 
 #### UIWidgets Package
 Visit our Github repository https://github.com/UnityTech/UIWidgets
@@ -259,7 +260,7 @@ In UIWidgets, you should almost always disable this by selecting the image in th
 
 #### Update Emoji
 UIWidgets supports rendering emoji in (editable) texts. The emoji images comes from the free
-resources provided by [https://www.joypixels.com](https://www.joypixels.com/). If you would
+resources provided by [Google Emoji](https://emojipedia.org/google). If you would
 like to use your own images for emoji, please update the texture image `Tests/Resources/Emoji.png`,
 and the unicode-index table in `Runtime/ui/txt/emoji.cs` which maps unicodes to specific locations
 in the texture. Specifically, remember to update the Dictionary `emojiLookupTable`, number of rows

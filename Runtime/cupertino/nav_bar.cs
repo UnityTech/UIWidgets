@@ -178,7 +178,7 @@ namespace Unity.UIWidgets.cupertino {
         public readonly NavigatorState navigator;
 
         public override string ToString() {
-            return "Default Hero tag for Cupertino navigation bars with navigator $navigator";
+            return $"Default Hero tag for Cupertino navigation bars with navigator {this.navigator}";
         }
 
         public bool Equals(_HeroTag other) {
@@ -1166,7 +1166,7 @@ namespace Unity.UIWidgets.cupertino {
             Widget child = null
         ) : base(key: componentsKeys.navBarBoxKey) {
             D.assert(largeExpanded != null);
-            D.assert(!largeExpanded.Value || this.largeTitleTextStyle != null);
+            D.assert(!largeExpanded.Value || largeTitleTextStyle != null);
 
             this.componentsKeys = componentsKeys;
             this.backgroundColor = backgroundColor;

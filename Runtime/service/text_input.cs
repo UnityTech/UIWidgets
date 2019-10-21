@@ -439,7 +439,7 @@ namespace Unity.UIWidgets.service {
     }
 
     public interface TextInputClient {
-        void updateEditingValue(TextEditingValue value);
+        void updateEditingValue(TextEditingValue value, bool isIMEInput);
 
         void performAction(TextInputAction action);
 
@@ -608,7 +608,7 @@ namespace Unity.UIWidgets.service {
             }
         }
 
-        internal static void _updateEditingState(int client, TextEditingValue value) {
+        internal static void _updateEditingState(int client, TextEditingValue value, bool isIMEInput = false) {
             if (_currentConnection == null) {
                 return;
             }
@@ -617,7 +617,7 @@ namespace Unity.UIWidgets.service {
                 return;
             }
 
-            _currentConnection._client.updateEditingValue(value);
+            _currentConnection._client.updateEditingValue(value, isIMEInput); 
         }
 
         internal static void _performAction(int client, TextInputAction action) {

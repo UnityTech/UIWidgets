@@ -49,7 +49,8 @@ https://github.com/UnityTech/DocCN 查看。
 ## 使用要求
 
 #### Unity
-安装 Unity 2018.3 或更高版本。 你可以从[https://unity3d.com/get-unity/download](https://unity3d.com/get-unity/download)下载最新的Unity。
+
+安装 **Unity 2018.4.10f1(LTS)** 或 **Unity 2019.1.14f1** 及其更高版本。 你可以从[https://unity3d.com/get-unity/download](https://unity3d.com/get-unity/download)下载最新的Unity。
 
 #### UIWidgets包
 
@@ -222,7 +223,7 @@ $JSEvents
 在UIWidgets中使用图片时，记得将这一特性关闭，以免图片被意外放缩，方法如下：在Project面板中选中图片，在"Inspector"面板中将"Non Power of 2"（在"Advanced"中）设置为"None"。
 
 #### 十、更新表情(Emoji)
-UIWidgets支持渲染文本中包含的表情。表情的图片来自[https://www.joypixels.com](https://www.joypixels.com/)提供的免费资源。
+UIWidgets支持渲染文本中包含的表情。表情的图片来自[Google Emoji](https://emojipedia.org/google)提供的免费资源。
 如果您希望使用自己的表情图片，请更新纹理图`Tests/Resources/Emoji.png`，以及`Runtime/ui/txt/emoji.cs`中将Unicode映射到纹理图中具体位置的映射表。
 特别地，请记得更新Dictionary变量`emojiLookupTable`，纹理图的行数`rowCount`以及纹理图的列数`colCount`。
 

@@ -5,15 +5,11 @@ using Unity.UIWidgets.painting;
 using Unity.UIWidgets.rendering;
 using Unity.UIWidgets.ui;
 using Unity.UIWidgets.widgets;
-using UnityEngine;
-using Canvas = Unity.UIWidgets.ui.Canvas;
-using Color = Unity.UIWidgets.ui.Color;
-using Rect = Unity.UIWidgets.ui.Rect;
 using TextStyle = Unity.UIWidgets.painting.TextStyle;
 
 namespace Unity.UIWidgets.cupertino {
     class CupertinoActionSheetUtils {
-        public static TextStyle _kActionSheetActionStyle = new TextStyle(
+        public static readonly TextStyle _kActionSheetActionStyle = new TextStyle(
             // fontFamily: ".SF UI Text",
             fontFamily: ".SF Pro Text",
             inherit: false,
@@ -23,7 +19,7 @@ namespace Unity.UIWidgets.cupertino {
             textBaseline: TextBaseline.alphabetic
         );
 
-        public static TextStyle _kActionSheetContentStyle = new TextStyle(
+        public static readonly TextStyle _kActionSheetContentStyle = new TextStyle(
             // fontFamily: ".SF UI Text",
             fontFamily: ".SF Pro Text",
             inherit: false,
@@ -33,16 +29,16 @@ namespace Unity.UIWidgets.cupertino {
             textBaseline: TextBaseline.alphabetic
         );
 
-        public static BoxDecoration _kAlertBlurOverlayDecoration = new BoxDecoration(
+        public static readonly BoxDecoration _kAlertBlurOverlayDecoration = new BoxDecoration(
             color: CupertinoColors.white,
             backgroundBlendMode: BlendMode.overlay
         );
 
-        public static Color _kBackgroundColor = new Color(0xD1F8F8F8);
-        public static Color _kPressedColor = new Color(0xA6E5E5EA);
-        public static Color _kButtonDividerColor = new Color(0x403F3F3F);
-        public static Color _kContentTextColor = new Color(0xFF8F8F8F);
-        public static Color _kCancelButtonPressedColor = new Color(0xFFEAEAEA);
+        public static readonly Color _kBackgroundColor = new Color(0xD1F8F8F8);
+        public static readonly Color _kPressedColor = new Color(0xA6E5E5EA);
+        public static readonly Color _kButtonDividerColor = new Color(0x403F3F3F);
+        public static readonly Color _kContentTextColor = new Color(0xFF8F8F8F);
+        public static readonly Color _kCancelButtonPressedColor = new Color(0xFFEAEAEA);
 
         public const float _kBlurAmount = 20.0f;
         public const float _kEdgeHorizontalPadding = 8.0f;
@@ -108,8 +104,6 @@ namespace Unity.UIWidgets.cupertino {
             if (this.actions == null || this.actions.isEmpty()) {
                 return new Container(height: 0.0f);
             }
-
-            Debug.Log("_buildActions");
 
             return new Container(
                 child: new _CupertinoAlertActionSection(
@@ -193,7 +187,6 @@ namespace Unity.UIWidgets.cupertino {
             bool isDefaultAction = false,
             bool isDestructiveAction = false
         ) {
-            Debug.Log("constructor");
             D.assert(child != null);
             D.assert(onPressed != null);
             this.child = child;
@@ -208,7 +201,6 @@ namespace Unity.UIWidgets.cupertino {
         public readonly Widget child;
 
         public override Widget build(BuildContext context) {
-            Debug.Log("build");
             TextStyle style = CupertinoActionSheetUtils._kActionSheetActionStyle;
 
             if (this.isDefaultAction) {
@@ -218,7 +210,6 @@ namespace Unity.UIWidgets.cupertino {
             if (this.isDestructiveAction) {
                 style = style.copyWith(color: CupertinoColors.destructiveRed);
             }
-
 
             return new GestureDetector(
                 onTap: () => this.onPressed(),
@@ -353,11 +344,11 @@ namespace Unity.UIWidgets.cupertino {
         }
 
         protected override void insertChildRenderObject(RenderObject child, object slot) {
-            this._placeChildInSlot(child, (_AlertSections) slot);
+            this._placeChildInSlot(child, slot);
         }
 
         protected override void moveChildRenderObject(RenderObject child, object slot) {
-            this._placeChildInSlot(child, (_AlertSections) slot);
+            this._placeChildInSlot(child, slot);
         }
 
         public override void update(Widget newWidget) {
@@ -388,8 +379,8 @@ namespace Unity.UIWidgets.cupertino {
             }
         }
 
-        void _placeChildInSlot(RenderObject child, _AlertSections slot) {
-            switch (slot) {
+        void _placeChildInSlot(RenderObject child, object slot) {
+            switch ((_AlertSections) slot) {
                 case _AlertSections.contentSection:
                     this.renderObject.contentSection = child as RenderBox;
                     break;
@@ -751,12 +742,11 @@ namespace Unity.UIWidgets.cupertino {
 
     class _CupertinoAlertActionSectionState : State<_CupertinoAlertActionSection> {
         public override Widget build(BuildContext context) {
-            Debug.Log("AlertAction build");
             float devicePixelRatio = MediaQuery.of(context).devicePixelRatio;
 
             List<Widget> interactiveButtons = new List<Widget>();
             for (int i = 0; i < this.widget.children.Count; i += 1) {
-                interactiveButtons.Add(new _PressableActionButton(
+                interactiveButtons.Add(new _PressableActionSheetActionButton(
                         child: this.widget.children[i]
                     )
                 );
@@ -775,6 +765,72 @@ namespace Unity.UIWidgets.cupertino {
         }
     }
 
+    class _PressableActionSheetActionButton : StatefulWidget {
+        public _PressableActionSheetActionButton(
+            Widget child
+        ) {
+            this.child = child;
+        }
+
+        public readonly Widget child;
+
+        public override State createState() {
+            return new _PressableActionSheetActionButtonState();
+        }
+    }
+
+    class _PressableActionSheetActionButtonState : State<_PressableActionSheetActionButton> {
+        bool _isPressed = false;
+
+        public override Widget build(BuildContext context) {
+            return new _ActionSheetActionButtonParentDataWidget(
+                isPressed: this._isPressed,
+                child: new GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTapDown: (TapDownDetails details) => this.setState(() => { this._isPressed = true; }),
+                    onTapUp: (TapUpDetails details) => this.setState(() => { this._isPressed = false; }),
+                    onTapCancel: () => this.setState(() => this._isPressed = false),
+                    child: this.widget.child
+                )
+            );
+        }
+    }
+
+    class _ActionSheetActionButtonParentDataWidget : ParentDataWidget<_CupertinoAlertActionsRenderWidget> {
+        public _ActionSheetActionButtonParentDataWidget(
+            Widget child,
+            bool isPressed = false,
+            Key key = null
+        ) : base(key: key, child: child) {
+            this.isPressed = isPressed;
+        }
+
+        public readonly bool isPressed;
+
+        public override void applyParentData(RenderObject renderObject) {
+            D.assert(renderObject.parentData is _ActionSheetActionButtonParentData);
+            _ActionSheetActionButtonParentData parentData =
+                renderObject.parentData as _ActionSheetActionButtonParentData;
+            if (parentData.isPressed != this.isPressed) {
+                parentData.isPressed = this.isPressed;
+                AbstractNodeMixinDiagnosticableTree targetParent = renderObject.parent;
+                if (targetParent is RenderObject) {
+                    ((RenderObject) targetParent).markNeedsPaint();
+                }
+            }
+        }
+    }
+
+    class _ActionSheetActionButtonParentData : MultiChildLayoutParentData {
+        public _ActionSheetActionButtonParentData(
+            bool isPressed = false
+        ) {
+            this.isPressed = isPressed;
+        }
+
+        public bool isPressed;
+    }
+
     class _CupertinoAlertActionsRenderWidget : MultiChildRenderObjectWidget {
         public _CupertinoAlertActionsRenderWidget(
             List<Widget> actionButtons,
@@ -782,7 +838,6 @@ namespace Unity.UIWidgets.cupertino {
             float dividerThickness = 0.0f,
             bool hasCancelButton = false
         ) : base(key: key, children: actionButtons) {
-            Debug.Log("AlertActionRenderWidget build");
             this._dividerThickness = dividerThickness;
             this._hasCancelButton = hasCancelButton;
         }
@@ -812,8 +867,7 @@ namespace Unity.UIWidgets.cupertino {
         ) {
             this._dividerThickness = dividerThickness;
             this._hasCancelButton = hasCancelButton;
-            this.addAll(children);
-            Debug.Log("_RenderCupertinoAlertActions");
+            this.addAll(children ?? new List<RenderBox>());
         }
 
         public float dividerThickness {
@@ -861,8 +915,8 @@ namespace Unity.UIWidgets.cupertino {
         };
 
         public override void setupParentData(RenderObject child) {
-            if (!(child.parentData is _ActionButtonParentData)) {
-                child.parentData = new _ActionButtonParentData();
+            if (!(child.parentData is _ActionSheetActionButtonParentData)) {
+                child.parentData = new _ActionSheetActionButtonParentData();
             }
         }
 
@@ -984,13 +1038,15 @@ namespace Unity.UIWidgets.cupertino {
             RenderBox child = this.firstChild;
             RenderBox prevChild = null;
             while (child != null) {
-                D.assert(child.parentData is _ActionButtonParentData);
-                _ActionButtonParentData currentButtonParentData = child.parentData as _ActionButtonParentData;
+                D.assert(child.parentData is _ActionSheetActionButtonParentData);
+                _ActionSheetActionButtonParentData currentButtonParentData =
+                    child.parentData as _ActionSheetActionButtonParentData;
                 bool isButtonPressed = currentButtonParentData.isPressed;
                 bool isPrevButtonPressed = false;
                 if (prevChild != null) {
-                    D.assert(prevChild.parentData is _ActionButtonParentData);
-                    _ActionButtonParentData previousButtonParentData = prevChild.parentData as _ActionButtonParentData;
+                    D.assert(prevChild.parentData is _ActionSheetActionButtonParentData);
+                    _ActionSheetActionButtonParentData previousButtonParentData =
+                        prevChild.parentData as _ActionSheetActionButtonParentData;
                     isPrevButtonPressed = previousButtonParentData.isPressed;
                 }
 

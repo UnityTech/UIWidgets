@@ -13,8 +13,6 @@ using Color = Unity.UIWidgets.ui.Color;
 
 namespace UIWidgetsGallery.gallery {
     class CupertinoNavigationDemoUtils {
-        public const string _kGalleryAssetsPackage = "flutter_gallery_assets";
-
         public const int _kChildCount = 50;
 
         public static List<Color> coolColors = new List<Color> {
@@ -56,7 +54,7 @@ namespace UIWidgetsGallery.gallery {
                 new Tab2ConversationRow(
                     avatar: new Tab2ConversationAvatar(
                         text: "KL",
-                        color: new Color(0xfFD5015)
+                        color: new Color(0xFFFD5015)
                     ),
                     text: "We'll rush you a new one.\nIt's gonna be incredible"
                 ),
@@ -66,7 +64,7 @@ namespace UIWidgetsGallery.gallery {
                 new Tab2ConversationRow(
                     avatar: new Tab2ConversationAvatar(
                         text: "SJ",
-                        color: new Color(0xf34CAD6)
+                        color: new Color(0xFF34CAD6)
                     ),
                     text: "We'll send you our\nnewest Labrador too!"
                 ),
@@ -76,7 +74,7 @@ namespace UIWidgetsGallery.gallery {
                 new Tab2ConversationRow(
                     avatar: new Tab2ConversationAvatar(
                         text: "KL",
-                        color: new Color(0xfFD5015)
+                        color: new Color(0xFFFD5015)
                     ),
                     text: "Actually there's one more thing..."
                 ),
@@ -86,7 +84,6 @@ namespace UIWidgetsGallery.gallery {
             };
         }
     }
-
 
     public class CupertinoNavigationDemo : StatelessWidget {
         public CupertinoNavigationDemo() {
@@ -187,8 +184,8 @@ namespace UIWidgetsGallery.gallery {
             List<Color> colorItems = null,
             List<string> colorNameItems = null
         ) {
-            this.colorItems = colorItems;
-            this.colorNameItems = colorNameItems;
+            this.colorItems = colorItems ?? new List<Color>();
+            this.colorNameItems = colorNameItems ?? new List<string>();
         }
 
         public readonly List<Color> colorItems;
@@ -284,7 +281,7 @@ namespace UIWidgetsGallery.gallery {
                                                 new Text(
                                                     "Buy this cool color",
                                                     style: new TextStyle(
-                                                        color: new Color(0xf8E8E93),
+                                                        color: new Color(0xFF8E8E93),
                                                         fontSize: 13.0f,
                                                         fontWeight: FontWeight.w300
                                                     )
@@ -319,7 +316,7 @@ namespace UIWidgetsGallery.gallery {
                     row,
                     new Container(
                         height: 1.0f,
-                        color: new Color(0xfD9D9D9)
+                        color: new Color(0xFFD9D9D9)
                     )
                 }
             );
@@ -352,13 +349,12 @@ namespace UIWidgetsGallery.gallery {
 
             this.relatedColors = new List<Color>();
             for (int i = 0; i < 10; i++) {
-                this.relatedColors.Add(
-                    Color.fromARGB(
-                        255, this.widget.color.red + Random.Range(0, 50).clamp(0, 255),
-                        this.widget.color.green + Random.Range(0, 50).clamp(0, 255),
-                        this.widget.color.blue + Random.Range(0, 50).clamp(0, 255)
-                    )
-                );
+                this.relatedColors.Add(Color.fromARGB(
+                    255,
+                    (this.widget.color.red + Random.Range(-50, 50)).clamp(0, 255),
+                    (this.widget.color.green + Random.Range(-50, 50)).clamp(0, 255),
+                    (this.widget.color.blue + Random.Range(-50, 50)).clamp(0, 255)
+                ));
             }
         }
 
@@ -370,7 +366,6 @@ namespace UIWidgetsGallery.gallery {
                     trailing: new ExitButton()
                 ),
                 child: new SafeArea(
-                    top: false,
                     bottom: false,
                     child: new ListView(
                         children: new List<Widget> {
@@ -400,9 +395,9 @@ namespace UIWidgetsGallery.gallery {
                                                     ),
                                                     new Padding(padding: EdgeInsets.only(top: 6.0f)),
                                                     new Text(
-                                                        "Item number ${widget.index}",
+                                                        $"Item number {this.widget.index}",
                                                         style: new TextStyle(
-                                                            color: new Color(0xf8E8E93),
+                                                            color: new Color(0xFF8E8E93),
                                                             fontSize: 16.0f,
                                                             fontWeight: FontWeight.w100
                                                         )
@@ -414,7 +409,7 @@ namespace UIWidgetsGallery.gallery {
                                                             CupertinoButton.filled(
                                                                 minSize: 30.0f,
                                                                 padding: EdgeInsets.symmetric(horizontal: 24.0f),
-                                                                borderRadius: BorderRadius.circular(32.0f),
+                                                                borderRadius: BorderRadius.circular(16.0f),
                                                                 child: new Text(
                                                                     "GET",
                                                                     style: new TextStyle(
@@ -428,7 +423,7 @@ namespace UIWidgetsGallery.gallery {
                                                             CupertinoButton.filled(
                                                                 minSize: 30.0f,
                                                                 padding: EdgeInsets.zero,
-                                                                borderRadius: BorderRadius.circular(32.0f),
+                                                                borderRadius: BorderRadius.circular(16.0f),
                                                                 child: new Icon(CupertinoIcons.ellipsis),
                                                                 onPressed: () => { }
                                                             )
@@ -445,7 +440,7 @@ namespace UIWidgetsGallery.gallery {
                                 child: new Text(
                                     "USERS ALSO LIKED",
                                     style: new TextStyle(
-                                        color: new Color(0xf646464),
+                                        color: new Color(0xFF646464),
                                         letterSpacing: -0.60f,
                                         fontSize: 15.0f,
                                         fontWeight: FontWeight.w500
@@ -480,7 +475,7 @@ namespace UIWidgetsGallery.gallery {
                                         );
                                     }
                                 )
-                            ),
+                            )
                         }
                     )
                 )
@@ -498,8 +493,11 @@ namespace UIWidgetsGallery.gallery {
                 navigationBar: new CupertinoNavigationBar(
                     trailing: CupertinoNavigationDemoUtils.trailingButtons
                 ),
-                child: new ListView(
-                    children: listViewList
+                child:
+                new SafeArea(
+                    child: new ListView(
+                        children: listViewList
+                    )
                 )
             );
         }
@@ -509,114 +507,110 @@ namespace UIWidgetsGallery.gallery {
         public override Widget build(BuildContext context) {
             return new Padding(
                 padding: EdgeInsets.all(16.0f),
-                child: new SafeArea(
-                    top: false,
-                    bottom: false,
-                    child: new ClipRRect(
-                        borderRadius: BorderRadius.all(Radius.circular(16.0f)),
-                        child: new Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: new List<Widget> {
-                                new Container(
-                                    decoration: new BoxDecoration(
-                                        color: new Color(0xfE5E5E5)
-                                    ),
-                                    child: new Padding(
-                                        padding: EdgeInsets.symmetric(horizontal: 18.0f, vertical: 12.0f),
-                                        child: new Row(
-                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                            children: new List<Widget> {
-                                                new Text(
-                                                    "SUPPORT TICKET",
-                                                    style: new TextStyle(
-                                                        color: new Color(0xf646464),
-                                                        letterSpacing: -0.9f,
-                                                        fontSize: 14.0f,
-                                                        fontWeight: FontWeight.w500
-                                                    )
-                                                ),
-                                                new Text(
-                                                    "Show More",
-                                                    style: new TextStyle(
-                                                        color: new Color(0xf646464),
-                                                        letterSpacing: -0.6f,
-                                                        fontSize: 12.0f,
-                                                        fontWeight: FontWeight.w500
-                                                    )
-                                                )
-                                            }
-                                        )
-                                    )
+                child: new ClipRRect(
+                    borderRadius: BorderRadius.all(Radius.circular(16.0f)),
+                    child: new Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: new List<Widget> {
+                            new Container(
+                                decoration: new BoxDecoration(
+                                    color: new Color(0xFFE5E5E5)
                                 ),
-                                new Container(
-                                    decoration: new BoxDecoration(
-                                        color: new Color(0xfF3F3F3)
-                                    ),
-                                    child: new Padding(
-                                        padding: EdgeInsets.symmetric(horizontal: 18.0f, vertical: 12.0f),
-                                        child: new Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: new List<Widget> {
-                                                new Text(
-                                                    "Product or product packaging damaged during transit",
-                                                    style: new TextStyle(
-                                                        fontSize: 16.0f,
-                                                        fontWeight: FontWeight.w700,
-                                                        letterSpacing: -0.46f
-                                                    )
-                                                ),
-                                                new Padding(padding: EdgeInsets.only(top: 16.0f)),
-                                                new Text(
-                                                    "REVIEWERS",
-                                                    style: new TextStyle(
-                                                        color: new Color(0xf646464),
-                                                        fontSize: 12.0f,
-                                                        letterSpacing: -0.6f,
-                                                        fontWeight: FontWeight.w500
-                                                    )
-                                                ),
-                                                new Padding(padding: EdgeInsets.only(top: 8.0f)),
-                                                new Row(
-                                                    children: new List<Widget> {
-                                                        new Container(
-                                                            width: 44.0f,
-                                                            height: 44.0f,
-                                                            decoration: new BoxDecoration(
-                                                                image: new DecorationImage(
-                                                                    image: new AssetImage(
-                                                                        "people/square/trevor"
-                                                                    )
-                                                                ),
-                                                                shape: BoxShape.circle
-                                                            )
-                                                        ),
-                                                        new Padding(padding: EdgeInsets.only(left: 8.0f)),
-                                                        new Container(
-                                                            width: 44.0f,
-                                                            height: 44.0f,
-                                                            decoration: new BoxDecoration(
-                                                                image: new DecorationImage(
-                                                                    image: new AssetImage(
-                                                                        "people/square/sandra"
-                                                                    )
-                                                                ),
-                                                                shape: BoxShape.circle
-                                                            )
-                                                        ),
-                                                        new Padding(padding: EdgeInsets.only(left: 2.0f)),
-                                                        new Icon(
-                                                            CupertinoIcons.check_mark_circled,
-                                                            color: new Color(0xf646464),
-                                                            size: 20.0f
-                                                        )
-                                                    }
+                                child: new Padding(
+                                    padding: EdgeInsets.symmetric(horizontal: 18.0f, vertical: 12.0f),
+                                    child: new Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: new List<Widget> {
+                                            new Text(
+                                                "SUPPORT TICKET",
+                                                style: new TextStyle(
+                                                    color: new Color(0xFF646464),
+                                                    letterSpacing: -0.9f,
+                                                    fontSize: 14.0f,
+                                                    fontWeight: FontWeight.w500
                                                 )
-                                            }
-                                        )
+                                            ),
+                                            new Text(
+                                                "Show More",
+                                                style: new TextStyle(
+                                                    color: new Color(0xFF646464),
+                                                    letterSpacing: -0.6f,
+                                                    fontSize: 12.0f,
+                                                    fontWeight: FontWeight.w500
+                                                )
+                                            )
+                                        }
                                     )
                                 )
-                            }
-                        )
+                            ),
+                            new Container(
+                                decoration: new BoxDecoration(
+                                    color: new Color(0xFFF3F3F3)
+                                ),
+                                child: new Padding(
+                                    padding: EdgeInsets.symmetric(horizontal: 18.0f, vertical: 12.0f),
+                                    child: new Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: new List<Widget> {
+                                            new Text(
+                                                "Product or product packaging damaged during transit",
+                                                style: new TextStyle(
+                                                    fontSize: 16.0f,
+                                                    fontWeight: FontWeight.w700,
+                                                    letterSpacing: -0.46f
+                                                )
+                                            ),
+                                            new Padding(padding: EdgeInsets.only(top: 16.0f)),
+                                            new Text(
+                                                "REVIEWERS",
+                                                style: new TextStyle(
+                                                    color: new Color(0xFF646464),
+                                                    fontSize: 12.0f,
+                                                    letterSpacing: -0.6f,
+                                                    fontWeight: FontWeight.w500
+                                                )
+                                            ),
+                                            new Padding(padding: EdgeInsets.only(top: 8.0f)),
+                                            new Row(
+                                                children: new List<Widget> {
+                                                    new Container(
+                                                        width: 44.0f,
+                                                        height: 44.0f,
+                                                        decoration: new BoxDecoration(
+                                                            image: new DecorationImage(
+                                                                image: new AssetImage(
+                                                                    "people/square/trevor"
+                                                                )
+                                                            ),
+                                                            shape: BoxShape.circle
+                                                        )
+                                                    ),
+                                                    new Padding(padding: EdgeInsets.only(left: 8.0f)),
+                                                    new Container(
+                                                        width: 44.0f,
+                                                        height: 44.0f,
+                                                        decoration: new BoxDecoration(
+                                                            image: new DecorationImage(
+                                                                image: new AssetImage(
+                                                                    "people/square/sandra"
+                                                                )
+                                                            ),
+                                                            shape: BoxShape.circle
+                                                        )
+                                                    ),
+                                                    new Padding(padding: EdgeInsets.only(left: 2.0f)),
+                                                    new Icon(
+                                                        CupertinoIcons.check_mark_circled,
+                                                        color: new Color(0xFF646464),
+                                                        size: 20.0f
+                                                    )
+                                                }
+                                            )
+                                        }
+                                    )
+                                )
+                            )
+                        }
                     )
                 )
             );
@@ -734,13 +728,11 @@ namespace UIWidgetsGallery.gallery {
                         : Tab2ConversationBubbleColor.gray
                 )
             );
-            return new SafeArea(
-                child: new Row(
-                    mainAxisAlignment: isSelf ? MainAxisAlignment.end : MainAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: isSelf ? CrossAxisAlignment.center : CrossAxisAlignment.end,
-                    children: children
-                )
+            return new Row(
+                mainAxisAlignment: isSelf ? MainAxisAlignment.end : MainAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: isSelf ? CrossAxisAlignment.center : CrossAxisAlignment.end,
+                children: children
             );
         }
     }
@@ -752,52 +744,54 @@ namespace UIWidgetsGallery.gallery {
                 navigationBar: new CupertinoNavigationBar(
                     trailing: CupertinoNavigationDemoUtils.trailingButtons
                 ),
-                child: new DecoratedBox(
-                    decoration: new BoxDecoration(
-                        color: CupertinoTheme.of(context).brightness == Brightness.light
-                            ? CupertinoColors.extraLightBackgroundGray
-                            : CupertinoColors.darkBackgroundGray
-                    ),
-                    child: new ListView(
-                        children: new List<Widget> {
-                            new Padding(padding: EdgeInsets.only(top: 32.0f)),
-                            new GestureDetector(
-                                onTap: () => {
-                                    Navigator.of(context, rootNavigator: true).push(
-                                        new CupertinoPageRoute(
-                                            fullscreenDialog: true,
-                                            builder: (BuildContext _context) => new Tab3Dialog()
-                                        )
-                                    );
-                                },
-                                child: new Container(
-                                    decoration: new BoxDecoration(
-                                        color: CupertinoTheme.of(context).scaffoldBackgroundColor,
-                                        border: new Border(
-                                            top: new BorderSide(color: new Color(0xfBCBBC1), width: 0.0f),
-                                            bottom: new BorderSide(color: new Color(0xfBCBBC1), width: 0.0f)
-                                        )
-                                    ),
-                                    height: 44.0f,
-                                    child: new Padding(
-                                        padding: EdgeInsets.symmetric(horizontal: 16.0f, vertical: 8.0f),
-                                        child: new SafeArea(
-                                            top: false,
-                                            bottom: false,
-                                            child: new Row(
-                                                children: new List<Widget> {
-                                                    new Text(
-                                                        "Sign in",
-                                                        style: new TextStyle(color: CupertinoTheme.of(context)
-                                                            .primaryColor)
-                                                    ),
-                                                }
+                child: new SafeArea(
+                    child: new DecoratedBox(
+                        decoration: new BoxDecoration(
+                            color: CupertinoTheme.of(context).brightness == Brightness.light
+                                ? CupertinoColors.extraLightBackgroundGray
+                                : CupertinoColors.darkBackgroundGray
+                        ),
+                        child: new ListView(
+                            children: new List<Widget> {
+                                new Padding(padding: EdgeInsets.only(top: 32.0f)),
+                                new GestureDetector(
+                                    onTap: () => {
+                                        Navigator.of(context, rootNavigator: true).push(
+                                            new CupertinoPageRoute(
+                                                fullscreenDialog: true,
+                                                builder: (BuildContext _context) => new Tab3Dialog()
+                                            )
+                                        );
+                                    },
+                                    child: new Container(
+                                        decoration: new BoxDecoration(
+                                            color: CupertinoTheme.of(context).scaffoldBackgroundColor,
+                                            border: new Border(
+                                                top: new BorderSide(color: new Color(0xFFBCBBC1), width: 0.0f),
+                                                bottom: new BorderSide(color: new Color(0xFFBCBBC1), width: 0.0f)
+                                            )
+                                        ),
+                                        height: 44.0f,
+                                        child: new Padding(
+                                            padding: EdgeInsets.symmetric(horizontal: 16.0f, vertical: 8.0f),
+                                            child: new SafeArea(
+                                                top: false,
+                                                bottom: false,
+                                                child: new Row(
+                                                    children: new List<Widget> {
+                                                        new Text(
+                                                            "Sign in",
+                                                            style: new TextStyle(color: CupertinoTheme.of(context)
+                                                                .primaryColor)
+                                                        ),
+                                                    }
+                                                )
                                             )
                                         )
                                     )
                                 )
-                            )
-                        }
+                            }
+                        )
                     )
                 )
             );
@@ -821,7 +815,7 @@ namespace UIWidgetsGallery.gallery {
                             new Icon(
                                 CupertinoIcons.profile_circled,
                                 size: 160.0f,
-                                color: new Color(0xf646464)
+                                color: new Color(0xFF646464)
                             ),
                             new Padding(padding: EdgeInsets.only(top: 18.0f)),
                             CupertinoButton.filled(

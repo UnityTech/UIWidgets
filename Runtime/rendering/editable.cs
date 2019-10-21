@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Xml.Schema;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.gestures;
 using Unity.UIWidgets.painting;
@@ -11,6 +10,13 @@ using Color = Unity.UIWidgets.ui.Color;
 using Rect = Unity.UIWidgets.ui.Rect;
 
 namespace Unity.UIWidgets.rendering {
+    class EditableUtils {
+        public static readonly float _kCaretGap = 1.0f;
+        public static readonly float _kCaretHeightOffset = 2.0f;
+        public static readonly Offset _kFloatingCaretSizeIncrease = new Offset(0.5f, 1.0f);
+        public static readonly float _kFloatingCaretRadius = 1.0f;
+    }
+
     public delegate void SelectionChangedHandler(TextSelection selection, RenderEditable renderObject,
         SelectionChangedCause cause);
 
@@ -41,55 +47,26 @@ namespace Unity.UIWidgets.rendering {
     }
 
     public class RenderEditable : RenderBox {
-        public static readonly char obscuringCharacter = '•';
-        static readonly float _kCaretGap = 1.0f;
-        static readonly float _kCaretHeightOffset = 2.0f;
-        static readonly Offset _kFloatingCaretSizeIncrease = new Offset(0.5f, 1.0f);
-        static readonly float _kFloatingCaretRadius = 1.0f;
-
-        TextPainter _textPainter;
-        Color _cursorColor;
-        int? _maxLines;
-        int? _minLines;
-        bool _expands;
-        Color _selectionColor;
-        ViewportOffset _offset;
-        ValueNotifier<bool> _showCursor;
-        TextSelection _selection;
-        bool _obscureText;
-        TapGestureRecognizer _tap;
-        LongPressGestureRecognizer _longPress;
-        DoubleTapGestureRecognizer _doubleTap;
-        public bool ignorePointer;
-        public SelectionChangedHandler onSelectionChanged;
-        public CaretChangedHandler onCaretChanged;
-        Rect _lastCaretRect;
-        float? _textLayoutLastWidth;
-        List<TextBox> _selectionRects;
-        Rect _caretPrototype;
-        bool _hasVisualOverflow = false;
-        Offset _lastTapDownPosition;
-
         public RenderEditable(
             TextSpan text,
             TextDirection textDirection,
-            ViewportOffset offset,
-            ValueNotifier<bool> showCursor,
             TextAlign textAlign = TextAlign.left,
-            float textScaleFactor = 1.0f,
             Color cursorColor = null,
             Color backgroundCursorColor = null,
+            ValueNotifier<bool> showCursor = null,
             bool? hasFocus = null,
             int? maxLines = 1,
             int? minLines = null,
             bool expands = false,
             StrutStyle strutStyle = null,
             Color selectionColor = null,
+            float textScaleFactor = 1.0f,
             TextSelection selection = null,
-            bool obscureText = false,
+            ViewportOffset offset = null,
             SelectionChangedHandler onSelectionChanged = null,
             CaretChangedHandler onCaretChanged = null,
             bool ignorePointer = false,
+            bool obscureText = false,
             float cursorWidth = 1.0f,
             Radius cursorRadius = null,
             bool paintCursorAboveText = false,
@@ -101,11 +78,19 @@ namespace Unity.UIWidgets.rendering {
             floatingCursorAddedMargin = floatingCursorAddedMargin ?? EdgeInsets.fromLTRB(4, 4, 4, 5);
             D.assert(textSelectionDelegate != null);
             D.assert(minLines == null || minLines > 0);
-            D.assert((minLines == null) || maxLines >= minLines, () => "minLines can't be greater than maxLines");
-            this._textPainter = new TextPainter(text: text, textAlign: textAlign, textDirection: textDirection,
-                textScaleFactor: textScaleFactor, strutStyle: strutStyle);
+            D.assert(maxLines == null || maxLines > 0);
+            D.assert((maxLines == null) || (minLines == null) || maxLines >= minLines,
+                () => "minLines can't be greater than maxLines");
+            D.assert(offset != null);
+            D.assert(cursorWidth >= 0.0f);
+            this._textPainter = new TextPainter(
+                text: text,
+                textAlign: textAlign,
+                textDirection: textDirection,
+                textScaleFactor: textScaleFactor,
+                strutStyle: strutStyle);
             this._cursorColor = cursorColor;
-
+            this._backgroundCursorColor = backgroundCursorColor;
             this._showCursor = showCursor ?? new ValueNotifier<bool>(false);
             this._hasFocus = hasFocus ?? false;
             this._maxLines = maxLines;
@@ -135,12 +120,19 @@ namespace Unity.UIWidgets.rendering {
             this._longPress = new LongPressGestureRecognizer(debugOwner: this);
             this._longPress.onLongPress = this._handleLongPress;
 
-            this._backgroundCursorColor = backgroundCursorColor;
             this._paintCursorOnTop = paintCursorAboveText;
             this._cursorOffset = cursorOffset;
             this._floatingCursorAddedMargin = floatingCursorAddedMargin;
             this._devicePixelRatio = devicePixelRatio;
         }
+
+        public static readonly char obscuringCharacter = '•';
+        public SelectionChangedHandler onSelectionChanged;
+        float? _textLayoutLastWidth;
+        public CaretChangedHandler onCaretChanged;
+        public bool ignorePointer;
+
+        float _devicePixelRatio;
 
         public float devicePixelRatio {
             get { return this._devicePixelRatio; }
@@ -154,71 +146,7 @@ namespace Unity.UIWidgets.rendering {
             }
         }
 
-        float _devicePixelRatio;
-
-        public Color backgroundCursorColor {
-            get { return this._backgroundCursorColor; }
-            set {
-                if (this.backgroundCursorColor == value) {
-                    return;
-                }
-
-                this._backgroundCursorColor = value;
-                this.markNeedsPaint();
-            }
-        }
-
-        Color _backgroundCursorColor;
-
-        public bool paintCursorAboveText {
-            get { return this._paintCursorOnTop; }
-            set {
-                if (this._paintCursorOnTop == value) {
-                    return;
-                }
-
-                this._paintCursorOnTop = value;
-                this.markNeedsLayout();
-            }
-        }
-
-        bool _paintCursorOnTop;
-
-        public Offset cursorOffset {
-            get { return this._cursorOffset; }
-            set {
-                if (this._cursorOffset == value) {
-                    return;
-                }
-
-                this._cursorOffset = value;
-                this.markNeedsLayout();
-            }
-        }
-
-        Offset _cursorOffset;
-
-        public EdgeInsets floatingCursorAddedMargin {
-            get { return this._floatingCursorAddedMargin; }
-            set {
-                if (this._floatingCursorAddedMargin == value) {
-                    return;
-                }
-
-                this._floatingCursorAddedMargin = value;
-                this.markNeedsPaint();
-            }
-        }
-
-        EdgeInsets _floatingCursorAddedMargin;
-
-        bool _floatingCursorOn = false;
-        Offset _floatingCursorOffset;
-        TextPosition _floatingCursorTextPosition;
-
-        public bool selectionEnabled {
-            get { return this.enableInteractiveSelection ?? !this.obscureText; }
-        }
+        bool _obscureText;
 
         public bool obscureText {
             get { return this._obscureText; }
@@ -233,6 +161,8 @@ namespace Unity.UIWidgets.rendering {
         }
 
         public TextSelectionDelegate textSelectionDelegate;
+        Rect _lastCaretRect;
+
 
         public ValueListenable<bool> selectionStartInViewport {
             get { return this._selectionStartInViewport; }
@@ -245,6 +175,9 @@ namespace Unity.UIWidgets.rendering {
         }
 
         readonly ValueNotifier<bool> _selectionEndInViewport = new ValueNotifier<bool>(true);
+
+
+        DoubleTapGestureRecognizer _doubleTap;
 
         void _updateSelectionExtentsVisibility(Offset effectiveOffset) {
             Rect visibleRegion = Offset.zero & this.size;
@@ -259,7 +192,7 @@ namespace Unity.UIWidgets.rendering {
                 .contains(startOffset + effectiveOffset);
 
             Offset endOffset = this._textPainter.getOffsetForCaret(
-                new TextPosition(offset: this._selection.end, affinity: this._selection.affinity), 
+                new TextPosition(offset: this._selection.end, affinity: this._selection.affinity),
                 Rect.zero
             );
             this._selectionEndInViewport.value = visibleRegion
@@ -271,7 +204,7 @@ namespace Unity.UIWidgets.rendering {
 
         int _baseOffset = -1;
 
-        int _previousCursorLocation;
+        int _previousCursorLocation = -1;
 
         bool _resetCursor = false;
 
@@ -571,6 +504,8 @@ namespace Unity.UIWidgets.rendering {
             this.markNeedsLayout();
         }
 
+        TextPainter _textPainter;
+
         public TextSpan text {
             get { return this._textPainter.text; }
             set {
@@ -621,6 +556,8 @@ namespace Unity.UIWidgets.rendering {
             }
         }
 
+        Color _cursorColor;
+
         public Color cursorColor {
             get { return this._cursorColor; }
             set {
@@ -632,6 +569,23 @@ namespace Unity.UIWidgets.rendering {
                 this.markNeedsPaint();
             }
         }
+
+        Color _backgroundCursorColor;
+
+        public Color backgroundCursorColor {
+            get { return this._backgroundCursorColor; }
+            set {
+                if (this.backgroundCursorColor == value) {
+                    return;
+                }
+
+                this._backgroundCursorColor = value;
+                this.markNeedsPaint();
+            }
+        }
+
+
+        ValueNotifier<bool> _showCursor;
 
         public ValueNotifier<bool> showCursor {
             get { return this._showCursor; }
@@ -680,6 +634,8 @@ namespace Unity.UIWidgets.rendering {
             }
         }
 
+        int? _maxLines;
+
         public int? maxLines {
             get { return this._maxLines; }
             set {
@@ -692,6 +648,8 @@ namespace Unity.UIWidgets.rendering {
                 this.markNeedsTextLayout();
             }
         }
+
+        int? _minLines;
 
         public int? minLines {
             get { return this._minLines; }
@@ -706,6 +664,8 @@ namespace Unity.UIWidgets.rendering {
             }
         }
 
+        bool _expands;
+
         public bool expands {
             get { return this._expands; }
             set {
@@ -717,6 +677,8 @@ namespace Unity.UIWidgets.rendering {
                 this.markNeedsTextLayout();
             }
         }
+
+        Color _selectionColor;
 
         public Color selectionColor {
             get { return this._selectionColor; }
@@ -742,6 +704,10 @@ namespace Unity.UIWidgets.rendering {
             }
         }
 
+        List<TextBox> _selectionRects;
+
+        TextSelection _selection;
+
         public TextSelection selection {
             get { return this._selection; }
             set {
@@ -755,6 +721,8 @@ namespace Unity.UIWidgets.rendering {
                 this.markNeedsSemanticsUpdate();
             }
         }
+
+        ViewportOffset _offset;
 
         public ViewportOffset offset {
             get { return this._offset; }
@@ -791,6 +759,35 @@ namespace Unity.UIWidgets.rendering {
             }
         }
 
+
+        bool _paintCursorOnTop;
+
+        public bool paintCursorAboveText {
+            get { return this._paintCursorOnTop; }
+            set {
+                if (this._paintCursorOnTop == value) {
+                    return;
+                }
+
+                this._paintCursorOnTop = value;
+                this.markNeedsLayout();
+            }
+        }
+
+        Offset _cursorOffset;
+
+        public Offset cursorOffset {
+            get { return this._cursorOffset; }
+            set {
+                if (this._cursorOffset == value) {
+                    return;
+                }
+
+                this._cursorOffset = value;
+                this.markNeedsLayout();
+            }
+        }
+
         Radius _cursorRadius;
 
         public Radius cursorRadius {
@@ -804,6 +801,25 @@ namespace Unity.UIWidgets.rendering {
                 this.markNeedsLayout();
             }
         }
+
+        public EdgeInsets floatingCursorAddedMargin {
+            get { return this._floatingCursorAddedMargin; }
+            set {
+                if (this._floatingCursorAddedMargin == value) {
+                    return;
+                }
+
+                this._floatingCursorAddedMargin = value;
+                this.markNeedsPaint();
+            }
+        }
+
+        EdgeInsets _floatingCursorAddedMargin;
+
+        bool _floatingCursorOn = false;
+        Offset _floatingCursorOffset;
+        TextPosition _floatingCursorTextPosition;
+
 
         bool? _enableInteractiveSelection;
 
@@ -820,8 +836,8 @@ namespace Unity.UIWidgets.rendering {
             }
         }
 
-        public float preferredLineHeight {
-            get { return this._textPainter.preferredLineHeight; }
+        public bool selectionEnabled {
+            get { return this.enableInteractiveSelection ?? !this.obscureText; }
         }
 
 
@@ -840,6 +856,60 @@ namespace Unity.UIWidgets.rendering {
 
             base.detach();
         }
+
+        bool _isMultiline {
+            get { return this._maxLines != 1; }
+        }
+
+        Axis _viewportAxis {
+            get { return this._isMultiline ? Axis.vertical : Axis.horizontal; }
+        }
+
+        Offset _paintOffset {
+            get {
+                switch (this._viewportAxis) {
+                    case Axis.horizontal:
+                        return new Offset(-this.offset.pixels, 0.0f);
+                    case Axis.vertical:
+                        return new Offset(0.0f, -this.offset.pixels);
+                }
+
+                return null;
+            }
+        }
+
+        float _viewportExtent {
+            get {
+                D.assert(this.hasSize);
+                switch (this._viewportAxis) {
+                    case Axis.horizontal:
+                        return this.size.width;
+                    case Axis.vertical:
+                        return this.size.height;
+                }
+
+                return 0.0f;
+            }
+        }
+
+        float _getMaxScrollExtent(Size contentSize) {
+            D.assert(this.hasSize);
+            switch (this._viewportAxis) {
+                case Axis.horizontal:
+                    return Mathf.Max(0.0f, contentSize.width - this.size.width);
+                case Axis.vertical:
+                    return Mathf.Max(0.0f, contentSize.height - this.size.height);
+            }
+
+            return 0.0f;
+        }
+
+        float _maxScrollExtent = 0;
+
+        bool _hasVisualOverflow {
+            get { return this._maxScrollExtent > 0 || this._paintOffset != Offset.zero; }
+        }
+
 
         /// Returns the local coordinates of the endpoints of the given selection.
         ///
@@ -1013,6 +1083,47 @@ namespace Unity.UIWidgets.rendering {
             return this._textPainter.maxIntrinsicWidth + this.cursorWidth;
         }
 
+        public float preferredLineHeight {
+            get { return this._textPainter.preferredLineHeight; }
+        }
+
+        float _preferredHeight(float width) {
+            bool lockedMax = this.maxLines != null && this.minLines == null;
+            bool lockedBoth = this.maxLines != null && this.minLines == this.maxLines;
+            bool singleLine = this.maxLines == 1;
+            if (singleLine || lockedMax || lockedBoth) {
+                return this.preferredLineHeight * this.maxLines.Value;
+            }
+
+            bool minLimited = this.minLines != null && this.minLines > 1;
+            bool maxLimited = this.maxLines != null;
+            if (minLimited || maxLimited) {
+                this._layoutText(width);
+                if (minLimited && this._textPainter.height < this.preferredLineHeight * this.minLines.Value) {
+                    return this.preferredLineHeight * this.minLines.Value;
+                }
+
+                if (maxLimited && this._textPainter.height > this.preferredLineHeight * this.maxLines.Value) {
+                    return this.preferredLineHeight * this.maxLines.Value;
+                }
+            }
+
+            if (!width.isFinite()) {
+                var text = this._textPainter.text.text;
+                int lines = 1;
+                for (int index = 0; index < text.Length; ++index) {
+                    if (text[index] == 0x0A) {
+                        lines += 1;
+                    }
+                }
+
+                return this.preferredLineHeight * lines;
+            }
+
+            this._layoutText(width);
+            return Mathf.Max(this.preferredLineHeight, this._textPainter.height);
+        }
+
         protected override float computeMinIntrinsicHeight(float width) {
             return this._preferredHeight(width);
         }
@@ -1026,6 +1137,13 @@ namespace Unity.UIWidgets.rendering {
             return this._textPainter.computeDistanceToActualBaseline(baseline);
         }
 
+        protected override bool hitTestSelf(Offset position) {
+            return true;
+        }
+
+        TapGestureRecognizer _tap;
+        LongPressGestureRecognizer _longPress;
+
         public override void handleEvent(PointerEvent evt, HitTestEntry entry) {
             if (this.ignorePointer) {
                 return;
@@ -1038,6 +1156,8 @@ namespace Unity.UIWidgets.rendering {
                 this._longPress.addPointer((PointerDownEvent) evt);
             }
         }
+
+        Offset _lastTapDownPosition;
 
         public void handleTapDown(TapDownDetails details) {
             this._lastTapDownPosition = details.globalPosition;
@@ -1144,7 +1264,8 @@ namespace Unity.UIWidgets.rendering {
             D.assert(this._lastTapDownPosition != null);
             if (this.onSelectionChanged != null) {
                 TextPosition position =
-                    this._textPainter.getPositionForOffset(this.globalToLocal(this._lastTapDownPosition - this._paintOffset));
+                    this._textPainter.getPositionForOffset(
+                        this.globalToLocal(this._lastTapDownPosition - this._paintOffset));
                 TextRange word = this._textPainter.getWordBoundary(position);
                 if (position.offset - word.start <= 1) {
                     this.onSelectionChanged(
@@ -1173,12 +1294,14 @@ namespace Unity.UIWidgets.rendering {
             return new TextSelection(baseOffset: word.start, extentOffset: word.end);
         }
 
+        Rect _caretPrototype;
+
         void _layoutText(float constraintWidth) {
             if (this._textLayoutLastWidth == constraintWidth) {
                 return;
             }
 
-            var caretMargin = _kCaretGap + this.cursorWidth;
+            var caretMargin = EditableUtils._kCaretGap + this.cursorWidth;
             var avialableWidth = Mathf.Max(0.0f, constraintWidth - caretMargin);
             var maxWidth = this._isMultiline ? avialableWidth : float.PositiveInfinity;
             this._textPainter.layout(minWidth: avialableWidth, maxWidth: maxWidth);
@@ -1189,11 +1312,11 @@ namespace Unity.UIWidgets.rendering {
             get {
                 switch (Application.platform) {
                     case RuntimePlatform.IPhonePlayer:
-                        return Rect.fromLTWH(0.0f, -_kCaretHeightOffset + 0.5f, this.cursorWidth,
+                        return Rect.fromLTWH(0.0f, -EditableUtils._kCaretHeightOffset + 0.5f, this.cursorWidth,
                             this.preferredLineHeight + 2.0f);
                     default:
-                        return Rect.fromLTWH(0.0f, _kCaretHeightOffset, this.cursorWidth,
-                            this.preferredLineHeight - 2.0f * _kCaretHeightOffset);
+                        return Rect.fromLTWH(0.0f, EditableUtils._kCaretHeightOffset, this.cursorWidth,
+                            this.preferredLineHeight - 2.0f * EditableUtils._kCaretHeightOffset);
                 }
             }
         }
@@ -1207,29 +1330,12 @@ namespace Unity.UIWidgets.rendering {
             var textPainterSize = this._textPainter.size;
             this.size = new Size(this.constraints.maxWidth,
                 this.constraints.constrainHeight(this._preferredHeight(this.constraints.maxWidth)));
-            var contentSize = new Size(textPainterSize.width + _kCaretGap + this.cursorWidth,
+            var contentSize = new Size(textPainterSize.width + EditableUtils._kCaretGap + this.cursorWidth,
                 textPainterSize.height);
-            var _maxScrollExtent = this._getMaxScrollExtend(contentSize);
-            this._hasVisualOverflow = _maxScrollExtent > 0.0;
-            this.offset.applyViewportDimension(this._viewportExtend);
-            this.offset.applyContentDimensions(0.0f, _maxScrollExtent);
+            this._maxScrollExtent = this._getMaxScrollExtent(contentSize);
+            this.offset.applyViewportDimension(this._viewportExtent);
+            this.offset.applyContentDimensions(0.0f, this._maxScrollExtent);
         }
-
-        public override void paint(PaintingContext context, Offset offset) {
-            this._layoutText(this.constraints.maxWidth);
-            if (this._hasVisualOverflow) {
-                context.pushClipRect(this.needsCompositing, offset, Offset.zero & this.size, this._paintContents);
-            }
-            else {
-                this._paintContents(context, offset);
-            }
-        }
-
-        protected override bool hitTestSelf(Offset position) {
-            return true;
-        }
-
-        // describeSemanticsConfiguration todo
 
         Offset _getPixelPerfectCursorOffset(Rect caretRect) {
             Offset caretPosition = this.localToGlobal(caretRect.topLeft);
@@ -1249,12 +1355,12 @@ namespace Unity.UIWidgets.rendering {
             if (this._cursorOffset != null) {
                 caretRect = caretRect.shift(this._cursorOffset);
             }
-            
+
 #if !UNITY_IOS
             if (this._textPainter.getFullHeightForCaret(textPosition, this._caretPrototype) != null) {
                 caretRect = Rect.fromLTWH(
                     caretRect.left,
-                    caretRect.top - _kCaretHeightOffset,
+                    caretRect.top - EditableUtils._kCaretHeightOffset,
                     caretRect.width,
                     this._textPainter.getFullHeightForCaret(textPosition, this._caretPrototype).Value
                 );
@@ -1303,14 +1409,16 @@ namespace Unity.UIWidgets.rendering {
             this.markNeedsPaint();
         }
 
+        // describeSemanticsConfiguration todo
+
         void _paintFloatingCaret(Canvas canvas, Offset effectiveOffset) {
             D.assert(this._textLayoutLastWidth == this.constraints.maxWidth);
             D.assert(this._floatingCursorOn);
 
             Paint paint = new Paint() {color = this._cursorColor.withOpacity(0.75f)};
 
-            float sizeAdjustmentX = _kFloatingCaretSizeIncrease.dx;
-            float sizeAdjustmentY = _kFloatingCaretSizeIncrease.dy;
+            float sizeAdjustmentX = EditableUtils._kFloatingCaretSizeIncrease.dx;
+            float sizeAdjustmentY = EditableUtils._kFloatingCaretSizeIncrease.dy;
 
             if (this._resetFloatingCursorAnimationValue != null) {
                 sizeAdjustmentX =
@@ -1327,7 +1435,7 @@ namespace Unity.UIWidgets.rendering {
             );
 
             Rect caretRect = floatingCaretPrototype.shift(effectiveOffset);
-            Radius floatingCursorRadius = Radius.circular(_kFloatingCaretRadius);
+            Radius floatingCursorRadius = Radius.circular(EditableUtils._kFloatingCaretRadius);
             RRect caretRRect = RRect.fromRectAndRadius(caretRect, floatingCursorRadius);
             canvas.drawRRect(caretRRect, paint);
         }
@@ -1419,6 +1527,7 @@ namespace Unity.UIWidgets.rendering {
                 else if (!this._selection.isCollapsed && this._selectionColor != null) {
                     showSelection = true;
                 }
+                this._updateSelectionExtentsVisibility(effectiveOffset);
             }
 
             if (showSelection) {
@@ -1451,92 +1560,18 @@ namespace Unity.UIWidgets.rendering {
             // todo
         }
 
-        float _preferredHeight(float width) {
-            bool lockedMax = this.maxLines != null && this.minLines == null;
-            bool lockedBoth = this.maxLines != null && this.minLines == this.maxLines;
-            bool singleLine = this.maxLines == 1;
-            if (singleLine || lockedMax || lockedBoth) {
-                return this.preferredLineHeight * this.maxLines.Value;
-            }
-
-            bool minLimited = this.minLines != null && this.minLines > 1;
-            bool maxLimited = this.maxLines != null;
-            if (minLimited || maxLimited) {
-                this._layoutText(width);
-                if (minLimited && this._textPainter.height < this.preferredLineHeight * this.minLines.Value) {
-                    return this.preferredLineHeight * this.minLines.Value;
-                }
-
-                if (maxLimited && this._textPainter.height > this.preferredLineHeight * this.maxLines.Value) {
-                    return this.preferredLineHeight * this.maxLines.Value;
-                }
-            }
-
-            if (!width.isFinite()) {
-                var text = this._textPainter.text.text;
-                int lines = 1;
-                for (int index = 0; index < text.Length; ++index) {
-                    if (text[index] == 0x0A) {
-                        lines += 1;
-                    }
-                }
-
-                return this.preferredLineHeight * lines;
-            }
-
-            this._layoutText(width);
-            return Mathf.Max(this.preferredLineHeight, this._textPainter.height);
-        }
-
-        bool _isMultiline {
-            get { return this._maxLines != 1; }
-        }
-
-        Axis _viewportAxis {
-            get { return this._isMultiline ? Axis.vertical : Axis.horizontal; }
-        }
-
-        Offset _paintOffset {
-            get {
-                switch (this._viewportAxis) {
-                    case Axis.horizontal:
-                        return new Offset(-this.offset.pixels, 0.0f);
-                    case Axis.vertical:
-                        return new Offset(0.0f, -this.offset.pixels);
-                }
-
-                return null;
-            }
-        }
-
-        float _viewportExtend {
-            get {
-                D.assert(this.hasSize);
-                switch (this._viewportAxis) {
-                    case Axis.horizontal:
-                        return this.size.width;
-                    case Axis.vertical:
-                        return this.size.height;
-                }
-
-                return 0.0f;
-            }
-        }
-
-        float _getMaxScrollExtend(Size contentSize) {
-            D.assert(this.hasSize);
-            switch (this._viewportAxis) {
-                case Axis.horizontal:
-                    return Mathf.Max(0.0f, contentSize.width - this.size.width);
-                case Axis.vertical:
-                    return Mathf.Max(0.0f, contentSize.height - this.size.height);
-            }
-
-            return 0.0f;
-        }
-
         public override Rect describeApproximatePaintClip(RenderObject child) {
             return this._hasVisualOverflow ? Offset.zero & this.size : null;
+        }
+
+        public override void paint(PaintingContext context, Offset offset) {
+            this._layoutText(this.constraints.maxWidth);
+            if (this._hasVisualOverflow) {
+                context.pushClipRect(this.needsCompositing, offset, Offset.zero & this.size, this._paintContents);
+            }
+            else {
+                this._paintContents(context, offset);
+            }
         }
 
         public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
