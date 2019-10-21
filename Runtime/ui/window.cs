@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Unity.UIWidgets.async;
+using Unity.UIWidgets.editor;
 using Unity.UIWidgets.foundation;
 using UnityEngine;
 
@@ -133,16 +134,26 @@ namespace Unity.UIWidgets.ui {
         }
 
         internal static Window _instance;
+        
+        public const int defaultAntiAliasing = 4;
 
         public float devicePixelRatio {
             get { return this._devicePixelRatio; }
         }
 
         protected float _devicePixelRatio = 1.0f;
+        
+        public int antiAliasing {
+            get { return this._antiAliasing; }
+        }
+
+        protected int _antiAliasing = defaultAntiAliasing;
 
         public Size physicalSize {
             get { return this._physicalSize; }
         }
+
+        public WindowConfig windowConfig = WindowConfig.defaultConfig;
 
         protected Size _physicalSize = Size.zero;
 
