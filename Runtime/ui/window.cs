@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Unity.UIWidgets.async;
+using Unity.UIWidgets.editor;
 using Unity.UIWidgets.foundation;
 using UnityEngine;
 
@@ -148,10 +149,11 @@ namespace Unity.UIWidgets.ui {
 
         protected int _antiAliasing = defaultAntiAliasing;
 
-
         public Size physicalSize {
             get { return this._physicalSize; }
         }
+
+        public WindowConfig windowConfig = WindowConfig.defaultConfig;
 
         protected Size _physicalSize = Size.zero;
 
