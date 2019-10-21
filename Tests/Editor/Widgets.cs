@@ -108,7 +108,7 @@ namespace UIWidgets.Tests {
         }
 
         void OnEnable() {
-            FontManager.instance.addFont(Resources.Load<Font>("MaterialIcons-Regular"), "Material Icons");
+            FontManager.instance.addFont(Resources.Load<Font>("fonts/MaterialIcons-Regular"), "Material Icons");
 
             this.windowAdapter = new EditorWindowAdapter(this);
             this.windowAdapter.OnEnable();

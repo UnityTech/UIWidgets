@@ -224,7 +224,7 @@ $JSEvents
 
 #### 十、更新表情(Emoji)
 UIWidgets支持渲染文本中包含的表情。表情的图片来自[Google Emoji](https://emojipedia.org/google)提供的免费资源。
-如果您希望使用自己的表情图片，请更新纹理图`Runtime/Resources/images/Emoji.png`，以及`Runtime/ui/txt/emoji.cs`中将Unicode映射到纹理图中具体位置的映射表。
+如果您希望使用自己的表情图片，请更新纹理图`Tests/Resources/Emoji.png`，以及`Runtime/ui/txt/emoji.cs`中将Unicode映射到纹理图中具体位置的映射表。
 特别地，请记得更新Dictionary变量`emojiLookupTable`，纹理图的行数`rowCount`以及纹理图的列数`colCount`。
 
 #### 十一、与GameObject进行拖拽交互
@@ -280,4 +280,4 @@ UIWidgets Inspector工具用于可视化和浏览窗口小部件树。 你可以
 | 有推荐的适用于UIWidgets的IDE吗？ | Rider, VSCode(Open .sln) |
 
 ## 如何贡献
-请查看[CONTRIBUTING.md](CONTRIBUTING.md)
+请查看[CONTRIBUTING](CONTRIBUTING)

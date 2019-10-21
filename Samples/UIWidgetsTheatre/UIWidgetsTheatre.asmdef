@@ -1,9 +1,0 @@
-﻿{
-	"name": "UIWidgetsTheatre",
-	"references": [
-			"Unity.UIWidgets",
-			"UIWidgetsGallery",
-			"UIWidgetsSample"],
-	"includePlatforms": [],
-	"excludePlatforms": []
-}

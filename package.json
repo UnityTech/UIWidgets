@@ -1,8 +1,8 @@
 {
 	"name": "com.unity.uiwidgets",
 	"displayName":"UIWidgets",
-	"version": "1.0.0-preview",
-	"unity": "2018.1",
+	"version": "1.5.4-preview.1",
+	"unity": "2018.4",
 	"description": "UIWidgets allows you to build beautiful cross-platform apps through Unity",
 	"dependencies": {
 	}

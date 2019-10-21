@@ -1,5 +1,4 @@
 # UIWidgets
-[中文](README-ZH.md)
 
 
 ## Introduction
@@ -261,7 +260,7 @@ In UIWidgets, you should almost always disable this by selecting the image in th
 #### Update Emoji
 UIWidgets supports rendering emoji in (editable) texts. The emoji images comes from the free
 resources provided by [Google Emoji](https://emojipedia.org/google). If you would
-like to use your own images for emoji, please update the texture image `Runtime/Resources/images/Emoji.png`,
+like to use your own images for emoji, please update the texture image `Tests/Resources/Emoji.png`,
 and the unicode-index table in `Runtime/ui/txt/emoji.cs` which maps unicodes to specific locations
 in the texture. Specifically, remember to update the Dictionary `emojiLookupTable`, number of rows
 in the texture `rowCount`, and number of columns `colCount`.
@@ -325,4 +324,4 @@ Meanwhile, you can join the discussion channel at (https://connect.unity.com/g/u
 
 ## How to Contribute
 
-Check [CONTRIBUTING.md](CONTRIBUTING.md)
+Check [CONTRIBUTING](CONTRIBUTING)
