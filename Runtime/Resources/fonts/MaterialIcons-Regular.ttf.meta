@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 3a6743c0a08ca4626a9b85050002f40c
+guid: 1bb29e480b1ee44a09d380d7e8521d1e
 TrueTypeFontImporter:
   externalObjects: {}
   serializedVersion: 4
@@ -8,9 +8,9 @@ TrueTypeFontImporter:
   characterSpacing: 0
   characterPadding: 1
   includeFontData: 1
-  fontName: GalleryIcons
+  fontName: Material Icons
   fontNames:
-  - GalleryIcons
+  - Material Icons
   fallbackFontReferences: []
   customCharacters: 
   fontRenderingMode: 0

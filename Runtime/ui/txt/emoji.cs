@@ -12,7 +12,7 @@ namespace Unity.UIWidgets.ui {
                 if (_image == null || _image.texture == null) {
                     try {
                         _image = new Image(
-                            Resources.Load<Texture2D>("Emoji")
+                            Resources.Load<Texture2D>("images/Emoji")
                         );
                     }
                     catch (Exception e) {
