@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Unity.UIWidgets.editor;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.ui;
 using UnityEngine;
@@ -228,8 +229,8 @@ namespace Unity.UIWidgets.flow {
             }
 
             //https://forum.unity.com/threads/rendertexture-create-failed-rendertexture-too-big.58667/
-            if (picture.paintBounds.size.width > 4096 ||
-                picture.paintBounds.size.height > 4096) {
+            if (picture.paintBounds.size.width > WindowConfig.MaxRasterImageSize ||
+                picture.paintBounds.size.height > WindowConfig.MaxRasterImageSize) {
                 return false;
             }
 

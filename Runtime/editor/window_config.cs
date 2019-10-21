@@ -4,6 +4,8 @@ namespace Unity.UIWidgets.editor {
     public class WindowConfig {
         public readonly bool disableRasterCache;
 
+        public static float MaxRasterImageSize = 4096;
+
         static bool? _disableComputeBuffer = null;
 
         public static bool disableComputeBuffer {
