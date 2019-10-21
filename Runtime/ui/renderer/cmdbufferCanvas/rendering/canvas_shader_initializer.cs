@@ -1,10 +1,9 @@
+using Unity.UIWidgets.editor;
 using UnityEngine;
 using UnityEngine.Rendering;
 
 namespace Unity.UIWidgets.ui {
     static partial class CanvasShader {
-        const bool enableComputeBuffer = false;
-
         const bool enableDebugLog = false;
 
         public static bool supportComputeBuffer;
@@ -22,7 +21,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         static void InitShaders() {
-            supportComputeBuffer = enableComputeBuffer && SystemInfo.supportsComputeShaders && IsShaderSupported();
+            supportComputeBuffer = !WindowConfig.disableComputeBuffer && SystemInfo.supportsComputeShaders && IsShaderSupported();
 
             if (!supportComputeBuffer) {
                 DebugAssert(false, "init default shaders");

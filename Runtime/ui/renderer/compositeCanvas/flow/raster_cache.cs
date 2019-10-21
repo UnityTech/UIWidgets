@@ -210,6 +210,10 @@ namespace Unity.UIWidgets.flow {
                 return false;
             }
 
+            if (Window.instance.windowConfig.disableRasterCache) {
+                return false;
+            }
+            
             var bounds = picture.paintBounds;
             if (bounds.isEmpty) {
                 return false;
@@ -220,6 +224,12 @@ namespace Unity.UIWidgets.flow {
             }
 
             if (picture.isDynamic) {
+                return false;
+            }
+
+            //https://forum.unity.com/threads/rendertexture-create-failed-rendertexture-too-big.58667/
+            if (picture.paintBounds.size.width > 4096 ||
+                picture.paintBounds.size.height > 4096) {
                 return false;
             }
 
