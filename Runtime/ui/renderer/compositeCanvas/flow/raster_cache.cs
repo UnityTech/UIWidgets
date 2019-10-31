@@ -25,11 +25,13 @@ namespace Unity.UIWidgets.flow {
         public readonly float devicePixelRatio;
 
         public void draw(Canvas canvas) {
-            var bounds = canvas.getTotalMatrix().mapRect(this.logicalRect).roundOut(this.devicePixelRatio);
+            var boundRect = canvas.getTotalMatrix().mapRect(this.logicalRect);
+            var bounds = boundRect.withDevicePixelRatio(this.devicePixelRatio);
 
             D.assert(() => {
-                var textureWidth = Mathf.CeilToInt(bounds.width * this.devicePixelRatio);
-                var textureHeight = Mathf.CeilToInt(bounds.height * this.devicePixelRatio);
+                var boundsInPixel = boundRect.roundOutScale(this.devicePixelRatio);
+                var textureWidth = Mathf.CeilToInt(boundsInPixel.width);
+                var textureHeight = Mathf.CeilToInt(boundsInPixel.height);
                 
                 //it is possible that there is a minor difference between the bound size and the image size (1 pixel at
                 //most) due to the roundOut operation when calculating the bounds if the elements in the canvas transform
@@ -239,11 +241,13 @@ namespace Unity.UIWidgets.flow {
 
         RasterCacheResult _rasterizePicture(Picture picture, Matrix3 transform, float devicePixelRatio,
             int antiAliasing, MeshPool meshPool) {
-            var bounds = transform.mapRect(picture.paintBounds).roundOut(devicePixelRatio);
+            var boundRect = transform.mapRect(picture.paintBounds);
+            var bounds = boundRect.withDevicePixelRatio(devicePixelRatio);
+            var boundsInPixel = boundRect.roundOutScale(devicePixelRatio);
 
             var desc = new RenderTextureDescriptor(
-                Mathf.CeilToInt((bounds.width * devicePixelRatio)),
-                Mathf.CeilToInt((bounds.height * devicePixelRatio)),
+                Mathf.CeilToInt(boundsInPixel.width),
+                Mathf.CeilToInt(boundsInPixel.height),
                 RenderTextureFormat.Default, 24) {
                 useMipMap = false,
                 autoGenerateMips = false,
