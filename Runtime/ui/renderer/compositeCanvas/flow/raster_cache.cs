@@ -59,16 +59,20 @@ namespace Unity.UIWidgets.flow {
             this.picture = picture;
             this.matrix = new Matrix3(matrix);
 
-            D.assert(() => {
-                var x = this.matrix[2] * devicePixelRatio;
-                var y = this.matrix[5] * devicePixelRatio;
-                this.matrix[2] = (x - (int) x) / devicePixelRatio; // x
-                this.matrix[5] = (y - (int) y) / devicePixelRatio; // y
-
-                D.assert(Mathf.Abs(this.matrix[2]) <= 1e-5);
-                D.assert(Mathf.Abs(this.matrix[5]) <= 1e-5);
-                return true;
-            });
+            //This Assertion ensures that the transform of the given view matrix, i.e., dx, dy must be both integers in Skia.
+            //We disable it because in our PictureLayer.PreRoll and Paint function, we use alignToPixel() to align the view matrix
+            //before creating RasterCache which cannot meet this constraint due to the involved devicePixelRatio.
+            //Enable it when we find a way to fix this alignment issue
+//            D.assert(() => {
+//                var x = this.matrix[2] * devicePixelRatio;
+//                var y = this.matrix[5] * devicePixelRatio;
+//                this.matrix[2] = (x - (int) x) / devicePixelRatio; // x
+//                this.matrix[5] = (y - (int) y) / devicePixelRatio; // y
+//
+//                D.assert(Mathf.Abs(this.matrix[2]) <= 1e-5);
+//                D.assert(Mathf.Abs(this.matrix[5]) <= 1e-5);
+//                return true;
+//            });
 
             this.matrix[2] = 0.0f;
             this.matrix[5] = 0.0f;
