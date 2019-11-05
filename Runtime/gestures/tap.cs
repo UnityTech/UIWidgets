@@ -3,21 +3,41 @@ using Unity.UIWidgets.ui;
 
 namespace Unity.UIWidgets.gestures {
     public class TapDownDetails {
-        public TapDownDetails(Offset globalPosition = null) {
+        public TapDownDetails(Offset globalPosition = null,
+            Offset localPosition = null,
+            PointerDeviceKind kind = PointerDeviceKind.touch) {
             this.globalPosition = globalPosition ?? Offset.zero;
+            this.localPosition = localPosition ?? this.globalPosition;
+            this.kind = kind;
         }
 
         public readonly Offset globalPosition;
+
+        public readonly Offset localPosition;
+
+        public readonly PointerDeviceKind kind;
     }
 
     public delegate void GestureTapDownCallback(TapDownDetails details);
 
     public class TapUpDetails {
-        public TapUpDetails(Offset globalPosition = null) {
+        public TapUpDetails(Offset globalPosition = null,
+            Offset localPosition = null,
+            PointerDeviceKind kind = PointerDeviceKind.touch,
+            int device = 0) {
             this.globalPosition = globalPosition ?? Offset.zero;
+            this.localPosition = localPosition ?? this.globalPosition;
+            this.kind = kind;
+            this.device = device;
         }
 
         public readonly Offset globalPosition;
+        
+        public readonly Offset localPosition;
+
+        public readonly PointerDeviceKind kind;
+
+        public readonly int device;
     }
 
     public delegate void GestureTapUpCallback(TapUpDetails details);
@@ -47,10 +67,10 @@ namespace Unity.UIWidgets.gestures {
         protected override void handlePrimaryPointer(PointerEvent evt) {
             if (evt is PointerUpEvent) {
                 this._finalPosition = evt.position;
-
+                
                 if (this._wonArenaForPrimaryPointer) {
                     this.resolve(GestureDisposition.accepted);
-                    this._checkUp();
+                    this._checkUp(evt);
                 }
             }
             else if (evt is PointerCancelEvent) {
@@ -87,7 +107,7 @@ namespace Unity.UIWidgets.gestures {
             if (pointer == this.primaryPointer) {
                 this._checkDown();
                 this._wonArenaForPrimaryPointer = true;
-                this._checkUp();
+                this._checkUp(null);
             }
         }
 
@@ -118,11 +138,13 @@ namespace Unity.UIWidgets.gestures {
             }
         }
 
-        void _checkUp() {
+        void _checkUp(PointerEvent evt) {
             if (this._finalPosition != null) {
                 if (this.onTapUp != null) {
                     this.invokeCallback<object>("onTapUp", () => {
-                        this.onTapUp(new TapUpDetails(globalPosition: this._finalPosition));
+                        this.onTapUp(new TapUpDetails(globalPosition: this._finalPosition, 
+                            kind: evt?.kind ?? PointerDeviceKind.touch,
+                            device: evt?.device ?? 0));
                         return null;
                     });
                 }
