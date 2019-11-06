@@ -3,11 +3,14 @@ using Unity.UIWidgets.ui;
 using UnityEngine.EventSystems;
 
 namespace Unity.UIWidgets.engine {
-    static class InputUtils {
+    public static class InputUtils {
         const int mouseScrollId = 1;
         const int preservedKeyNum = 10;
         const int preservedMouseKeyNum = 100;
         const int fingerKeyStart = preservedKeyNum + preservedMouseKeyNum;
+
+        public const int MouseLeftKeyDevice = preservedKeyNum;
+        public const int MouseRightKeyDevice = preservedKeyNum + 1;
 
         public static PointerDeviceKind getPointerDeviceKind(PointerEventData eventData) {
             return isTouchEvent(eventData) ? PointerDeviceKind.touch : PointerDeviceKind.mouse;
