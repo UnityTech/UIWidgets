@@ -373,7 +373,7 @@ namespace Unity.UIWidgets.widgets {
                 // processElement may modify the Map - need to do a .toList() here.
                 this._childElements.Keys.ToList().ForEach(action: processElement);
                 if (this._didUnderflow) {
-                    var lastKey = this._childElements?.Last().Key ?? -1;
+                    var lastKey = this._childElements?.Last()?.Key ?? -1;
                     processElement(lastKey + 1);
                 }
             }
