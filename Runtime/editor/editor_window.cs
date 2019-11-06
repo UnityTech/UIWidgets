@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Unity.UIWidgets.async;
+using Unity.UIWidgets.engine;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.rendering;
 using Unity.UIWidgets.scheduler;
@@ -363,7 +364,7 @@ namespace Unity.UIWidgets.editor {
                         timeStamp: Timer.timespanSinceStartup,
                         change: PointerChange.down,
                         kind: PointerDeviceKind.mouse,
-                        device: evt.button,
+                        device: InputUtils.getMouseButtonKey(evt.button),
                         physicalX: evt.mousePosition.x * this._devicePixelRatio,
                         physicalY: evt.mousePosition.y * this._devicePixelRatio
                     );
@@ -373,7 +374,7 @@ namespace Unity.UIWidgets.editor {
                         timeStamp: Timer.timespanSinceStartup,
                         change: PointerChange.up,
                         kind: PointerDeviceKind.mouse,
-                        device: evt.button,
+                        device: InputUtils.getMouseButtonKey(evt.button),
                         physicalX: evt.mousePosition.x * this._devicePixelRatio,
                         physicalY: evt.mousePosition.y * this._devicePixelRatio
                     );
@@ -383,7 +384,7 @@ namespace Unity.UIWidgets.editor {
                         timeStamp: Timer.timespanSinceStartup,
                         change: PointerChange.move,
                         kind: PointerDeviceKind.mouse,
-                        device: evt.button,
+                        device: InputUtils.getMouseButtonKey(evt.button),
                         physicalX: evt.mousePosition.x * this._devicePixelRatio,
                         physicalY: evt.mousePosition.y * this._devicePixelRatio
                     );
@@ -393,7 +394,7 @@ namespace Unity.UIWidgets.editor {
                         timeStamp: Timer.timespanSinceStartup,
                         change: PointerChange.hover,
                         kind: PointerDeviceKind.mouse,
-                        device: evt.button,
+                        device: InputUtils.getMouseButtonKey(evt.button),
                         physicalX: evt.mousePosition.x * this._devicePixelRatio,
                         physicalY: evt.mousePosition.y * this._devicePixelRatio
                     );
@@ -403,7 +404,7 @@ namespace Unity.UIWidgets.editor {
                         -evt.delta.y * this._devicePixelRatio,
                         evt.mousePosition.x * this._devicePixelRatio,
                         evt.mousePosition.y * this._devicePixelRatio,
-                        evt.button
+                        InputUtils.getMouseButtonKey(evt.button)
                     );
                 }
                 else if (evt.type == EventType.DragUpdated) {
@@ -411,7 +412,7 @@ namespace Unity.UIWidgets.editor {
                         timeStamp: Timer.timespanSinceStartup,
                         change: PointerChange.dragFromEditorMove,
                         kind: PointerDeviceKind.mouse,
-                        device: evt.button,
+                        device: InputUtils.getMouseButtonKey(evt.button),
                         physicalX: evt.mousePosition.x * this._devicePixelRatio,
                         physicalY: evt.mousePosition.y * this._devicePixelRatio
                     );
@@ -421,7 +422,7 @@ namespace Unity.UIWidgets.editor {
                         timeStamp: Timer.timespanSinceStartup,
                         change: PointerChange.dragFromEditorRelease,
                         kind: PointerDeviceKind.mouse,
-                        device: evt.button,
+                        device: InputUtils.getMouseButtonKey(evt.button),
                         physicalX: evt.mousePosition.x * this._devicePixelRatio,
                         physicalY: evt.mousePosition.y * this._devicePixelRatio
                     );
