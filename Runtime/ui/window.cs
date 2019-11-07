@@ -294,7 +294,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         static void defaultFrameRateSpeedUp() {
-#if UNITY_2019_3
+#if UNITY_2019_3_OR_NEWER
             OnDemandRendering.renderFrameInterval = defaultMinRenderFrameInterval;
 #else
             Application.targetFrameRate = defaultMaxTargetFrameRate;
@@ -316,7 +316,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         static void defaultFrameRateCoolDown() {
-#if UNITY_2019_3
+#if UNITY_2019_3_OR_NEWER
             OnDemandRendering.renderFrameInterval = defaultMaxRenderFrameInterval;
 #else
             Application.targetFrameRate = defaultMinTargetFrameRate;
