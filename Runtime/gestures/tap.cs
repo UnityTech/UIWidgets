@@ -135,6 +135,7 @@ namespace Unity.UIWidgets.gestures {
             }
             
             this.handleTapDown(down: this._down);
+            this._sentTapDown = true;
         }
 
         void _checkUp() {
