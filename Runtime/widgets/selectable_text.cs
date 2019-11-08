@@ -8,6 +8,7 @@ using Unity.UIWidgets.material;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.rendering;
 using Unity.UIWidgets.ui;
+using Color = Unity.UIWidgets.ui.Color;
 using Constants = Unity.UIWidgets.gestures.Constants;
 using TextStyle = Unity.UIWidgets.painting.TextStyle;
 
@@ -22,7 +23,10 @@ namespace Unity.UIWidgets.widgets {
             float? textScaleFactor = null,
             int? maxLines = null,
             FocusNode focusNode = null,
-            Color selectionColor = null) : base(key) {
+            Color selectionColor = null,
+            GestureTapDownCallback onTapDown = null,
+            GestureTapUpCallback onTapUp = null,
+            GestureTapCancelCallback onTapCancel = null) : base(key) {
             D.assert(data != null);
             this.textSpan = null;
             this.data = data;
@@ -34,6 +38,9 @@ namespace Unity.UIWidgets.widgets {
             this.maxLines = maxLines;
             this.focusNode = focusNode ?? new FocusNode();
             this.selectionColor = selectionColor;
+            this.onTapDown = onTapDown;
+            this.onTapUp = onTapUp;
+            this.onTapCancel = onTapCancel;
         }
 
         public SelectableText(TextSpan textSpan,
@@ -45,7 +52,10 @@ namespace Unity.UIWidgets.widgets {
             float? textScaleFactor = null,
             int? maxLines = null,
             FocusNode focusNode = null,
-            Color selectionColor = null) : base(key) {
+            Color selectionColor = null,
+            GestureTapDownCallback onTapDown = null,
+            GestureTapUpCallback onTapUp = null,
+            GestureTapCancelCallback onTapCancel = null) : base(key) {
             D.assert(textSpan != null);
             this.textSpan = textSpan;
             this.data = null;
@@ -57,6 +67,9 @@ namespace Unity.UIWidgets.widgets {
             this.maxLines = maxLines;
             this.focusNode = focusNode ?? new FocusNode();
             this.selectionColor = selectionColor;
+            this.onTapDown = onTapDown;
+            this.onTapUp = onTapUp;
+            this.onTapCancel = onTapCancel;
         }
 
         public static SelectableText rich(TextSpan textSpan,
@@ -68,7 +81,10 @@ namespace Unity.UIWidgets.widgets {
             float? textScaleFactor = null,
             int? maxLines = null,
             FocusNode focusNode = null,
-            Color selectionColor = null) {
+            Color selectionColor = null,
+            GestureTapDownCallback onTapDown = null,
+            GestureTapUpCallback onTapUp = null,
+            GestureTapCancelCallback onTapCancel = null) {
             return new SelectableText(
                 textSpan, key,
                 style,
@@ -78,7 +94,10 @@ namespace Unity.UIWidgets.widgets {
                 textScaleFactor,
                 maxLines,
                 focusNode,
-                selectionColor);
+                selectionColor,
+                onTapDown,
+                onTapUp,
+                onTapCancel);
         }
 
         public readonly string data;
@@ -100,6 +119,12 @@ namespace Unity.UIWidgets.widgets {
         public readonly int? maxLines;
 
         public readonly Color selectionColor;
+
+        public readonly GestureTapDownCallback onTapDown;
+
+        public readonly GestureTapUpCallback onTapUp;
+
+        public readonly GestureTapCancelCallback onTapCancel;
 
         public override State createState() {
             return new _SelectableTextState();
@@ -172,12 +197,15 @@ namespace Unity.UIWidgets.widgets {
         }
 
         void _handleTapDown(TapDownDetails details) {
+            this.widget.onTapDown?.Invoke(details);
         }
 
         void _handleSingleTapUp(TapUpDetails details) {
+            this.widget.onTapUp?.Invoke(details);
         }
 
         void _handleSingleTapCancel() {
+            this.widget.onTapCancel?.Invoke();
         }
 
         void _handleLongPress() {
