@@ -276,7 +276,8 @@ namespace Unity.UIWidgets.material {
                             padding: metrics.padding.copyWith(
                                 bottom: Mathf.Max(metrics.padding.bottom, bodyConstraints.bottomWidgetsHeight)
                             )
-                        )
+                        ),
+                        child: this.body
                     );
                 }
             );

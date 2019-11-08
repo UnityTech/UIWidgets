@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.gestures;
 using Unity.UIWidgets.painting;
@@ -74,7 +75,8 @@ namespace Unity.UIWidgets.rendering {
             float devicePixelRatio = 1.0f,
             bool? enableInteractiveSelection = null,
             EdgeInsets floatingCursorAddedMargin = null,
-            TextSelectionDelegate textSelectionDelegate = null) {
+            TextSelectionDelegate textSelectionDelegate = null,
+            Func<RawKeyEvent, bool> globalKeyEventHandler = null) {
             floatingCursorAddedMargin = floatingCursorAddedMargin ?? EdgeInsets.fromLTRB(4, 4, 4, 5);
             D.assert(textSelectionDelegate != null);
             D.assert(minLines == null || minLines > 0);
@@ -107,6 +109,7 @@ namespace Unity.UIWidgets.rendering {
             this.onCaretChanged = onCaretChanged;
             this.onSelectionChanged = onSelectionChanged;
             this.textSelectionDelegate = textSelectionDelegate;
+            this.globalKeyEventHandler = globalKeyEventHandler;
 
             D.assert(this._maxLines == null || this._maxLines > 0);
             D.assert(this._showCursor != null);
@@ -208,7 +211,14 @@ namespace Unity.UIWidgets.rendering {
 
         bool _resetCursor = false;
 
+        public Func<RawKeyEvent, bool> globalKeyEventHandler;
+
         void _handleKeyEvent(RawKeyEvent keyEvent) {
+            if (this.globalKeyEventHandler != null &&
+                this.globalKeyEventHandler.Invoke(keyEvent)) {
+                return;
+            }
+            
             if (keyEvent is RawKeyUpEvent) {
                 return;
             }

@@ -496,7 +496,7 @@ namespace Unity.UIWidgets.material {
 
         void _updateCurrentDate() {
             this._todayDate = DateTime.Now;
-            DateTime tomorrow = new DateTime(this._todayDate.Year, this._todayDate.Month, this._todayDate.Day + 1);
+            DateTime tomorrow = this._todayDate.AddDays(1);
             TimeSpan timeUntilTomorrow = tomorrow.TimeOfDay - this._todayDate.TimeOfDay;
             this._timer?.cancel();
             this._timer = Window.instance.run(timeUntilTomorrow,
@@ -508,13 +508,7 @@ namespace Unity.UIWidgets.material {
         }
 
         DateTime _addMonthsToMonthDate(DateTime monthDate, int monthsToAdd) {
-            if (monthsToAdd < 0) {
-                var monthsToAddAfterMod = monthsToAdd % 12 + 12;
-                return new DateTime(monthDate.Year + (monthsToAdd / 12), monthDate.Month + monthsToAddAfterMod, 1);
-            }
-            else {
-                return new DateTime(monthDate.Year + (monthsToAdd / 12), monthDate.Month + monthsToAdd % 12, 1);
-            }
+            return monthDate.AddMonths(monthsToAdd);
         }
 
         Widget _buildItems(BuildContext context, int index) {

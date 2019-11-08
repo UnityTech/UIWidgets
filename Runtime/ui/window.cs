@@ -4,6 +4,7 @@ using Unity.UIWidgets.async;
 using Unity.UIWidgets.editor;
 using Unity.UIWidgets.foundation;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 namespace Unity.UIWidgets.ui {
     public delegate void VoidCallback();
@@ -275,6 +276,8 @@ namespace Unity.UIWidgets.ui {
 
         public const int defaultMaxTargetFrameRate = 60;
         public const int defaultMinTargetFrameRate = 25;
+        public const int defaultMaxRenderFrameInterval = 100;
+        public const int defaultMinRenderFrameInterval = 1;
 
         static Action _onFrameRateSpeedUp = defaultFrameRateSpeedUp;
 
@@ -291,7 +294,11 @@ namespace Unity.UIWidgets.ui {
         }
 
         static void defaultFrameRateSpeedUp() {
+#if UNITY_2019_3_OR_NEWER
+            OnDemandRendering.renderFrameInterval = defaultMinRenderFrameInterval;
+#else
             Application.targetFrameRate = defaultMaxTargetFrameRate;
+#endif
         }
 
         static Action _onFrameRateCoolDown = defaultFrameRateCoolDown;
@@ -309,7 +316,11 @@ namespace Unity.UIWidgets.ui {
         }
 
         static void defaultFrameRateCoolDown() {
+#if UNITY_2019_3_OR_NEWER
+            OnDemandRendering.renderFrameInterval = defaultMaxRenderFrameInterval;
+#else
             Application.targetFrameRate = defaultMinTargetFrameRate;
+#endif
         }
     }
 }
