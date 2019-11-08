@@ -22,32 +22,25 @@ namespace Unity.UIWidgets.plugins.raycast {
         }
 
         public override Element createElement() {
-            return new _RaycastableBoxRenderElement(this.windowHashCode, this);
+            return new _RaycastableBoxRenderElement(windowHashCode: this.windowHashCode, widget: this);
         }
     }
 
     class RenderRaycastableBox : RenderProxyBox {
         public RenderRaycastableBox(
             int windowHashCode,
-            RenderBox child = null,
-            RaycastableBox widget = null
-        ) : base(child) {
-            this.widget = widget;
+            RaycastableBox widget
+        ) {
+            this.widgetHashCode = widget.GetHashCode();
             this.windowHashCode = windowHashCode;
         }
 
+        readonly int widgetHashCode;
         readonly int windowHashCode;
-        RaycastableBox widget;
-
-        public override void detach() {
-            base.detach();
-            this.markNeedsPaint();
-        }
-
 
         public override void paint(PaintingContext context, Offset offset) {
             // Debug.Log($"[RenderRaycastableBox] Paint {this.widget.GetHashCode()}: {this.size}@{offset}");
-            RaycastManager.UpdateSizeOffset(this.widget.GetHashCode(), (int) this.windowHashCode, this.size, offset);
+            RaycastManager.UpdateSizeOffset(this.widgetHashCode, this.windowHashCode, this.size, offset);
 
             base.paint(context, offset);
         }
