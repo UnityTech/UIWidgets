@@ -1206,10 +1206,10 @@ namespace Unity.UIWidgets.ui {
                     (!ReferenceEquals(item.Value, null) && item.Value.Equals(this.root.Value)));
         }
 
-        public KeyValuePair<TKey, TValue> First() {
+        public KeyValuePair<TKey, TValue>? First() {
             SplayTreeNode t = this.root;
             if (t == null) {
-                throw new NullReferenceException("The root of this tree is null!");
+                return null;
             }
 
             while (t.LeftChild != null) {
@@ -1232,10 +1232,10 @@ namespace Unity.UIWidgets.ui {
             return new KeyValuePair<TKey, TValue>(t.Key, t.Value);
         }
 
-        public KeyValuePair<TKey, TValue> Last() {
+        public KeyValuePair<TKey, TValue>? Last() {
             SplayTreeNode t = this.root;
             if (t == null) {
-                throw new NullReferenceException("The root of this tree is null!");
+                return null;
             }
 
             while (t.RightChild != null) {

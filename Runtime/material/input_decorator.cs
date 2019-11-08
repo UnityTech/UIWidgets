@@ -995,11 +995,11 @@ namespace Unity.UIWidgets.material {
                 ? 0
                 : this.decoration.floatingLabelHeight;
             float topHeight = this.decoration.border.isOutline
-                ? Math.Max(labelHeight - boxToBaseline[this.label], 0)
+                ? Math.Max(labelHeight - boxToBaseline.getOrDefault(this.label, 0), 0)
                 : labelHeight;
             float counterHeight = this.counter == null
                 ? 0
-                : boxToBaseline[this.counter] + subtextGap;
+                : boxToBaseline.getOrDefault(this.counter, 0) + subtextGap;
             bool helperErrorExists = this.helperError?.size != null
                                      && this.helperError.size.height > 0;
             float helperErrorHeight = !helperErrorExists

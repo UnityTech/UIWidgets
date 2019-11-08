@@ -617,8 +617,8 @@ namespace Unity.UIWidgets.widgets {
                 return;
             }
 
-            int firstIndex = this._childElements.First().Key;
-            int lastIndex = this._childElements.Last().Key;
+            int firstIndex = this._childElements.First()?.Key ?? 0;
+            int lastIndex = this._childElements.Last()?.Key ?? 0;
 
             for (int index = firstIndex; index <= lastIndex; ++index) {
                 Element newChild = this.updateChild(this._childElements[index], this.retrieveWidget(index), index);
