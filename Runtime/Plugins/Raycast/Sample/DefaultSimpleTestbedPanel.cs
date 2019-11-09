@@ -1,3 +1,4 @@
+﻿using Unity.UIWidgets.engine;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.material;
 using Unity.UIWidgets.plugins.raycast;
@@ -8,7 +9,7 @@ using Color = Unity.UIWidgets.ui.Color;
 using Material = Unity.UIWidgets.material.Material;
 
 namespace Unity.UIWidgets.Sample {
-    public class RaycastSimpleTestbedPanel : UIWidgetsRaycastablePanel {
+    public class DefaultSimpleTestbedPanel : UIWidgetsPanel {
         protected override void OnEnable() {
             FontManager.instance.addFont(Resources.Load<Font>("fonts/MaterialIcons-Regular"), "Material Icons");
             base.OnEnable();
@@ -16,26 +17,26 @@ namespace Unity.UIWidgets.Sample {
 
         protected override Widget createWidget() {
             return new MaterialApp(
-                home: new RaycastSimpleTestbedWidget()
+                home: new DefaultSimpleTestbedWidget()
             );
         }
     }
 
-    public class RaycastSimpleTestbedWidget : StatefulWidget {
-        public RaycastSimpleTestbedWidget(Key key = null) : base(key) { }
+    public class DefaultSimpleTestbedWidget : StatefulWidget {
+        public DefaultSimpleTestbedWidget(Key key = null) : base(key) { }
 
         public override State createState() {
-            return new RaycastSimpleTestbedWidgetState();
+            return new DefaultSimpleTestbedWidgetState();
         }
     }
 
-    public class RaycastSimpleTestbedWidgetState : State<RaycastSimpleTestbedWidget> {
+    public class DefaultSimpleTestbedWidgetState : State<DefaultSimpleTestbedWidget> {
         public override Widget build(BuildContext context) {
             return new Material(
                 color: new Color(0x44FFFF00),
                 child: new Center(
-                    child: new RaycastableContainer(
-                        new MaterialButton(
+                    child: new Container(
+                        child: new MaterialButton(
                             child: new Text("Material Button"),
                             onPressed: () => { },
                             color: Colors.lightBlue

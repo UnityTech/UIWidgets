@@ -13,7 +13,7 @@ using Material = Unity.UIWidgets.material.Material;
 using TextStyle = Unity.UIWidgets.painting.TextStyle;
 
 namespace Unity.UIWidgets.Sample {
-    public class RaycastTestbedPanel : UIWidgetsPanel {
+    public class RaycastTestbedPanel : UIWidgetsRaycastablePanel {
         protected override void OnEnable() {
             FontManager.instance.addFont(Resources.Load<Font>("fonts/MaterialIcons-Regular"), "Material Icons");
             base.OnEnable();
