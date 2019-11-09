@@ -57,20 +57,17 @@ namespace Unity.UIWidgets.plugins.raycast {
 
         public static void NewWindow(int windowHashCode) {
             if (!instance.raycastHandlerMap.ContainsKey(windowHashCode)) {
-                // Debug.Log($"New Window: @[{windowHashCode}] ({instance.raycastHandlerMap.Count})");
                 instance.raycastHandlerMap.Add(windowHashCode, new Dictionary<int, RaycastableRect>());
             }
         }
 
         public static void DisposeWindow(int windowHashCode) {
             if (instance.raycastHandlerMap.ContainsKey(windowHashCode)) {
-                // Debug.Log($"Dispose Window: @[{windowHashCode}]");
                 instance.raycastHandlerMap.Remove(windowHashCode);
             }
         }
 
         public static void AddToList(int widgetHashCode, int windowHashCode) {
-            // Debug.Log($"Add To List: [{widgetHashCode}]@[{windowHashCode}]");
             D.assert(instance.raycastHandlerMap.ContainsKey(windowHashCode), () =>
                 $"Raycast Handler Map doesn't contain Window {windowHashCode}, " +
                 $"Make sure using UIWidgetsRaycastablePanel instead of UIWidgetsPanel " +
@@ -82,7 +79,6 @@ namespace Unity.UIWidgets.plugins.raycast {
         }
 
         public static void MarkDirty(int widgetHashCode, int windowHashCode) {
-            // Debug.Log($"Mark Dirty: [{widgetHashCode}]@[{windowHashCode}]");
             D.assert(instance.raycastHandlerMap.ContainsKey(windowHashCode), () =>
                 $"Raycast Handler Map doesn't contain Window {windowHashCode}");
             D.assert(instance.raycastHandlerMap[windowHashCode].ContainsKey(widgetHashCode), () =>
@@ -98,7 +94,6 @@ namespace Unity.UIWidgets.plugins.raycast {
                 $"Raycast Handler Map doesn't contain Widget {widgetHashCode} at Window {windowHashCode}");
 
             if (instance.raycastHandlerMap[windowHashCode][widgetHashCode].isDirty) {
-                // Debug.Log($"Update Size Offset: [{widgetHashCode}]@[{windowHashCode}]");
                 instance.raycastHandlerMap[windowHashCode][widgetHashCode]
                     .UpdateRect(offset.dx, offset.dy, size.width, size.height);
                 instance.raycastHandlerMap[windowHashCode][widgetHashCode].UnmarkDirty();
@@ -106,7 +101,6 @@ namespace Unity.UIWidgets.plugins.raycast {
         }
 
         public static void RemoveFromList(int widgetHashCode, int windowHashCode) {
-            // Debug.Log($"Remove From List: [{widgetHashCode}]@[{windowHashCode}]");
             D.assert(instance.raycastHandlerMap.ContainsKey(windowHashCode), () =>
                 $"Raycast Handler Map doesn't contain Window {windowHashCode}");
             D.assert(instance.raycastHandlerMap[windowHashCode].ContainsKey(widgetHashCode), () =>

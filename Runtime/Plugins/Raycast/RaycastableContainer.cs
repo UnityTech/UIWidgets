@@ -39,7 +39,6 @@ namespace Unity.UIWidgets.plugins.raycast {
         readonly int windowHashCode;
 
         public override void paint(PaintingContext context, Offset offset) {
-            // Debug.Log($"[RenderRaycastableBox] Paint {this.widget.GetHashCode()}: {this.size}@{offset}");
             RaycastManager.UpdateSizeOffset(this.widgetHashCode, this.windowHashCode, this.size, offset);
 
             base.paint(context, offset);
@@ -63,20 +62,16 @@ namespace Unity.UIWidgets.plugins.raycast {
 
         public override void mount(Element parent, object newSlot) {
             this.widgetHashCode = this.widget.GetHashCode();
-
-            // Debug.Log($"[RaycastableBox] Mount: {this.initHashCode}");
             RaycastManager.AddToList(this.widgetHashCode, this.windowHashCode);
             base.mount(parent, newSlot);
         }
 
         public override void update(Widget newWidget) {
-            // Debug.Log($"[RaycastableBox] Update: {this.initHashCode}");
             RaycastManager.MarkDirty(this.widgetHashCode, this.windowHashCode);
             base.update(newWidget);
         }
 
         public override void unmount() {
-            // Debug.Log($"[RaycastableBox] Unmount: {this.initHashCode}");
             RaycastManager.RemoveFromList(this.widgetHashCode, this.windowHashCode);
             base.unmount();
         }
