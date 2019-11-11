@@ -230,7 +230,7 @@ Status bar is always hidden by default when an Unity project is running on an An
 
 To build an App that is able to adjust the frame rate automatically, please open Project Settings, and in the Quality tab, set the "V Sync Count" option of the target platform to "Don't Sync".
 The default logic is to reduce the frame rate when the screen is static, and change it back to 60 whenever the screen changes.
-If you would like to disable this behavior, please set `Window.onFrameRateSpeedUp` and/or `Window.onFrameRateCoolDown` to null function, i.e., () => {}.
+If you would like to disable this behavior, please set `Window.onFrameRateSpeedUp` and `Window.onFrameRateCoolDown` to null function, i.e., () => {}.
 
 Note that in Unity 2019.3 and above, UIWidgets will use OnDemandRenderAPI to implement this feature, which will greatly save the battery.
 
@@ -297,7 +297,7 @@ via *Window/Analysis/UIWidgets* inspector in Editor menu.
 ## Learn
 
 #### Samples
-You can find many UIWidgets sample projects on Github, which covers different aspects and provide you
+You can find many UIWidgets sample projects on Github, which cover different aspects and provide you
 learning materials in various levels:
 * UIWidgetsSamples (https://github.com/UIWidgets/UIWidgetsSamples). These samples are developed by the dev team in order to illustrates all the features of 
 UIWidgets. First clone this Repo to the **Assets** folder of your local UIWidgets project. Then
@@ -305,7 +305,7 @@ you can find all the sample scenes under the **Scene** folder.
 You can also try UIWidgets-based Editor windows by clicking the new **UIWidgetsTests** tab on the main menu
 and open one of the dropdown samples.
 * awesome-UIWidgets by Liangxie (https://github.com/liangxiegame/awesome-uiwidgets). This Repo contains 
-lots of UIWidget demos apps and third-party applications. 
+lots of UIWidget demo apps and third-party applications. 
 * ConnectApp (https://github.com/UnityTech/ConnectAppCN). This is an online, open-source UIWidget-based App developed 
 by the dev team. If you are making your own App with UIWidgets, this project will provides you with 
 many best practice cases.
