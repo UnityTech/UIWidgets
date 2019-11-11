@@ -229,8 +229,10 @@ Status bar is always hidden by default when an Unity project is running on an An
 #### Automatically Adjust Frame Rate
 
 To build an App that is able to adjust the frame rate automatically, please open Project Settings, and in the Quality tab, set the "V Sync Count" option of the target platform to "Don't Sync".
-The default logic is to set the frame rate to 25 when the screen is static, and change the frame rate to 60 whenever the screen changes.
-If you would like to modify the behavior of speeding up or cooling down the frame rate, please set `Window.onFrameRateSpeedUp` and/or `Window.onFrameRateCoolDown` to your own functions.
+The default logic is to reduce the frame rate when the screen is static, and change it back to 60 whenever the screen changes.
+If you would like to disable this behavior, please set `Window.onFrameRateSpeedUp` and/or `Window.onFrameRateCoolDown` to null function, i.e., () => {}.
+
+Note that in Unity 2019.3 and above, UIWidgets will use OnDemandRenderAPI to implement this feature, which will greatly save the battery.
 
 #### WebGL Canvas Device Pixel Ratio Plugin
 The width and height of the Canvas in browser may differ from the number of pixels the Canvas occupies on the screen.
@@ -274,8 +276,6 @@ in the texture `rowCount`, and number of columns `colCount`.
 
 With the provided packaged stateful widget `UnityObjectDetector` and its `onRelease` callback function, you can easily drag some objects (for example GameObject from Hierarchy, files from Project Window, etc) into the area, get the UnityEngine.Object[] references and make further modification.
 
-Please refer to "UIWidgetsTests -> Drag&Drop" for simple examples.
-
 
 ## Debug UIWidgets Application
 
@@ -296,13 +296,19 @@ via *Window/Analysis/UIWidgets* inspector in Editor menu.
 ## Learn
 
 #### Samples
-You can find many UIWidgets App samples in the UIWidgets package in the **Samples** folder.
-Feel free to try them out and make modifications to see the results.
-To get started, the UIWidgetsTheatre scene provides you
-a list of carefully selected samples to start with.
-
-You can also try UIWidgets-based Editor windows by clicking **UIWidgetsTest** on the main menu
+You can find many UIWidgets sample projects on Github, which covers different aspects and provide you
+learning materials in various levels:
+* UIWidgetsSamples (https://github.com/UIWidgets/UIWidgetsSamples). These samples are developed by the dev team in order to illustrates all the features of 
+UIWidgets. Clone this Repo to the **Assets** folder of your local UIWidgets project and then
+you can find all the sample scenes under the **Scene** folder.
+You can also try UIWidgets-based Editor windows by clicking the new **UIWidgetsTests** tab on the main menu
 and open one of the dropdown samples.
+* awesome-UIWidgets by Liangxie (https://github.com/liangxiegame/awesome-uiwidgets). This Repo contains 
+lots of UIWidget demos apps and third-party applications. 
+* ConnectApp (https://github.com/UnityTech/ConnectAppCN). This is an online, open-source UIWidget-based App developed 
+by the dev team. If you are making your own App with UIWidgets, this project will provides you with 
+many best practice cases.
+
 
 #### Wiki
 The develop team is still working on the UIWidgets Wiki. However, since UIWidgets is mainly derived from Flutter,
