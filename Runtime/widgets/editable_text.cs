@@ -103,7 +103,7 @@ namespace Unity.UIWidgets.widgets {
             DragStartBehavior dragStartBehavior = DragStartBehavior.down,
             bool? enableInteractiveSelection = null,
             ScrollPhysics scrollPhysics = null,
-            GlobalKeyEventHandlerDelegate globalCtrlKeyEventHandler = null
+            GlobalKeyEventHandlerDelegate globalKeyEventHandler = null
         ) : base(key) {
             D.assert(controller != null);
             D.assert(focusNode != null);
@@ -164,7 +164,7 @@ namespace Unity.UIWidgets.widgets {
             this.enableInteractiveSelection = enableInteractiveSelection;
             this.dragStartBehavior = dragStartBehavior;
             this.scrollPhysics = scrollPhysics;
-            this.globalKeyEventHandler = globalCtrlKeyEventHandler;
+            this.globalKeyEventHandler = globalKeyEventHandler;
         }
 
         public readonly TextEditingController controller;
