@@ -259,14 +259,14 @@ UIWidgets Inspector工具用于可视化和浏览窗口小部件树。 你可以
 #### 教程
 
 包括开发组在内的广大开发者为UIWidgets提供了许多可供学习的样例和教程，你可以根据你的需求进行学习：
-- UIWidgets官方示例。目前所有官方使用的示例项目均维护在一个独立的Github仓库（https://github.com/UIWidgets/UIWidgetsSamples）中。你可以
+- UIWidgets官方示例。目前所有官方使用的示例项目均维护在一个独立的Github仓库（ https://github.com/UIWidgets/UIWidgetsSamples ）中。你可以
 将它clone到你项目本地的Assets目录下使用。
 具体的，你可以在Sample项目的**Scene**子文件夹中浏览所有示例UI场景。
 此外，你还可以点击主菜单上的新增的UIWidgetsTests选项卡，并在下拉菜单中选择一个EditorWindow UI示例来运行。
-- UIWidgets凉鞋系列教程。你可以在凉鞋老师整理的Github仓库（https://github.com/liangxiegame/awesome-uiwidgets）中学习UIWidgets的基本用法
+- UIWidgets凉鞋系列教程。你可以在凉鞋老师整理的Github仓库（ https://github.com/liangxiegame/awesome-uiwidgets ）中学习UIWidgets的基本用法
 以及许多有趣的小Demo。
 - ConnectApp开源项目。这是一个完整的线上、开源、完全基于UIWidgets的第一方App项目。其中包含了大量产品级的UIWidgets工程实践细节，
-如果你想深入了解UIWidgets并且使用它构建线上项目，请访问项目Github仓库了解更多（https://github.com/UnityTech/ConnectAppCN）。
+如果你想深入了解UIWidgets并且使用它构建线上项目，请访问项目Github仓库了解更多（ https://github.com/UnityTech/ConnectAppCN ）。
 
 #### Wiki
 

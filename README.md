@@ -289,6 +289,7 @@ The symbol is for debug purpose, please remove it from your release build.
 #### UIWidgets Inspector
 The UIWidgets Inspector tool is for visualizing and exploring the widget trees. You can find it
 via *Window/Analysis/UIWidgets* inspector in Editor menu.
+
 **Note**
 * **UIWidgets_DEBUG** needs to be define for inspector to work properly.
 * Inspector currently only works in Editor Play Mode, inspect standalone built application is not supported for now.
@@ -299,7 +300,7 @@ via *Window/Analysis/UIWidgets* inspector in Editor menu.
 You can find many UIWidgets sample projects on Github, which covers different aspects and provide you
 learning materials in various levels:
 * UIWidgetsSamples (https://github.com/UIWidgets/UIWidgetsSamples). These samples are developed by the dev team in order to illustrates all the features of 
-UIWidgets. Clone this Repo to the **Assets** folder of your local UIWidgets project and then
+UIWidgets. First clone this Repo to the **Assets** folder of your local UIWidgets project. Then
 you can find all the sample scenes under the **Scene** folder.
 You can also try UIWidgets-based Editor windows by clicking the new **UIWidgetsTests** tab on the main menu
 and open one of the dropdown samples.
