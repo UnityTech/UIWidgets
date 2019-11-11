@@ -76,7 +76,7 @@ namespace Unity.UIWidgets.rendering {
             bool? enableInteractiveSelection = null,
             EdgeInsets floatingCursorAddedMargin = null,
             TextSelectionDelegate textSelectionDelegate = null,
-            Func<RawKeyEvent, bool> globalKeyEventHandler = null) {
+            GlobalKeyEventHandlerDelegate globalKeyEventHandler = null) {
             floatingCursorAddedMargin = floatingCursorAddedMargin ?? EdgeInsets.fromLTRB(4, 4, 4, 5);
             D.assert(textSelectionDelegate != null);
             D.assert(minLines == null || minLines > 0);
@@ -164,6 +164,7 @@ namespace Unity.UIWidgets.rendering {
         }
 
         public TextSelectionDelegate textSelectionDelegate;
+        public GlobalKeyEventHandlerDelegate globalKeyEventHandler;
         Rect _lastCaretRect;
 
 
@@ -211,14 +212,7 @@ namespace Unity.UIWidgets.rendering {
 
         bool _resetCursor = false;
 
-        public Func<RawKeyEvent, bool> globalKeyEventHandler;
-
         void _handleKeyEvent(RawKeyEvent keyEvent) {
-            if (this.globalKeyEventHandler != null &&
-                this.globalKeyEventHandler.Invoke(keyEvent)) {
-                return;
-            }
-            
             if (keyEvent is RawKeyUpEvent) {
                 return;
             }
@@ -226,6 +220,10 @@ namespace Unity.UIWidgets.rendering {
             if (this.selection.isCollapsed) {
                 this._extentOffset = this.selection.extentOffset;
                 this._baseOffset = this.selection.baseOffset;
+            }
+            
+            if (this.globalKeyEventHandler?.Invoke(keyEvent, false)?.swallow ?? false) {
+                return;
             }
 
             KeyCode pressedKeyCode = keyEvent.data.unityEvent.keyCode;
