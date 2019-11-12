@@ -7,6 +7,10 @@ using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.ui;
 using UnityEngine;
 
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+
 namespace Unity.UIWidgets.service {
     
     public delegate RawInputKeyResponse GlobalKeyEventHandlerDelegate(RawKeyEvent rawEvt, bool enableCustomAction = false);
@@ -68,16 +72,23 @@ namespace Unity.UIWidgets.service {
         public void setEditingState(TextEditingValue value) {
             this._value = value;
         }
+        
+        Offset _editorWindowPosToScreenPos(Offset position) {
+#if UNITY_EDITOR
+            //locate the IME 15 logical pixels higher than the caret
+            return new Offset(position.dx, position.dy - 15 * EditorGUIUtility.pixelsPerPoint);
+#else
+            return position;
+#endif
+        }
 
         public void setIMEPos(Offset imeGlobalPos) {
             var uiWidgetWindowAdapter = Window.instance as UIWidgetWindowAdapter;
-            if (uiWidgetWindowAdapter != null) {
-                var screenPos = uiWidgetWindowAdapter.windowPosToScreenPos(imeGlobalPos);
-                Input.compositionCursorPos = new Vector2(screenPos.dx, screenPos.dy);
-            }
-            else { // editor window case
-                Input.compositionCursorPos = new Vector2(imeGlobalPos.dx, imeGlobalPos.dy);
-            }
+            Offset screenPos = uiWidgetWindowAdapter != null 
+                ? uiWidgetWindowAdapter.windowPosToScreenPos(imeGlobalPos) 
+                : this._editorWindowPosToScreenPos(imeGlobalPos);
+            
+            Input.compositionCursorPos = new Vector2(screenPos.dx, screenPos.dy);
         }
 
         public void setClient(int client, TextInputConfiguration configuration) {
