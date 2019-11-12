@@ -509,7 +509,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         public static bool isEmptyEmoji(int c) {
-            return !emojiLookupTable.ContainsKey(c) && c == 0xFE0F;
+            return c == 0xFE0F && !emojiLookupTable.ContainsKey(c);
         }
 
         public static List<string> splitByEmoji(string text) {

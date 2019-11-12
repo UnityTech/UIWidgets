@@ -1,5 +1,4 @@
 # UIWidgets
-[中文](README-ZH.md)
 
 
 ## Introduction
@@ -354,4 +353,4 @@ Meanwhile, you can join the discussion channel at (https://connect.unity.com/g/u
 
 ## How to Contribute
 
-Check [CONTRIBUTING.md](CONTRIBUTING.md)
+Check [CONTRIBUTING](CONTRIBUTING)
