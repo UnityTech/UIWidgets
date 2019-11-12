@@ -225,9 +225,34 @@ $JSEvents
 在UIWidgets中使用图片时，记得将这一特性关闭，以免图片被意外放缩，方法如下：在Project面板中选中图片，在"Inspector"面板中将"Non Power of 2"（在"Advanced"中）设置为"None"。
 
 #### 十、更新表情(Emoji)
-UIWidgets支持渲染文本中包含的表情。表情的图片来自[Google Emoji](https://emojipedia.org/google)提供的免费资源。
-如果您希望使用自己的表情图片，请更新纹理图`Runtime/Resources/images/Emoji.png`，以及`Runtime/ui/txt/emoji.cs`中将Unicode映射到纹理图中具体位置的映射表。
-特别地，请记得更新Dictionary变量`emojiLookupTable`，纹理图的行数`rowCount`以及纹理图的列数`colCount`。
+UIWidgets支持渲染文本中包含的表情。
+默认的表情资源为[iOS 13.2](https://emojipedia.org/apple/ios-13.2)。
+我们也准备了[Google Emoji](https://emojipedia.org/google)的表情资源。
+如果您希望切换到Google版本的表情，请按如下步骤操作：
+
+1. 拷贝`Runtime/Resources/backup~/EmojiGoogle.png`到`Runtime/Resources/images`目录。
+2. 在**Project**面板中，找到`EmojiGoogle`资源，在**Inspector**面板中，将**Max Size**更改为4096，并取消**Generate Mipmaps**选项前的对勾。
+3. 在您的代码中继承`UIWidgetsPanel`的类的`OnEnable()`函数中，添加如下代码
+
+```csharp
+EmojiUtils.configuration = EmojiUtils.googleEmojiConfiguration;
+```
+
+如果您希望使用自己的表情图片，请按如下步骤操作：
+
+1. 参照`EmojiGoogle.png`，创建您自己的Emoji表单，并放到工程目录下的某个`Resources`目录中，例如`Resources/myImages/MyEmoji.png`）。
+2. 在`OnEnable()`函数中，添加如下代码（记得将示例的值改为真实的值）。注意Emoji的编码的顺序要和Emoji表单一致。
+
+```csharp
+EmojiUtils.configuration = new EmojiResourceConfiguration(
+  spriteSheetAssetName: "myImage/MyEmoji",
+  emojiCodes: new List<int> {
+    0x1f004, 0x1f0cf, 0x1f170, ...
+  },
+  spriteSheetNumberOfRows: 36,
+  spriteSheetNumberOfColumns: 37,
+);
+```
 
 #### 十一、与GameObject进行拖拽交互
 

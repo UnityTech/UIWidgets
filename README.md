@@ -261,12 +261,34 @@ Unity, by default, resizes the width and height of an imported image to the near
 In UIWidgets, you should almost always disable this by selecting the image in the "Project" panel, then in the "Inspector" panel set the "Non Power of 2" option (in "Advanced") to "None", to prevent your image from being resized unexpectedly.
 
 #### Update Emoji
-UIWidgets supports rendering emoji in (editable) texts. The emoji images comes from the free
-resources provided by [Google Emoji](https://emojipedia.org/google). If you would
-like to use your own images for emoji, please update the texture image `Runtime/Resources/images/Emoji.png`,
-and the unicode-index table in `Runtime/ui/txt/emoji.cs` which maps unicodes to specific locations
-in the texture. Specifically, remember to update the Dictionary `emojiLookupTable`, number of rows
-in the texture `rowCount`, and number of columns `colCount`.
+UIWidgets supports rendering emoji in (editable) texts.
+The default emoji resource version is [iOS 13.2](https://emojipedia.org/apple/ios-13.2).
+We also prepared the resources of [Google Emoji](https://emojipedia.org/google).
+To switch to Google version of emoji, please follow the following steps:
+
+1. Copy `Runtime/Resources/backup~/EmojiGoogle.png` to `Runtime/Resources/images` folder.
+2. In the **Project** panel, find and select `EmojiGoogle` asset, and in the **Inspector** panel, change **Max Size** to 4096, and disable **Generate Mipmaps**.
+3. In the `OnEnable()` function in your class overriding `UIWidgetsPanel`, add the following code
+
+```csharp
+EmojiUtils.configuration = EmojiUtils.googleEmojiConfiguration;
+```
+
+If you would like to use your own images for emoji, please follow the following steps:
+
+1. Create the sprite sheet (take `EmojiGoogle.png` as an example), and put in a `Resources` folder in your project, (for example `Resources/myImages/MyEmoji.png`).
+2. In the `OnEnable()` function, add the following code (replace example values with actual value). Note that the order of emoji codes should be consistent with the sprite sheet.
+
+```csharp
+EmojiUtils.configuration = new EmojiResourceConfiguration(
+  spriteSheetAssetName: "myImage/MyEmoji",
+  emojiCodes: new List<int> {
+    0x1f004, 0x1f0cf, 0x1f170, ...
+  },
+  spriteSheetNumberOfRows: 36,
+  spriteSheetNumberOfColumns: 37,
+);
+```
 
 #### Interact with GameObject Drag&Drops
 
