@@ -404,7 +404,7 @@ namespace Unity.UIWidgets.editor {
                         -evt.delta.y * this._devicePixelRatio,
                         evt.mousePosition.x * this._devicePixelRatio,
                         evt.mousePosition.y * this._devicePixelRatio,
-                        InputUtils.getMouseButtonKey(evt.button)
+                        InputUtils.getScrollButtonKey()
                     );
                 }
                 else if (evt.type == EventType.DragUpdated) {
