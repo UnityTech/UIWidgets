@@ -74,13 +74,12 @@ namespace Unity.UIWidgets.service {
         }
         
         Offset _editorWindowPosToScreenPos(Offset position) {
-            //locate the IME 35 logical pixels higher than the caret
-            var offsetY = 35f;
 #if UNITY_EDITOR_WIN
-            var pixelPerPoint = EditorGUIUtility.pixelsPerPoint;
-            return new Offset(position.dx * pixelPerPoint, (position.dy - offsetY) * pixelPerPoint);
+            return position * EditorGUIUtility.pixelsPerPoint;
 #elif UNITY_EDITOR_OSX
-            return new Offset(position.dx, position.dy - offsetY);
+            //locate the IME 30 logical pixels lower than the caret
+            var offsetY = 30f;
+            return new Offset(position.dx, position.dy + offsetY);
 #else
             return position;
 #endif
