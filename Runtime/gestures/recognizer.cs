@@ -37,7 +37,7 @@ namespace Unity.UIWidgets.gestures {
         protected virtual void handleNonAllowedPointer(PointerDownEvent evt) {
         }
 
-        protected bool isPointerAllowed(PointerDownEvent evt) {
+        protected virtual bool isPointerAllowed(PointerDownEvent evt) {
             return this._kind == null || this._kind == evt.kind;
         }
 
