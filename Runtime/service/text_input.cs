@@ -444,6 +444,8 @@ namespace Unity.UIWidgets.service {
         void performAction(TextInputAction action);
 
         void updateFloatingCursor(RawFloatingCursorPoint point);
+
+        RawInputKeyResponse globalInputKeyHandler(RawKeyEvent evt);
     }
 
     public enum TextInputAction {
@@ -630,6 +632,18 @@ namespace Unity.UIWidgets.service {
             }
 
             _currentConnection._client.performAction(action);
+        }
+
+        internal static RawInputKeyResponse _handleGlobalInputKey(int client, RawKeyEvent evt) {
+            if (_currentConnection == null) {
+                return RawInputKeyResponse.convert(evt);
+            }
+
+            if (client != _currentConnection._id) {
+                return RawInputKeyResponse.convert(evt);
+            }
+
+            return _currentConnection._client.globalInputKeyHandler(evt);
         }
 
         static bool _hidePending = false;
