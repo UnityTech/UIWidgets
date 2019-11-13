@@ -87,7 +87,7 @@ namespace Unity.UIWidgets.gestures {
                 }
 
                 this._reset();
-            } else if (evt.buttons != this._down.buttons) {
+            } else if (evt.buttons != this._down?.buttons) {
                 this.resolve(GestureDisposition.rejected);
                 this.stopTrackingPointer(this.primaryPointer);
             }

@@ -103,7 +103,7 @@ namespace Unity.UIWidgets.widgets {
             DragStartBehavior dragStartBehavior = DragStartBehavior.down,
             bool? enableInteractiveSelection = null,
             ScrollPhysics scrollPhysics = null,
-            Func<RawKeyEvent, bool> globalCtrlKeyEventHandler = null
+            GlobalKeyEventHandlerDelegate globalKeyEventHandler = null
         ) : base(key) {
             D.assert(controller != null);
             D.assert(focusNode != null);
@@ -164,7 +164,7 @@ namespace Unity.UIWidgets.widgets {
             this.enableInteractiveSelection = enableInteractiveSelection;
             this.dragStartBehavior = dragStartBehavior;
             this.scrollPhysics = scrollPhysics;
-            this.globalKeyEventHandler = globalCtrlKeyEventHandler;
+            this.globalKeyEventHandler = globalKeyEventHandler;
         }
 
         public readonly TextEditingController controller;
@@ -216,7 +216,7 @@ namespace Unity.UIWidgets.widgets {
         public readonly DragStartBehavior dragStartBehavior;
         public readonly bool? enableInteractiveSelection;
         public readonly ScrollPhysics scrollPhysics;
-        public readonly Func<RawKeyEvent, bool> globalKeyEventHandler;
+        public readonly GlobalKeyEventHandlerDelegate globalKeyEventHandler;
 
         public bool selectionEnabled {
             get { return this.enableInteractiveSelection ?? !this.obscureText; }
@@ -431,6 +431,10 @@ namespace Unity.UIWidgets.widgets {
                         curve: Curves.decelerate);
                     break;
             }
+        }
+
+        public RawInputKeyResponse globalInputKeyHandler(RawKeyEvent evt) {
+            return this.widget.globalKeyEventHandler?.Invoke(evt, true) ?? RawInputKeyResponse.convert(evt);
         }
 
         void _onFloatingCursorResetTick() {
@@ -951,7 +955,7 @@ namespace Unity.UIWidgets.widgets {
                             enableInteractiveSelection: this.widget.enableInteractiveSelection == true,
                             textSelectionDelegate: this,
                             devicePixelRatio: this._devicePixelRatio,
-                            globalKeyEventHandler: this.widget.globalKeyEventHandler
+                            globalKeyEventHandler : this.widget.globalKeyEventHandler
                         )
                     )
             );
@@ -1053,8 +1057,7 @@ namespace Unity.UIWidgets.widgets {
         public readonly TextSelectionDelegate textSelectionDelegate;
         public readonly bool? paintCursorAboveText;
         public readonly float? devicePixelRatio;
-        public readonly Func<RawKeyEvent, bool> globalKeyEventHandler;
-
+        public readonly GlobalKeyEventHandlerDelegate globalKeyEventHandler;
 
         public _Editable(TextSpan textSpan = null,
             TextEditingValue value = null,
@@ -1084,7 +1087,7 @@ namespace Unity.UIWidgets.widgets {
             bool enableInteractiveSelection = true,
             bool? paintCursorAboveText = null,
             float? devicePixelRatio = null,
-            Func<RawKeyEvent, bool> globalKeyEventHandler = null) : base(key) {
+            GlobalKeyEventHandlerDelegate globalKeyEventHandler = null) : base(key) {
             this.textSpan = textSpan;
             this.value = value;
             this.cursorColor = cursorColor;
@@ -1143,7 +1146,7 @@ namespace Unity.UIWidgets.widgets {
                 textSelectionDelegate: this.textSelectionDelegate,
                 paintCursorAboveText: this.paintCursorAboveText == true,
                 devicePixelRatio: this.devicePixelRatio ?? 1.0f,
-                globalKeyEventHandler: this.globalKeyEventHandler
+                globalKeyEventHandler : this.globalKeyEventHandler
             );
         }
 
