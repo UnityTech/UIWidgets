@@ -228,7 +228,7 @@ namespace Unity.UIWidgets.ui {
         );
         
         public static readonly EmojiResourceConfiguration appleEmojiConfiguration = new EmojiResourceConfiguration(
-            "images/EmojiIOS12.3",
+            "images/EmojiIOS13.2",
             emojiCodes: new List<int> {
                 0x1f004, 0x1f0cf, 0x1f170, 0x1f171, 0x1f17e, 0x1f17f, 0x1f18e,
                 0x1f191, 0x1f192, 0x1f193, 0x1f194, 0x1f195, 0x1f196, 0x1f197,
