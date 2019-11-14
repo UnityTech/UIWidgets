@@ -231,7 +231,7 @@ UIWidgets支持渲染文本中包含的表情。
 如果您希望切换到Google版本的表情，请按如下步骤操作：
 
 1. 拷贝`Runtime/Resources/backup~/EmojiGoogle.png`到`Runtime/Resources/images`目录。
-2. 在**Project**面板中，找到`EmojiGoogle`资源，在**Inspector**面板中，将**Max Size**更改为4096，并取消**Generate Mipmaps**选项前的对勾。
+2. 在**Project**面板中，找到`EmojiGoogle`资源，在**Inspector**面板中，将**Max Size**更改为4096，取消选中**Generate Mipmaps**，并选中**Alpha Is Transparency**。
 3. 在您的代码中继承`UIWidgetsPanel`的类的`OnEnable()`函数中，添加如下代码
 
 ```csharp
