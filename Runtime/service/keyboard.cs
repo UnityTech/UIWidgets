@@ -7,7 +7,34 @@ using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.ui;
 using UnityEngine;
 
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+
 namespace Unity.UIWidgets.service {
+    
+    public delegate RawInputKeyResponse GlobalKeyEventHandlerDelegate(RawKeyEvent rawEvt, bool enableCustomAction = false);
+    
+    public class RawInputKeyResponse {
+        public readonly bool swallow;
+        public readonly char input;
+        public readonly TextInputAction? inputAction;
+
+        public RawInputKeyResponse(bool swallow, char input = '\0', TextInputAction? inputAction = null) {
+            this.swallow = swallow;
+            this.input = input;
+            this.inputAction = inputAction;
+        }
+        
+        public static RawInputKeyResponse convert(RawKeyEvent evt) {
+            return new RawInputKeyResponse(
+                false, 
+                evt.data.unityEvent.character,
+                null);
+        }
+
+        public static readonly RawInputKeyResponse swallowResponse = new RawInputKeyResponse(true, '\0', null);
+    }
 
     interface KeyboardDelegate: IDisposable {
         void show();
@@ -45,16 +72,26 @@ namespace Unity.UIWidgets.service {
         public void setEditingState(TextEditingValue value) {
             this._value = value;
         }
+        
+        Offset _editorWindowPosToScreenPos(Offset position) {
+#if UNITY_EDITOR_WIN
+            return position * EditorGUIUtility.pixelsPerPoint;
+#elif UNITY_EDITOR_OSX
+            //locate the IME 30 logical pixels lower than the caret
+            var offsetY = 30f;
+            return new Offset(position.dx, position.dy + offsetY);
+#else
+            return position;
+#endif
+        }
 
         public void setIMEPos(Offset imeGlobalPos) {
             var uiWidgetWindowAdapter = Window.instance as UIWidgetWindowAdapter;
-            if (uiWidgetWindowAdapter != null) {
-                var screenPos = uiWidgetWindowAdapter.windowPosToScreenPos(imeGlobalPos);
-                Input.compositionCursorPos = new Vector2(screenPos.dx, screenPos.dy);
-            }
-            else { // editor window case
-                Input.compositionCursorPos = new Vector2(imeGlobalPos.dx, imeGlobalPos.dy);
-            }
+            Offset screenPos = uiWidgetWindowAdapter != null 
+                ? uiWidgetWindowAdapter.windowPosToScreenPos(imeGlobalPos) 
+                : this._editorWindowPosToScreenPos(imeGlobalPos);
+            
+            Input.compositionCursorPos = new Vector2(screenPos.dx, screenPos.dy);
         }
 
         public void setClient(int client, TextInputConfiguration configuration) {
@@ -83,9 +120,20 @@ namespace Unity.UIWidgets.service {
             
             var currentEvent = Event.current;
             var oldValue = this._value;
-            
+
             if (currentEvent != null && currentEvent.type == EventType.KeyDown) {
-                if (currentEvent.keyCode == KeyCode.Backspace) {
+                var response = TextInput._handleGlobalInputKey(this._client,
+                    new RawKeyDownEvent(new RawKeyEventData(currentEvent)));
+
+                if (response.swallow) {
+                    if (response.inputAction != null) {
+                        Window.instance.run(() => { TextInput._performAction(this._client, response.inputAction.Value); });
+                    }
+                    
+                    if (_validateCharacter(response.input)) {
+                        this._value = this._value.insert(new string(response.input, 1));
+                    }
+                } else if (currentEvent.keyCode == KeyCode.Backspace) {
                     if (this._value.selection.isValid) {
                         this._value = this._value.deleteSelection(true);
                     }
