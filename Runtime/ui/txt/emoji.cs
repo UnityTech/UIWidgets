@@ -21,7 +21,7 @@ namespace Unity.UIWidgets.ui {
             D.assert(emojiCodes != null && emojiCodes.isNotEmpty());
             D.assert(spriteSheetNumberOfColumns > 0);
             D.assert(spriteSheetNumberOfRows > 0);
-            D.assert(emojiCodes.Count >= spriteSheetNumberOfColumns * spriteSheetNumberOfRows);
+            D.assert(emojiCodes.Count <= spriteSheetNumberOfColumns * spriteSheetNumberOfRows);
             this.spriteSheetAssetName = spriteSheetAssetName;
             this.emojiLookupTable = new Dictionary<int, int>();
             for (int i = 0; i < emojiCodes.Count; i++) {
