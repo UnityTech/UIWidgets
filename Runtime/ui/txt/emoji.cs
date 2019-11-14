@@ -221,7 +221,7 @@ namespace Unity.UIWidgets.ui {
                 0x2754, 0x2755, 0x2757, 0x2763, 0x2764, 0x2795, 0x2796,
                 0x2797, 0x27a1, 0x27b0, 0x27bf, 0x2934, 0x2935, 0x2b05,
                 0x2b06, 0x2b07, 0x2b1b, 0x2b1c, 0x2b50, 0x2b55, 0x3030,
-                0x303d, 0x3297, 0x3299,
+                0x303d, 0x3297, 0x3299, 0xa9, 0xae, 0xfe0f
             },
             spriteSheetNumberOfRows: 36,
             spriteSheetNumberOfColumns: 37
@@ -411,7 +411,7 @@ namespace Unity.UIWidgets.ui {
                 0x2763, 0x2764, 0x2795, 0x2796, 0x2797, 0x27a1, 0x27b0,
                 0x27bf, 0x2934, 0x2935, 0x2b05, 0x2b06, 0x2b07, 0x2b1b,
                 0x2b1c, 0x2b50, 0x2b55, 0x3030, 0x303d, 0x3297, 0x3299,
-                0xa9, 0xae, 0xfe0f, 1269
+                0xa9, 0xae, 0xfe0f,
             },
             spriteSheetNumberOfRows: 35,
             spriteSheetNumberOfColumns: 37
@@ -476,6 +476,7 @@ namespace Unity.UIWidgets.ui {
         
         public static float advanceFactor = 1.3f;
         public static float sizeFactor = 1.2f;
+        public const int emptyEmojiCode = 0xfe0f;
 
         public static Rect getMinMaxRect(float fontSize, float ascent, float descent) {
             return Rect.fromLTWH((advanceFactor - sizeFactor) / 2 * fontSize,
@@ -486,6 +487,13 @@ namespace Unity.UIWidgets.ui {
 
         public static Rect getUVRect(int code) {
             bool exist = emojiLookupTable.TryGetValue(code, out int index);
+            if(!exist) {
+                exist = emojiLookupTable.TryGetValue(emptyEmojiCode, out index);
+                D.assert(() => {
+                    Debug.LogWarning($"Unrecognized unicode for emoji {code:x}");
+                    return true;
+                });
+            }
             if (exist) {
                 return Rect.fromLTWH(
                     (index % colCount) * (1.0f / colCount),
@@ -493,10 +501,6 @@ namespace Unity.UIWidgets.ui {
                     1.0f / colCount, 1.0f / rowCount);
             }
 
-            D.assert(() => {
-                Debug.LogWarning($"Unrecognized unicode for emoji {code:x}");
-                return true;
-            });
             return Rect.fromLTWH(0, 0, 0, 0);
         }
 
@@ -509,7 +513,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         public static bool isEmptyEmoji(int c) {
-            return c == 0xFE0F && !emojiLookupTable.ContainsKey(c);
+            return c == emptyEmojiCode && !emojiLookupTable.ContainsKey(c);
         }
 
         public static List<string> splitByEmoji(string text) {
