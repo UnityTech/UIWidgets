@@ -102,7 +102,7 @@ namespace Unity.UIWidgets.ui {
                 return this._cache;
             }
 
-            var _cache = uiPathCache.create(scale);
+            var _cache = uiPathCache.create(scale, this._shapeHint);
 
             var i = 0;
             while (i < this._commands.Count) {
