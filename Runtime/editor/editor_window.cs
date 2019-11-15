@@ -15,10 +15,33 @@ namespace Unity.UIWidgets.editor {
 #if UNITY_EDITOR
     public abstract class UIWidgetsEditorWindow : EditorWindow, WindowHost {
         WindowAdapter _windowAdapter;
+        
+        static readonly List<UIWidgetsEditorWindow> _activeEditorWindows = new List<UIWidgetsEditorWindow>();
 
+        [InitializeOnLoadMethod]
+        static void _OnBaseEditorWindowLoaded()
+        {
+            EditorApplication.quitting += () =>
+            {
+                foreach (var editorWindow in _activeEditorWindows) {
+                    editorWindow.OnDisable();
+                }
+                
+                _activeEditorWindows.Clear();
+            };
+        }
+        
         public UIWidgetsEditorWindow() {
             this.wantsMouseMove = true;
             this.wantsMouseEnterLeaveWindow = true;
+            
+            _activeEditorWindows.Add(this);
+        }
+        
+        void OnDestroy() {
+            if (_activeEditorWindows.Contains(this)) {
+                _activeEditorWindows.Remove(this);
+            }
         }
 
         protected virtual void OnEnable() {
@@ -404,7 +427,7 @@ namespace Unity.UIWidgets.editor {
                         -evt.delta.y * this._devicePixelRatio,
                         evt.mousePosition.x * this._devicePixelRatio,
                         evt.mousePosition.y * this._devicePixelRatio,
-                        InputUtils.getMouseButtonKey(evt.button)
+                        InputUtils.getScrollButtonKey()
                     );
                 }
                 else if (evt.type == EventType.DragUpdated) {
