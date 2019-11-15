@@ -25,6 +25,10 @@ namespace Unity.UIWidgets.gestures {
                 this._routeMap.Remove(pointer);
             }
         }
+                
+        public bool acceptScroll() {
+            return this._routeMap.Count == 0;
+        }
 
         public void clearScrollRoute(int pointer) {
             if (this._routeMap.ContainsKey(pointer)) {

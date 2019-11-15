@@ -345,6 +345,9 @@ namespace Unity.UIWidgets.service {
             D.assert(!string.IsNullOrEmpty(composeText));
             var composeStart = this.composing == TextRange.empty ? this.selection.start : this.composing.start;
             var lastComposeEnd = this.composing == TextRange.empty ? this.selection.end : this.composing.end;
+            
+            composeStart = Mathf.Clamp(composeStart, 0, this.text.Length);
+            lastComposeEnd = Mathf.Clamp(lastComposeEnd, 0, this.text.Length);
             var newText = this.text.Substring(0, composeStart) + composeText + this.text.Substring(lastComposeEnd);
             var componseEnd = composeStart + composeText.Length;
             return new TextEditingValue(
