@@ -24,6 +24,7 @@ namespace Unity.UIWidgets.painting {
         public readonly Paint foreground;
         public readonly Paint background;
         public readonly string fontFamily;
+        public readonly List<BoxShadow> shadows;
 
         public List<string> fontFamilyFallback {
             get { return this._fontFamilyFallback; }
@@ -58,6 +59,7 @@ namespace Unity.UIWidgets.painting {
             float? decorationThickness = null,
             string fontFamily = null,
             List<string> fontFamilyFallback = null,
+            List<BoxShadow> shadows = null,
             string debugLabel = null) {
             D.assert(color == null || foreground == null, () => _kColorForegroundWarning);
             D.assert(backgroundColor == null || background == null, () => _kColorBackgroundWarning);
@@ -80,22 +82,22 @@ namespace Unity.UIWidgets.painting {
             this.debugLabel = debugLabel;
             this.foreground = foreground;
             this.background = background;
+            this.shadows = shadows;
         }
 
         public RenderComparison compareTo(TextStyle other) {
-            if (this.inherit != other.inherit || this.fontFamily != other.fontFamily
-                                              || this.fontSize != other.fontSize || this.fontWeight != other.fontWeight
-                                              || this.fontStyle != other.fontStyle ||
-                                              this.letterSpacing != other.letterSpacing
-                                              || this.wordSpacing != other.wordSpacing ||
-                                              this.textBaseline != other.textBaseline
-                                              || this.height != other.height || this.background != other.background) {
+            if (this.inherit != other.inherit || this.fontFamily != other.fontFamily ||
+                this.fontSize != other.fontSize || this.fontWeight != other.fontWeight ||
+                this.fontStyle != other.fontStyle || this.letterSpacing != other.letterSpacing ||
+                this.wordSpacing != other.wordSpacing || this.textBaseline != other.textBaseline ||
+                this.height != other.height || this.background != other.background ||
+                this.shadows.equalsList(other.shadows)) {
                 return RenderComparison.layout;
             }
 
             if (this.color != other.color || this.decoration != other.decoration ||
-                this.decorationColor != other.decorationColor
-                || this.decorationStyle != other.decorationStyle) {
+                this.decorationColor != other.decorationColor ||
+                this.decorationStyle != other.decorationStyle) {
                 return RenderComparison.paint;
             }
 
@@ -122,6 +124,7 @@ namespace Unity.UIWidgets.painting {
             float decorationThicknessDelta = 0.0f,
             string fontFamily = null,
             List<string> fontFamilyFallback = null,
+            List<BoxShadow> shadows = null,
             float fontSizeFactor = 1.0f,
             float fontSizeDelta = 0.0f,
             int fontWeightDelta = 0,
@@ -172,6 +175,7 @@ namespace Unity.UIWidgets.painting {
                 decorationThickness: this.decorationThickness == null
                     ? null
                     : this.decorationThickness * decorationThicknessFactor + decorationThicknessDelta,
+                shadows: shadows ?? this.shadows,
                 debugLabel: modifiedDebugLabel
             );
         }
@@ -213,6 +217,7 @@ namespace Unity.UIWidgets.painting {
                 decorationColor: other.decorationColor,
                 decorationStyle: other.decorationStyle,
                 decorationThickness: other.decorationThickness,
+                shadows: other.shadows,
                 debugLabel: mergedDebugLabel
             );
         }
@@ -236,6 +241,7 @@ namespace Unity.UIWidgets.painting {
             Color decorationColor = null,
             TextDecorationStyle? decorationStyle = null,
             float? decorationThickness = null,
+            List<BoxShadow> shadows = null,
             string debugLabel = null) {
             D.assert(color == null || foreground == null, () => _kColorForegroundWarning);
             D.assert(backgroundColor == null || background == null, () => _kColorBackgroundWarning);
@@ -267,6 +273,7 @@ namespace Unity.UIWidgets.painting {
                 decorationThickness: decorationThickness ?? this.decorationThickness,
                 foreground: foreground ?? this.foreground,
                 background: background ?? this.background,
+                shadows: shadows ?? this.shadows,
                 debugLabel: newDebugLabel
             );
         }
@@ -304,6 +311,7 @@ namespace Unity.UIWidgets.painting {
                     decorationColor: Color.lerp(null, b.decorationColor, t),
                     decorationStyle: t < 0.5f ? null : b.decorationStyle,
                     decorationThickness: t < 0.5f ? null : b.decorationThickness,
+                    shadows: t < 0.5f ? null : b.shadows,
                     debugLabel: lerpDebugLabel
                 );
             }
@@ -328,6 +336,7 @@ namespace Unity.UIWidgets.painting {
                     decorationColor: Color.lerp(a.decorationColor, null, t),
                     decorationStyle: t < 0.5f ? a.decorationStyle : null,
                     decorationThickness: t < 0.5f ? a.decorationThickness : null,
+                    shadows: t < 0.5f ? a.shadows : null,
                     debugLabel: lerpDebugLabel
                 );
             }
@@ -365,6 +374,7 @@ namespace Unity.UIWidgets.painting {
                 decorationThickness: MathUtils.lerpFloat(
                     a.decorationThickness ?? b.decorationThickness ?? 0.0f,
                     b.decorationThickness ?? a.decorationThickness ?? 0.0f, t),
+                shadows: t < 0.5f ? a.shadows : b.shadows,
                 debugLabel: lerpDebugLabel
             );
         }
@@ -471,7 +481,8 @@ namespace Unity.UIWidgets.painting {
                    this.decorationThickness == other.decorationThickness &&
                    Equals(this.foreground, other.foreground) &&
                    Equals(this.background, other.background) &&
-                   CollectionUtils.equalsList(this.fontFamilyFallback, other.fontFamilyFallback) &&
+                   this.fontFamilyFallback.equalsList(other.fontFamilyFallback) &&
+                   this.shadows.equalsList(other.shadows) &&
                    string.Equals(this.fontFamily, other.fontFamily);
         }
 
@@ -512,6 +523,7 @@ namespace Unity.UIWidgets.painting {
                 hashCode = (hashCode * 397) ^ (this.fontFamily != null ? this.fontFamily.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^
                            (this.fontFamilyFallback != null ? this.fontFamilyFallback.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (this.shadows != null ? this.shadows.GetHashCode() : 0);
                 return hashCode;
             }
         }
