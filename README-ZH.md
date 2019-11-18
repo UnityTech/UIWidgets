@@ -262,8 +262,6 @@ EmojiUtils.configuration = new EmojiResourceConfiguration(
 
 我们提供了一个包装好的`UnityObjectDetector`组件以及`onRelease`回调函数，借此您可以实现简单地将物体（例如Hierarchy内的场景物体、Project窗口下的文件等）拖拽至区域内，来获得`UnityEngine.Object[] `类型的引用并进行操作。
 
-你可以在“Window -> UIWidgets -> Tests -> Drag&Drop”下找到简单的实例样例。
-
 ## 调试UIWidgets应用程序
 
 #### 定义UIWidgets_DEBUG
