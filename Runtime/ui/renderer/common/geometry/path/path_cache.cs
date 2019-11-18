@@ -33,11 +33,14 @@ namespace Unity.UIWidgets.ui {
         float _miterLimit;
         float _fringe;
 
-        public static uiPathCache create(float scale) {
+        uiPath.uiPathShapeHint _shapeHint;
+
+        public static uiPathCache create(float scale, uiPath.uiPathShapeHint shapeHint) {
             uiPathCache newPathCache = ObjectPool<uiPathCache>.alloc();
             newPathCache._distTol = 0.01f / scale;
             newPathCache._tessTol = 0.25f / scale;
             newPathCache._scale = scale;
+            newPathCache._shapeHint = shapeHint;
             return newPathCache;
         }
 
@@ -49,6 +52,10 @@ namespace Unity.UIWidgets.ui {
             return true;
         }
 
+        public bool canSkipAAHairline {
+            get { return this._shapeHint == uiPath.uiPathShapeHint.Rect; }
+        }
+
         public override void clear() {
             this._paths.Clear();
             this._points.Clear();
@@ -57,6 +64,8 @@ namespace Unity.UIWidgets.ui {
 
             ObjectPool<uiMeshMesh>.release(this._strokeMesh);
             this._strokeMesh = null;
+
+            this._shapeHint = uiPath.uiPathShapeHint.Other;
         }
 
         public uiPathCache() {
@@ -460,7 +469,7 @@ namespace Unity.UIWidgets.ui {
 
             uiList<Vector3> _strokeVertices = null;
             uiList<Vector2> _strokeUV = null;
-            if (aa > 0.0f) {
+            if (aa > 0.0f && !this.canSkipAAHairline) {
                 _strokeVertices = ObjectPool<uiList<Vector3>>.alloc();
                 _strokeUV = ObjectPool<uiList<Vector2>>.alloc();
                 cvertices = 0;
