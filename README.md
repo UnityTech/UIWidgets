@@ -229,8 +229,10 @@ Status bar is always hidden by default when an Unity project is running on an An
 #### Automatically Adjust Frame Rate
 
 To build an App that is able to adjust the frame rate automatically, please open Project Settings, and in the Quality tab, set the "V Sync Count" option of the target platform to "Don't Sync".
-The default logic is to set the frame rate to 25 when the screen is static, and change the frame rate to 60 whenever the screen changes.
-If you would like to modify the behavior of speeding up or cooling down the frame rate, please set `Window.onFrameRateSpeedUp` and/or `Window.onFrameRateCoolDown` to your own functions.
+The default logic is to reduce the frame rate when the screen is static, and change it back to 60 whenever the screen changes.
+If you would like to disable this behavior, please set `Window.onFrameRateSpeedUp` and `Window.onFrameRateCoolDown` to null function, i.e., () => {}.
+
+Note that in Unity 2019.3 and above, UIWidgets will use OnDemandRenderAPI to implement this feature, which will greatly save the battery.
 
 #### WebGL Canvas Device Pixel Ratio Plugin
 The width and height of the Canvas in browser may differ from the number of pixels the Canvas occupies on the screen.
@@ -259,12 +261,34 @@ Unity, by default, resizes the width and height of an imported image to the near
 In UIWidgets, you should almost always disable this by selecting the image in the "Project" panel, then in the "Inspector" panel set the "Non Power of 2" option (in "Advanced") to "None", to prevent your image from being resized unexpectedly.
 
 #### Update Emoji
-UIWidgets supports rendering emoji in (editable) texts. The emoji images comes from the free
-resources provided by [Google Emoji](https://emojipedia.org/google). If you would
-like to use your own images for emoji, please update the texture image `Tests/Resources/Emoji.png`,
-and the unicode-index table in `Runtime/ui/txt/emoji.cs` which maps unicodes to specific locations
-in the texture. Specifically, remember to update the Dictionary `emojiLookupTable`, number of rows
-in the texture `rowCount`, and number of columns `colCount`.
+UIWidgets supports rendering emoji in (editable) texts.
+The default emoji resource version is [iOS 13.2](https://emojipedia.org/apple/ios-13.2).
+We also prepared the resources of [Google Emoji](https://emojipedia.org/google).
+To switch to Google version of emoji, please follow the following steps:
+
+1. Copy `Runtime/Resources/backup~/EmojiGoogle.png` to `Runtime/Resources/images` folder.
+2. In the **Project** panel, find and select `EmojiGoogle` asset, and in the **Inspector** panel, change **Max Size** to 4096, disable **Generate Mipmaps**, and enable **Alpha Is Transparency**.
+3. In the `OnEnable()` function in your class overriding `UIWidgetsPanel`, add the following code
+
+```csharp
+EmojiUtils.configuration = EmojiUtils.googleEmojiConfiguration;
+```
+
+If you would like to use your own images for emoji, please follow the following steps:
+
+1. Create the sprite sheet (take `EmojiGoogle.png` as an example), and put in a `Resources` folder in your project, (for example `Resources/myImages/MyEmoji.png`).
+2. In the `OnEnable()` function, add the following code (replace example values with actual value). Note that the order of emoji codes should be consistent with the sprite sheet.
+
+```csharp
+EmojiUtils.configuration = new EmojiResourceConfiguration(
+  spriteSheetAssetName: "myImage/MyEmoji",
+  emojiCodes: new List<int> {
+    0x1f004, 0x1f0cf, 0x1f170, ...
+  },
+  spriteSheetNumberOfRows: 36,
+  spriteSheetNumberOfColumns: 37,
+);
+```
 
 #### Interact with GameObject Drag&Drops
 
@@ -273,8 +297,6 @@ in the texture `rowCount`, and number of columns `colCount`.
 </p>
 
 With the provided packaged stateful widget `UnityObjectDetector` and its `onRelease` callback function, you can easily drag some objects (for example GameObject from Hierarchy, files from Project Window, etc) into the area, get the UnityEngine.Object[] references and make further modification.
-
-Please refer to "UIWidgetsTests -> Drag&Drop" for simple examples.
 
 
 ## Debug UIWidgets Application
@@ -289,6 +311,7 @@ The symbol is for debug purpose, please remove it from your release build.
 #### UIWidgets Inspector
 The UIWidgets Inspector tool is for visualizing and exploring the widget trees. You can find it
 via *Window/Analysis/UIWidgets* inspector in Editor menu.
+
 **Note**
 * **UIWidgets_DEBUG** needs to be define for inspector to work properly.
 * Inspector currently only works in Editor Play Mode, inspect standalone built application is not supported for now.
@@ -296,13 +319,19 @@ via *Window/Analysis/UIWidgets* inspector in Editor menu.
 ## Learn
 
 #### Samples
-You can find many UIWidgets App samples in the UIWidgets package in the **Samples** folder.
-Feel free to try them out and make modifications to see the results.
-To get started, the UIWidgetsTheatre scene provides you
-a list of carefully selected samples to start with.
-
-You can also try UIWidgets-based Editor windows by clicking **UIWidgetsTest** on the main menu
+You can find many UIWidgets sample projects on Github, which cover different aspects and provide you
+learning materials in various levels:
+* UIWidgetsSamples (https://github.com/UIWidgets/UIWidgetsSamples). These samples are developed by the dev team in order to illustrates all the features of 
+UIWidgets. First clone this Repo to the **Assets** folder of your local UIWidgets project. Then
+you can find all the sample scenes under the **Scene** folder.
+You can also try UIWidgets-based Editor windows by clicking the new **UIWidgetsTests** tab on the main menu
 and open one of the dropdown samples.
+* awesome-UIWidgets by Liangxie (https://github.com/liangxiegame/awesome-uiwidgets). This Repo contains 
+lots of UIWidget demo apps and third-party applications. 
+* ConnectApp (https://github.com/UnityTech/ConnectAppCN). This is an online, open-source UIWidget-based App developed 
+by the dev team. If you are making your own App with UIWidgets, this project will provides you with 
+many best practice cases.
+
 
 #### Wiki
 The develop team is still working on the UIWidgets Wiki. However, since UIWidgets is mainly derived from Flutter,

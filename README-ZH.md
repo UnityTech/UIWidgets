@@ -194,8 +194,10 @@ UIWidgets也支持Gif！
 
 #### 七、自动调节帧率
 如果要使得构建出的应用能够自动调节帧率，请打开Project Settings，将构建目标平台对应的Quality选项卡中的V Sync Count设置为Don't Sync。
-默认的逻辑是在界面静止时将帧率降低为25，在界面变动时将帧率提高至60。
-如果您需要修改帧率升高或降低时的行为，请将`Window.onFrameRateSpeedUp`和/或`Window.onFrameRateCoolDown`设置为您自己的函数。
+默认的逻辑是在界面静止时将帧率降低，在界面变动时再将帧率提高至60。
+如果您不想开启该功能，请将`Window.onFrameRateSpeedUp`和/或`Window.onFrameRateCoolDown`设置为空函数，()=> {}即可。
+
+在Unity 2019.3版本及以上，UIWidgets将使用OnDemandRenderAPI来实现帧率调节，它将在不影响UI响应速度的情况下大幅降低耗电和发热问题。
 
 #### 八、WebGL Canvas分辨率调整插件
 因为浏览器中Canvas的宽高和其在显示器上的像素数可能不一致，所以构建出的WebGL程序中画面可能会模糊。
@@ -223,9 +225,34 @@ $JSEvents
 在UIWidgets中使用图片时，记得将这一特性关闭，以免图片被意外放缩，方法如下：在Project面板中选中图片，在"Inspector"面板中将"Non Power of 2"（在"Advanced"中）设置为"None"。
 
 #### 十、更新表情(Emoji)
-UIWidgets支持渲染文本中包含的表情。表情的图片来自[Google Emoji](https://emojipedia.org/google)提供的免费资源。
-如果您希望使用自己的表情图片，请更新纹理图`Tests/Resources/Emoji.png`，以及`Runtime/ui/txt/emoji.cs`中将Unicode映射到纹理图中具体位置的映射表。
-特别地，请记得更新Dictionary变量`emojiLookupTable`，纹理图的行数`rowCount`以及纹理图的列数`colCount`。
+UIWidgets支持渲染文本中包含的表情。
+默认的表情资源为[iOS 13.2](https://emojipedia.org/apple/ios-13.2)。
+我们也准备了[Google Emoji](https://emojipedia.org/google)的表情资源。
+如果您希望切换到Google版本的表情，请按如下步骤操作：
+
+1. 拷贝`Runtime/Resources/backup~/EmojiGoogle.png`到`Runtime/Resources/images`目录。
+2. 在**Project**面板中，找到`EmojiGoogle`资源，在**Inspector**面板中，将**Max Size**更改为4096，取消选中**Generate Mipmaps**，并选中**Alpha Is Transparency**。
+3. 在您的代码中继承`UIWidgetsPanel`的类的`OnEnable()`函数中，添加如下代码
+
+```csharp
+EmojiUtils.configuration = EmojiUtils.googleEmojiConfiguration;
+```
+
+如果您希望使用自己的表情图片，请按如下步骤操作：
+
+1. 参照`EmojiGoogle.png`，创建您自己的Emoji表单，并放到工程目录下的某个`Resources`目录中，例如`Resources/myImages/MyEmoji.png`）。
+2. 在`OnEnable()`函数中，添加如下代码（记得将示例的值改为真实的值）。注意Emoji的编码的顺序要和Emoji表单一致。
+
+```csharp
+EmojiUtils.configuration = new EmojiResourceConfiguration(
+  spriteSheetAssetName: "myImage/MyEmoji",
+  emojiCodes: new List<int> {
+    0x1f004, 0x1f0cf, 0x1f170, ...
+  },
+  spriteSheetNumberOfRows: 36,
+  spriteSheetNumberOfColumns: 37,
+);
+```
 
 #### 十一、与GameObject进行拖拽交互
 
@@ -234,8 +261,6 @@ UIWidgets支持渲染文本中包含的表情。表情的图片来自[Google Emo
 </p>
 
 我们提供了一个包装好的`UnityObjectDetector`组件以及`onRelease`回调函数，借此您可以实现简单地将物体（例如Hierarchy内的场景物体、Project窗口下的文件等）拖拽至区域内，来获得`UnityEngine.Object[] `类型的引用并进行操作。
-
-你可以在“UIWidgetsTests -> Drag&Drop”下找到简单的实例样例。
 
 
 ## 调试UIWidgets应用程序
@@ -256,15 +281,22 @@ UIWidgets Inspector工具用于可视化和浏览窗口小部件树。 你可以
 
 ## 学习
 
-#### 示例
+#### 教程
 
-你可以在**Samples**文件夹的UIWidgets包中找到一些精心挑选的UIWidgets应用示例，并通过这些示例来开始你的学习。请随意尝试并进行修改以查看结果。
-
-你也可以在支持**UIWidgets**的编辑器中，点击主菜单上的UIWidgets，并在下拉窗口中选择一个示例。
+包括开发组在内的广大开发者为UIWidgets提供了许多可供学习的样例和教程，你可以根据你的需求进行学习：
+- UIWidgets官方示例。目前所有官方使用的示例项目均维护在一个独立的Github仓库（ https://github.com/UIWidgets/UIWidgetsSamples ）中。你可以
+将它clone到你项目本地的Assets目录下使用。
+具体的，你可以在Sample项目的**Scene**子文件夹中浏览所有示例UI场景。
+此外，你还可以点击主菜单上的新增的UIWidgetsTests选项卡，并在下拉菜单中选择一个EditorWindow UI示例来运行。
+- UIWidgets凉鞋系列教程。你可以在凉鞋老师整理的Github仓库（ https://github.com/liangxiegame/awesome-uiwidgets ）中学习UIWidgets的基本用法
+以及许多有趣的小Demo。
+- ConnectApp开源项目。这是一个完整的线上、开源、完全基于UIWidgets的第一方App项目。其中包含了大量产品级的UIWidgets工程实践细节，
+如果你想深入了解UIWidgets并且使用它构建线上项目，请访问项目Github仓库了解更多（ https://github.com/UnityTech/ConnectAppCN ）。
 
 #### Wiki
 
-目前开发团队仍在改进UIWidgets Wiki。 由于UIWidgets主要来源于Flutter，你也可以参考Flutter Wiki中与UIWidgets API对应部分的详细描述。同时，你可以加入我们的讨论组( https://connect.unity.com/g/uiwidgets )。
+目前开发团队仍在改进UIWidgets Wiki。 由于UIWidgets主要来源于Flutter，你也可以参考Flutter Wiki中与UIWidgets API对应部分的详细描述。
+同时，你可以加入我们的讨论组( https://connect.unity.com/g/uiwidgets )。
 
 #### 常问问题解答
 
