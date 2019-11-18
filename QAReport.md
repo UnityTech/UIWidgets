@@ -1,26 +1,21 @@
 # Quality Report
-Use this file to outline the test strategy for this package.
 
-## Version tested: [*package version*]
+## Version tested: [1.0.3-preview]
 
-## QA Owner: [*Add Name*]
-## UX Owner: [*Add Name*]
+## QA Owner: Jason Fu
+## UX Owner: Yuncong Zhang
 
 ## Test strategy
-*Use this section to describe how this feature was tested.*
-* A link to the Test Plan (Test Rails, other)
 * Results from the package's editor and runtime test suite.
-* Link to automated test results (if any)
-* Manual test Results, [here's an example](https://docs.google.com/spreadsheets/d/12A76U5Gf969w10KL4Ik0wC1oFIBDUoRrqIvQgD18TFo/edit#gid=0)
-* Scenario test week outcome
-* etc.
+```
+Overall result: PASS
+Total Tests run: 4, Passed: 4, Failures: 0, Errors: 0, Inconclusives: 0
+Total not run : 0, Invalid: 0, Ignored: 0, Skipped: 0
+```
+* Test Rail Scenarios:https://qatestrail.hq.unity3d.com/index.php?/suites/view/67&group_by=cases:section_id&group_order=asc&group_id=76244
+* Editor/Runtime Test Suite:
+* Manual test Results: https://qatestrail.hq.unity3d.com/index.php?/runs/view/13298&group_by=cases:section_id&group_order=asc
 
 ## Package Status
-Use this section to describe:
-* UX status/evaluation results
 * package stability
-* known bugs, issues
-* performance metrics,
-* etc
-
-In other words, a general feeling on the health of this package.
+	* Stable
