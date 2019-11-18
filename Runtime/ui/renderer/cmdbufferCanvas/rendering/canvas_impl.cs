@@ -1055,8 +1055,9 @@ namespace Unity.UIWidgets.ui {
             }
 
             if (paint.maskFilter != null && paint.maskFilter.Value.sigma != 0) {
-                this._drawWithMaskFilter(textBlobBounds, paint, paint.maskFilter.Value, null, null, false, 0, 0, tex,
-                    textBlobBounds, mesh, notEmoji, this.___drawTextDrawMeshCallback);
+                this._drawWithMaskFilter(textBlobBounds, paint, paint.maskFilter.Value, null, null, false, 0, 0,
+                    notEmoji ? tex : EmojiUtils.image.texture,
+                    textBlobBounds, mesh, true, this.___drawTextDrawMeshCallback);
                 return;
             }
 
