@@ -30,10 +30,8 @@ namespace Unity.UIWidgets.ui {
                 return;
             }
             this._isNaiveRRect = isNaiveRRect && this._hasOnlyMoveTos();
-            if (this._isNaiveRRect) {
-                this._shapeHint = shapeHint;
-                this._rRectCorner = corner;
-            }
+            this._shapeHint = shapeHint;
+            this._rRectCorner = corner;
         }
         
         bool _hasOnlyMoveTos() {
