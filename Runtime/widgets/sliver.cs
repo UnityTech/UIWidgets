@@ -5,6 +5,7 @@ using com.unity.uiwidgets.Runtime.rendering;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.rendering;
+using Unity.UIWidgets.Runtime.external;
 using Unity.UIWidgets.ui;
 
 namespace Unity.UIWidgets.widgets {
