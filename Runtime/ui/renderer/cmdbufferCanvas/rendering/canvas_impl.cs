@@ -766,6 +766,9 @@ namespace Unity.UIWidgets.ui {
             int saveCount = 0;
 
             var drawCmds = picture.drawCmds;
+            var queryBound = this._currentLayer.currentState.matrix?.invert().Value
+                                 .mapRect(this._currentLayer.layerBounds) ??
+                             this._currentLayer.layerBounds;
             foreach (var drawCmd in drawCmds) {
                 switch (drawCmd) {
                     case DrawSave _:
@@ -839,6 +842,10 @@ namespace Unity.UIWidgets.ui {
                     }
 
                     case DrawPath cmd: {
+                        if (uiRectHelper.intersect(uiRectHelper.fromRect(
+                            cmd.path.getBoundsWithMargin(5)).Value, queryBound).isEmpty) {
+                            continue;
+                        }
                         var uipath = uiPath.fromPath(cmd.path);
                         this._drawPath(uipath, uiPaint.fromPaint(cmd.paint));
                         uiPathCacheManager.putToCache(uipath);
@@ -846,18 +853,35 @@ namespace Unity.UIWidgets.ui {
                     }
 
                     case DrawImage cmd: {
+                        if (uiRectHelper.intersect(uiRectHelper.fromLTWH(
+                            cmd.offset.dx, cmd.offset.dy,
+                            cmd.image.width / this._devicePixelRatio,
+                            cmd.image.height / this._devicePixelRatio), queryBound).isEmpty) {
+                            continue;
+                        }
                         this._drawImage(cmd.image, (uiOffset.fromOffset(cmd.offset)).Value,
                             uiPaint.fromPaint(cmd.paint));
                         break;
                     }
 
                     case DrawImageRect cmd: {
+                        if (uiRectHelper.intersect(uiRectHelper.fromRect(cmd.dst).Value, queryBound).isEmpty) {
+                            continue;
+                        }
                         this._drawImageRect(cmd.image, uiRectHelper.fromRect(cmd.src), uiRectHelper.fromRect(cmd.dst).Value,
                             uiPaint.fromPaint(cmd.paint));
                         break;
                     }
 
                     case DrawImageNine cmd: {
+                        if (uiRectHelper.intersect(uiRectHelper.fromLTRB(
+                            cmd.dst.left + ((cmd.center.left - cmd.src.left) * cmd.src.width),
+                            cmd.dst.top + ((cmd.center.top - cmd.src.top) * cmd.src.height),
+                            cmd.dst.right - ((cmd.src.right - cmd.center.right) * cmd.src.width),
+                            cmd.dst.bottom - ((cmd.src.bottom - cmd.center.bottom) * cmd.src.height)
+                        ), queryBound).isEmpty) {
+                            continue;
+                        }
                         this._drawImageNine(cmd.image, uiRectHelper.fromRect(cmd.src),
                             uiRectHelper.fromRect(cmd.center).Value, uiRectHelper.fromRect(cmd.dst).Value,
                             uiPaint.fromPaint(cmd.paint));
@@ -865,11 +889,19 @@ namespace Unity.UIWidgets.ui {
                     }
 
                     case DrawPicture cmd: {
+                        if (uiRectHelper.intersect(uiRectHelper.fromRect(
+                            cmd.picture.paintBounds).Value, queryBound).isEmpty) {
+                            continue;
+                        }
                         this._drawPicture(cmd.picture);
                         break;
                     }
 
                     case DrawTextBlob cmd: {
+                        if (uiRectHelper.intersect(uiRectHelper.fromRect(
+                            cmd.textBlob.Value.boundsInText.translate(cmd.offset.dx, cmd.offset.dy)).Value, queryBound).isEmpty) {
+                            continue;
+                        }
                         this._paintTextShadow(cmd.textBlob, cmd.offset);
                         this._drawTextBlob(cmd.textBlob, (uiOffset.fromOffset(cmd.offset)).Value,
                             uiPaint.fromPaint(cmd.paint));
@@ -899,6 +931,9 @@ namespace Unity.UIWidgets.ui {
             int saveCount = 0;
 
             var drawCmds = picture.drawCmds;
+            var queryBound = this._currentLayer.currentState.matrix?.invert().Value
+                                 .mapRect(this._currentLayer.layerBounds) ??
+                             this._currentLayer.layerBounds;
             foreach (var drawCmd in drawCmds) {
                 switch (drawCmd) {
                     case uiDrawSave _:
@@ -970,31 +1005,60 @@ namespace Unity.UIWidgets.ui {
                     }
 
                     case uiDrawPath cmd: {
+                        if (uiRectHelper.intersect(cmd.path.getBoundsWithMargin(5), queryBound).isEmpty) {
+                            continue;
+                        }
                         this._drawPath(cmd.path, cmd.paint);
                         break;
                     }
 
                     case uiDrawImage cmd: {
+                        if (uiRectHelper.intersect(uiRectHelper.fromLTWH(
+                            cmd.offset.Value.dx, cmd.offset.Value.dy,
+                            cmd.image.width / this._devicePixelRatio,
+                            cmd.image.height / this._devicePixelRatio), queryBound).isEmpty) {
+                            continue;
+                        }
                         this._drawImage(cmd.image, cmd.offset.Value, cmd.paint);
                         break;
                     }
 
                     case uiDrawImageRect cmd: {
+                        if (uiRectHelper.intersect(cmd.dst.Value, queryBound).isEmpty) {
+                            continue;
+                        }
                         this._drawImageRect(cmd.image, cmd.src, cmd.dst.Value, cmd.paint);
                         break;
                     }
 
                     case uiDrawImageNine cmd: {
+                        if (uiRectHelper.intersect(uiRectHelper.fromLTRB(
+                            cmd.dst.Value.left + ((cmd.center.Value.left - cmd.src.Value.left) * cmd.src.Value.width),
+                            cmd.dst.Value.top + ((cmd.center.Value.top - cmd.src.Value.top) * cmd.src.Value.height),
+                            cmd.dst.Value.right - ((cmd.src.Value.right - cmd.center.Value.right) * cmd.src.Value.width),
+                            cmd.dst.Value.bottom - ((cmd.src.Value.bottom - cmd.center.Value.bottom) * cmd.src.Value.height)
+                        ), queryBound).isEmpty) {
+                            continue;
+                        }
                         this._drawImageNine(cmd.image, cmd.src, cmd.center.Value, cmd.dst.Value, cmd.paint);
                         break;
                     }
 
                     case uiDrawPicture cmd: {
+                        if (uiRectHelper.intersect(uiRectHelper.fromRect(
+                            cmd.picture.paintBounds).Value, queryBound).isEmpty) {
+                            continue;
+                        }
                         this._drawPicture(cmd.picture);
                         break;
                     }
 
                     case uiDrawTextBlob cmd: {
+                        if (uiRectHelper.intersect(uiRectHelper.fromRect(
+                            cmd.textBlob.Value.boundsInText.translate(cmd.offset.Value.dx, cmd.offset.Value.dy)).Value,
+                            queryBound).isEmpty) {
+                            continue;
+                        }
                         this._paintTextShadow(cmd.textBlob, new Offset(cmd.offset.Value.dx, cmd.offset.Value.dy));
                         this._drawTextBlob(cmd.textBlob, cmd.offset.Value, cmd.paint);
                         break;

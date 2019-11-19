@@ -472,7 +472,8 @@ namespace Unity.UIWidgets.ui {
 
                                 // If all the positions have not changed, use the cached ellipsized text
                                 // else update the cache
-                                if (!(this._ellipsizedLength == textStart + textCount - truncateCount &&
+                                if (!(this._ellipsizedText != null &&
+                                      this._ellipsizedLength == textStart + textCount - truncateCount &&
                                       this._ellipsizedText.Length == this._ellipsizedLength + ellipsis.Length &&
                                       this._ellipsizedText.EndsWith(ellipsis))) {
                                     this._ellipsizedText =

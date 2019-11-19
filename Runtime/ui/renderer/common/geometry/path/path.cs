@@ -170,6 +170,14 @@ namespace Unity.UIWidgets.ui {
             return uiRectHelper.fromLTRB(this._minX, this._minY, this._maxX, this._maxY);
         }
 
+        public uiRect getBoundsWithMargin(float margin) {
+            if (this._minX - margin >= this._maxX + margin || this._minY - margin >= this._maxY + margin) {
+                return uiRectHelper.zero;
+            }
+
+            return uiRectHelper.fromLTRB(this._minX - margin, this._minY - margin, this._maxX + margin, this._maxY + margin);
+        }
+
         void _appendMoveTo(float x, float y) {
             this._commands.Add((float) uiPathCommand.moveTo);
             this._commands.Add(x);
