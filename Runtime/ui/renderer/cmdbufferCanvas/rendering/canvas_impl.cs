@@ -870,6 +870,7 @@ namespace Unity.UIWidgets.ui {
                     }
 
                     case DrawTextBlob cmd: {
+                        this._paintTextShadow(cmd.textBlob, cmd.offset);
                         this._drawTextBlob(cmd.textBlob, (uiOffset.fromOffset(cmd.offset)).Value,
                             uiPaint.fromPaint(cmd.paint));
                         break;
@@ -994,6 +995,7 @@ namespace Unity.UIWidgets.ui {
                     }
 
                     case uiDrawTextBlob cmd: {
+                        this._paintTextShadow(cmd.textBlob, new Offset(cmd.offset.Value.dx, cmd.offset.Value.dy));
                         this._drawTextBlob(cmd.textBlob, cmd.offset.Value, cmd.paint);
                         break;
                     }
@@ -1009,6 +1011,22 @@ namespace Unity.UIWidgets.ui {
 
             if (needsSave) {
                 this._restore();
+            }
+        }
+
+        void _paintTextShadow(TextBlob? textBlob, Offset offset) {
+            D.assert(textBlob != null);
+            if (textBlob.Value.style.shadows != null && textBlob.Value.style.shadows.isNotEmpty()) {
+                textBlob.Value.style.shadows.ForEach(shadow => {
+                    Paint paint = new Paint {
+                        color = shadow.color,
+                        maskFilter = shadow.blurRadius != 0
+                            ? MaskFilter.blur(BlurStyle.normal, shadow.blurRadius)
+                            : null,
+                    };
+                    this._drawTextBlob(textBlob, uiOffset.fromOffset(shadow.offset + offset).Value,
+                        uiPaint.fromPaint(paint));
+                });
             }
         }
 
@@ -1037,12 +1055,14 @@ namespace Unity.UIWidgets.ui {
             }
 
             if (paint.maskFilter != null && paint.maskFilter.Value.sigma != 0) {
-                this._drawWithMaskFilter(textBlobBounds, paint, paint.maskFilter.Value, null, null, false, 0, 0, tex,
-                    textBlobBounds, mesh, notEmoji, this.___drawTextDrawMeshCallback);
+                this._drawWithMaskFilter(textBlobBounds, paint, paint.maskFilter.Value, null, null, false, 0, 0,
+                    notEmoji ? tex : EmojiUtils.image.texture,
+                    textBlobBounds, mesh, true, this.___drawTextDrawMeshCallback);
                 return;
             }
 
             this._drawTextDrawMeshCallback(paint, null, null, false, 0, 0, tex, textBlobBounds, mesh, notEmoji);
+            
         }
 
         public void flush(uiPicture picture) {
