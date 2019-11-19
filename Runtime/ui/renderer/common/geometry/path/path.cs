@@ -78,6 +78,8 @@ namespace Unity.UIWidgets.ui {
             this.needCache = false;
             this.pathKey = 0;
             this._isNaiveRRect = false;
+            this._shapeHint = uiPathShapeHint.Other;
+            this._rRectCorner = 0;
         }
 
         void _reset() {
