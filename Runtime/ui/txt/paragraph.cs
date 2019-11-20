@@ -318,7 +318,8 @@ namespace Unity.UIWidgets.ui {
         }
 
         public void layout(ParagraphConstraints constraints) {
-            if (!this._needsLayout && this._width == constraints.width) {
+            if ((!this._needsLayout && this._width == constraints.width) ||
+                this._text == null || this._text.isEmpty()) {
                 return;
             }
 
@@ -663,6 +664,13 @@ namespace Unity.UIWidgets.ui {
         }
 
         internal void setText(string text, StyledRuns runs, bool skipRequestCharacters = false) {
+            if (text == null || text.isEmpty()) {
+                this.clear();
+                this._text = text;
+                this._runs = runs;
+                this._needsLayout = false;
+                return;
+            }
             this._text = text;
             this._runs = runs;
             this._needsLayout = true;
@@ -672,7 +680,7 @@ namespace Unity.UIWidgets.ui {
                     var run = runs.getRun(i);
                     var font = FontManager.instance.getOrCreate(style.fontFamily, style.fontWeight, style.fontStyle).font;
                     font.RequestCharactersInTextureSafe(text.Substring(run.start, run.end - run.start),
-                        Mathf.CeilToInt(style.fontSize), style.UnityFontStyle);
+                        style.UnityFontSize, style.UnityFontStyle);
                 }
             }
         }
