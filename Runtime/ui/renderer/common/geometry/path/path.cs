@@ -30,10 +30,8 @@ namespace Unity.UIWidgets.ui {
                 return;
             }
             this._isNaiveRRect = isNaiveRRect && this._hasOnlyMoveTos();
-            if (this._isNaiveRRect) {
-                this._shapeHint = shapeHint;
-                this._rRectCorner = corner;
-            }
+            this._shapeHint = shapeHint;
+            this._rRectCorner = corner;
         }
         
         bool _hasOnlyMoveTos() {
@@ -80,6 +78,8 @@ namespace Unity.UIWidgets.ui {
             this.needCache = false;
             this.pathKey = 0;
             this._isNaiveRRect = false;
+            this._shapeHint = uiPathShapeHint.Other;
+            this._rRectCorner = 0;
         }
 
         void _reset() {
