@@ -115,7 +115,7 @@ namespace Unity.UIWidgets.Runtime.external
         }
     }
 
-    public partial class RTree<T>
+    public class RTree<T> where T : ISpatialData
     {
         public class RTreeNode : ISpatialData
         {
@@ -157,10 +157,6 @@ namespace Unity.UIWidgets.Runtime.external
                 _Rect = GetEnclosingRect(children);
             }
         }
-    }
-
-    public partial class RTree<T>
-    {
         #region Search
 
         private List<T> DoSearch(in Rect boundingBox)
@@ -298,13 +294,13 @@ namespace Unity.UIWidgets.Runtime.external
                 rTreeNode.children.Sort(CompareMinX);
         }
 
-        private double GetPotentialSplitMargins(List<ISpatialData> children)
+        private float GetPotentialSplitMargins(List<ISpatialData> children)
         {
             return GetPotentialEnclosingMargins(children) +
                    GetPotentialEnclosingMargins(children.AsEnumerable().Reverse().ToList());
         }
 
-        private double GetPotentialEnclosingMargins(List<ISpatialData> children)
+        private float GetPotentialEnclosingMargins(List<ISpatialData> children)
         {
             var rect = Rect.zero;
             var i = 0;
@@ -396,14 +392,10 @@ namespace Unity.UIWidgets.Runtime.external
         }
 
         #endregion
-    }
-
-    public partial class RTree<T> where T : ISpatialData
-    {
         private const int DefaultMaxEntries = 9;
         private const int MinimumMaxEntries = 4;
         private const int MinimumMinEntries = 2;
-        private const double DefaultFillFactor = 0.4;
+        private const float DefaultFillFactor = 0.4f;
 
         private readonly EqualityComparer<T> comparer;
         private readonly int maxEntries;
