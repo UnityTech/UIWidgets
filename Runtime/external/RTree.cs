@@ -7,9 +7,26 @@ namespace Unity.UIWidgets.Runtime.external
 {
     public interface ISpatialData
     {
-        ref readonly Rect Rect { get; }
+        uiRect bounds { get; }
     }
 
+    public class IndexedRect : ISpatialData
+    {
+        private uiRect _bounds;
+
+        public uiRect bounds
+        {
+            get { return _bounds; }
+        }
+
+        public readonly int index;
+
+        public IndexedRect(uiRect bounds, int index)
+        {
+            this._bounds = bounds;
+            this.index = index;
+        }
+    }
 
     /// <summary>
     ///     Non-generic class to produce instances of the generic class,
@@ -115,12 +132,18 @@ namespace Unity.UIWidgets.Runtime.external
         }
     }
 
-    public class RTree<T> where T : ISpatialData
+    public interface BBoxHierarchy<T> where T : ISpatialData
+    {
+        IReadOnlyList<T> Search(in uiRect boundingBox);
+        void BulkLoad(IEnumerable<T> items);
+    }
+
+    public class RTree<T> : BBoxHierarchy<T> where T : ISpatialData
     {
         public class RTreeNode : ISpatialData
         {
             internal readonly List<ISpatialData> children;
-            private Rect _Rect;
+            private uiRect _Rect;
 
             internal RTreeNode(List<ISpatialData> items, int height)
             {
@@ -132,12 +155,12 @@ namespace Unity.UIWidgets.Runtime.external
             public IReadOnlyList<ISpatialData> Children => children;
             public int Height { get; }
             public bool IsLeaf => Height == 1;
-            public ref readonly Rect Rect => ref _Rect;
+            public uiRect bounds => _Rect;
 
             internal void Add(ISpatialData node)
             {
                 children.Add(node);
-                _Rect = Rect.expandToInclude(node.Rect);
+                _Rect = bounds.expandToInclude(node.bounds);
             }
 
             internal void Remove(ISpatialData node)
@@ -159,9 +182,9 @@ namespace Unity.UIWidgets.Runtime.external
         }
         #region Search
 
-        private List<T> DoSearch(in Rect boundingBox)
+        private List<T> DoSearch(in uiRect boundingBox)
         {
-            if (!Root.Rect.overlaps(boundingBox))
+            if (!uiRectHelper.overlaps(Root.bounds, boundingBox))
                 return new List<T>();
 
             var intersections = new List<T>();
@@ -174,13 +197,13 @@ namespace Unity.UIWidgets.Runtime.external
                 if (item.IsLeaf)
                 {
                     foreach (var leafChildItem in item.children.Cast<T>())
-                        if (leafChildItem.Rect.overlaps(boundingBox))
+                        if (uiRectHelper.overlaps(leafChildItem.bounds, boundingBox))
                             intersections.Add(leafChildItem);
                 }
                 else
                 {
                     foreach (var child in item.children.Cast<RTreeNode>())
-                        if (child.Rect.overlaps(boundingBox))
+                        if (uiRectHelper.overlaps(child.bounds, boundingBox))
                             queue.Enqueue(child);
                 }
             }
@@ -190,11 +213,11 @@ namespace Unity.UIWidgets.Runtime.external
 
         #endregion
 
-        private static Rect GetEnclosingRect(IEnumerable<ISpatialData> items)
+        private static uiRect GetEnclosingRect(IEnumerable<ISpatialData> items)
         {
-            var rect = Rect.zero;
-            foreach (var data in items) rect = rect.expandToInclude(data.Rect);
-            return rect;
+            var uiRect = uiRectHelper.zero;
+            foreach (var data in items) uiRect = uiRect.expandToInclude(data.bounds);
+            return uiRect;
         }
 
         private List<T> GetAllChildren(List<T> list, RTreeNode n)
@@ -212,16 +235,16 @@ namespace Unity.UIWidgets.Runtime.external
         #region Sort Functions
 
         private static readonly IComparer<ISpatialData> CompareMinX =
-            ProjectionComparer<ISpatialData>.Create(d => d.Rect.left);
+            ProjectionComparer<ISpatialData>.Create(d => d.bounds.left);
 
         private static readonly IComparer<ISpatialData> CompareMinY =
-            ProjectionComparer<ISpatialData>.Create(d => d.Rect.top);
+            ProjectionComparer<ISpatialData>.Create(d => d.bounds.top);
 
         #endregion
 
         #region Insert
 
-        private List<RTreeNode> FindCoveringArea(in Rect area, int depth)
+        private List<RTreeNode> FindCoveringArea(in uiRect area, int depth)
         {
             var path = new List<RTreeNode>();
             var node = Root;
@@ -234,7 +257,7 @@ namespace Unity.UIWidgets.Runtime.external
 
                 node = node.children
                     .Select(c => new
-                        {EnlargedArea = c.Rect.expandToInclude(_area).area, c.Rect.area, Node = c as RTreeNode})
+                        {EnlargedArea = c.bounds.expandToInclude(_area).area, c.bounds.area, Node = c as RTreeNode})
                     .OrderBy(x => x.EnlargedArea)
                     .ThenBy(x => x.area)
                     .Select(x => x.Node)
@@ -244,7 +267,7 @@ namespace Unity.UIWidgets.Runtime.external
 
         private void Insert(ISpatialData data, int depth)
         {
-            var path = FindCoveringArea(data.Rect, depth);
+            var path = FindCoveringArea(data.bounds, depth);
 
             var insertNode = path.Last();
             insertNode.Add(data);
@@ -302,15 +325,15 @@ namespace Unity.UIWidgets.Runtime.external
 
         private float GetPotentialEnclosingMargins(List<ISpatialData> children)
         {
-            var rect = Rect.zero;
+            var uiRect = uiRectHelper.zero;
             var i = 0;
-            for (; i < minEntries; i++) rect = rect.expandToInclude(children[i].Rect);
+            for (; i < minEntries; i++) uiRect = uiRect.expandToInclude(children[i].bounds);
 
-            var totalMargin = rect.margin;
+            var totalMargin = uiRect.margin;
             for (; i < children.Count - minEntries; i++)
             {
-                rect = rect.expandToInclude(children[i].Rect);
-                totalMargin += rect.margin;
+                uiRect = uiRect.expandToInclude(children[i].bounds);
+                totalMargin += uiRect.margin;
             }
 
             return totalMargin;
@@ -420,7 +443,7 @@ namespace Unity.UIWidgets.Runtime.external
         }
 
         public RTreeNode Root { get; private set; }
-        public ref readonly Rect Rect => ref Root.Rect;
+        public uiRect uiRect => Root.bounds;
 
         public int Count { get; private set; }
 
@@ -435,7 +458,7 @@ namespace Unity.UIWidgets.Runtime.external
             return GetAllChildren(new List<T>(), Root);
         }
 
-        public IReadOnlyList<T> Search(in Rect boundingBox)
+        public IReadOnlyList<T> Search(in uiRect boundingBox)
         {
             return DoSearch(boundingBox);
         }

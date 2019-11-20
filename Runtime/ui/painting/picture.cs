@@ -1,17 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
 using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.Runtime.external;
 
 namespace Unity.UIWidgets.ui {
     public class Picture {
-        public Picture(List<DrawCmd> drawCmds, Rect paintBounds, bool isDynamic = false) {
+        public Picture(List<DrawCmd> drawCmds,
+            Rect paintBounds,
+            bool isDynamic = false,
+            BBoxHierarchy<IndexedRect> bbh = null,
+            List<int> stateUpdatesIndices = null) {
             this.drawCmds = drawCmds;
             this.paintBounds = paintBounds;
             this._isDynamic = isDynamic;
+            this.bbh = bbh;
+            this.stateUpdatesIndices = stateUpdatesIndices;
         }
 
         public readonly List<DrawCmd> drawCmds;
         public readonly Rect paintBounds;
+        public readonly BBoxHierarchy<IndexedRect> bbh;
+        public readonly List<int> stateUpdatesIndices; 
 
         public bool isDynamic {
             get { return this._isDynamic; }
@@ -58,8 +67,26 @@ namespace Unity.UIWidgets.ui {
                 throw new Exception("unmatched save/restore commands");
             }
 
+            int index = 0;
+            RTree<IndexedRect> bbh = new RTree<IndexedRect>();
+            List<int> stateUpdateIndices = new List<int>();
+            foreach (var cmd in this._drawCmds) {
+                if (cmd is StateUpdateDrawCmd) {
+                    stateUpdateIndices.Add(index);
+                }
+                else {
+                    bbh.Insert(new IndexedRect(cmd.bounds(5), index));
+                }
+                index++;
+            }
+
             var state = this._getState();
-            return new Picture(new List<DrawCmd>(this._drawCmds), state.paintBounds, this._isDynamic);
+            return new Picture(
+                new List<DrawCmd>(this._drawCmds),
+                state.paintBounds,
+                this._isDynamic,
+                bbh,
+                stateUpdateIndices);
         }
 
         public void addDrawCmd(DrawCmd drawCmd) {

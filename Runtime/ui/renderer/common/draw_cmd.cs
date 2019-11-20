@@ -1,9 +1,16 @@
 namespace Unity.UIWidgets.ui {
     public abstract class uiDrawCmd : PoolObject {
         public abstract void release();
+        public abstract uiRect bounds(float margin);
     }
 
-    public class uiDrawSave : uiDrawCmd {
+    public abstract class uiStateUpdateDrawCmd : uiDrawCmd {
+        public override uiRect bounds(float margin) {
+            return uiRectHelper.zero;
+        }
+    }
+
+    public class uiDrawSave : uiStateUpdateDrawCmd {
         public uiDrawSave() {
         }
 
@@ -17,7 +24,7 @@ namespace Unity.UIWidgets.ui {
         }
     }
 
-    public class uiDrawSaveLayer : uiDrawCmd {
+    public class uiDrawSaveLayer : uiStateUpdateDrawCmd {
         public uiDrawSaveLayer() {
         }
 
@@ -40,7 +47,7 @@ namespace Unity.UIWidgets.ui {
         public uiPaint paint;
     }
 
-    public class uiDrawRestore : uiDrawCmd {
+    public class uiDrawRestore : uiStateUpdateDrawCmd {
         public uiDrawRestore() {
         }
 
@@ -54,7 +61,7 @@ namespace Unity.UIWidgets.ui {
         }
     }
 
-    public class uiDrawTranslate : uiDrawCmd {
+    public class uiDrawTranslate : uiStateUpdateDrawCmd {
         public uiDrawTranslate() {
         }
 
@@ -73,7 +80,7 @@ namespace Unity.UIWidgets.ui {
         public float dy;
     }
 
-    public class uiDrawScale : uiDrawCmd {
+    public class uiDrawScale : uiStateUpdateDrawCmd {
         public uiDrawScale() {
         }
 
@@ -92,7 +99,7 @@ namespace Unity.UIWidgets.ui {
         public float? sy;
     }
 
-    public class uiDrawRotate : uiDrawCmd {
+    public class uiDrawRotate : uiStateUpdateDrawCmd {
         public uiDrawRotate() {
         }
 
@@ -115,7 +122,7 @@ namespace Unity.UIWidgets.ui {
         public uiOffset? offset;
     }
 
-    public class uiDrawSkew : uiDrawCmd {
+    public class uiDrawSkew : uiStateUpdateDrawCmd {
         public uiDrawSkew() {
         }
 
@@ -134,7 +141,7 @@ namespace Unity.UIWidgets.ui {
         public float sy;
     }
 
-    public class uiDrawConcat : uiDrawCmd {
+    public class uiDrawConcat : uiStateUpdateDrawCmd {
         public uiDrawConcat() {
         }
 
@@ -155,7 +162,7 @@ namespace Unity.UIWidgets.ui {
         public uiMatrix3? matrix;
     }
 
-    public class uiDrawResetMatrix : uiDrawCmd {
+    public class uiDrawResetMatrix : uiStateUpdateDrawCmd {
         public uiDrawResetMatrix() {
         }
 
@@ -169,7 +176,7 @@ namespace Unity.UIWidgets.ui {
         }
     }
 
-    public class uiDrawSetMatrix : uiDrawCmd {
+    public class uiDrawSetMatrix : uiStateUpdateDrawCmd {
         public uiDrawSetMatrix() {
         }
 
@@ -190,7 +197,7 @@ namespace Unity.UIWidgets.ui {
         public uiMatrix3? matrix;
     }
 
-    public class uiDrawClipRect : uiDrawCmd {
+    public class uiDrawClipRect : uiStateUpdateDrawCmd {
         public uiDrawClipRect() {
         }
 
@@ -211,7 +218,7 @@ namespace Unity.UIWidgets.ui {
         public uiRect? rect;
     }
 
-    public class uiDrawClipRRect : uiDrawCmd {
+    public class uiDrawClipRRect : uiStateUpdateDrawCmd {
         public uiDrawClipRRect() {
         }
 
@@ -232,7 +239,7 @@ namespace Unity.UIWidgets.ui {
         public RRect rrect;
     }
 
-    public class uiDrawClipPath : uiDrawCmd {
+    public class uiDrawClipPath : uiStateUpdateDrawCmd {
         public uiDrawClipPath() {
         }
 
@@ -278,6 +285,10 @@ namespace Unity.UIWidgets.ui {
 
         public uiPath path;
         public uiPaint paint;
+
+        public override uiRect bounds(float margin) {
+            return this.path.getBoundsWithMargin(margin);
+        }
     }
 
     public class uiDrawImage : uiDrawCmd {
@@ -304,6 +315,17 @@ namespace Unity.UIWidgets.ui {
         public Image image;
         public uiOffset? offset;
         public uiPaint paint;
+        
+        
+        // TODO: Should divide by device pixel ratio here, which is not available as
+        //       this DrawCmd is created. This bounds should only used as an upper bound,
+        //       assuming that device pixel ratio is always >= 1
+        public override uiRect bounds(float margin) {
+            return uiRectHelper.fromLTWH(
+                this.offset.Value.dx - margin, this.offset.Value.dy - margin,
+                this.image.width + 2 * margin,
+                this.image.height + 2 * margin);
+        }
     }
 
     public class uiDrawImageRect : uiDrawCmd {
@@ -333,6 +355,10 @@ namespace Unity.UIWidgets.ui {
         public uiRect? src;
         public uiRect? dst;
         public uiPaint paint;
+        
+        public override uiRect bounds(float margin) {
+            return uiRectHelper.inflate(this.dst.Value, margin);
+        }
     }
 
     public class uiDrawImageNine : uiDrawCmd {
@@ -365,6 +391,15 @@ namespace Unity.UIWidgets.ui {
         public uiRect? center;
         public uiRect? dst;
         public uiPaint paint;
+
+        public override uiRect bounds(float margin) {
+            return uiRectHelper.fromLTRB(
+                this.dst.Value.left + ((this.center.Value.left - this.src.Value.left) * this.src.Value.width) - margin,
+                this.dst.Value.top + ((this.center.Value.top - this.src.Value.top) * this.src.Value.height) - margin,
+                this.dst.Value.right - ((this.src.Value.right - this.center.Value.right) * this.src.Value.width) + margin,
+                this.dst.Value.bottom - ((this.src.Value.bottom - this.center.Value.bottom) * this.src.Value.height) + margin
+            );
+        }
     }
 
     public class uiDrawPicture : uiDrawCmd {
@@ -386,6 +421,9 @@ namespace Unity.UIWidgets.ui {
         }
 
         public Picture picture;
+        public override uiRect bounds(float margin) {
+            return uiRectHelper.fromRect(this.picture.paintBounds.inflate(margin)).Value;
+        }
     }
 
     public class uiDrawTextBlob : uiDrawCmd {
@@ -412,5 +450,10 @@ namespace Unity.UIWidgets.ui {
         public TextBlob? textBlob;
         public uiOffset? offset;
         public uiPaint paint;
+
+        public override uiRect bounds(float margin) {
+            return uiRectHelper.fromRect(this.textBlob.Value.boundsInText.translate(
+                this.offset.Value.dx, this.offset.Value.dy).inflate(margin)).Value;
+        }
     }
 }

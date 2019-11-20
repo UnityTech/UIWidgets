@@ -1,25 +1,34 @@
 using System;
 using System.Collections.Generic;
 using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.Runtime.external;
 
 namespace Unity.UIWidgets.ui {
     public class uiPicture : PoolObject {
         public uiPicture() {
         }
 
-        public static uiPicture create(List<uiDrawCmd> drawCmds, uiRect paintBounds) {
+        public static uiPicture create(List<uiDrawCmd> drawCmds,
+            uiRect paintBounds,
+            BBoxHierarchy<IndexedRect> bbh = null,
+            uiList<int> stateUpdateIndices = null) {
             var picture = ObjectPool<uiPicture>.alloc();
             picture.drawCmds = drawCmds;
             picture.paintBounds = paintBounds;
+            picture.bbh = bbh;
+            picture.stateUpdatesIndices = stateUpdateIndices;
             return picture;
         }
 
         public List<uiDrawCmd> drawCmds;
         public uiRect paintBounds;
+        public BBoxHierarchy<IndexedRect> bbh; 
+        public uiList<int> stateUpdatesIndices; 
 
         public override void clear() {
             //the recorder will dispose the draw commands
             this.drawCmds = null;
+            ObjectPool<uiList<int>>.release(this.stateUpdatesIndices);
         }
     }
 
@@ -65,9 +74,22 @@ namespace Unity.UIWidgets.ui {
             if (this._states.Count > 1) {
                 throw new Exception("unmatched save/restore commands");
             }
+            
+            int index = 0;
+            RTree<IndexedRect> bbh = new RTree<IndexedRect>();
+            uiList<int> stateUpdateIndices = ObjectPool<uiList<int>>.alloc();
+            foreach (var cmd in this._drawCmds) {
+                if (cmd is uiStateUpdateDrawCmd) {
+                    stateUpdateIndices.Add(index);
+                }
+                else {
+                    bbh.Insert(new IndexedRect(cmd.bounds(5), index));
+                }
+                index++;
+            }
 
             var state = this._getState();
-            return uiPicture.create(this._drawCmds, state.paintBounds);
+            return uiPicture.create(this._drawCmds, state.paintBounds, bbh: bbh, stateUpdateIndices: stateUpdateIndices);
         }
 
         public void addDrawCmd(uiDrawCmd drawCmd) {
