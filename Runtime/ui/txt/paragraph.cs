@@ -662,10 +662,19 @@ namespace Unity.UIWidgets.ui {
             return nextLineStart - lineStart;
         }
 
-        internal void setText(string text, StyledRuns runs) {
+        internal void setText(string text, StyledRuns runs, bool skipRequestCharacters = false) {
             this._text = text;
             this._runs = runs;
             this._needsLayout = true;
+            if (!skipRequestCharacters) {
+                for (int i = 0; i < runs.size; i++) {
+                    var style = runs.getStyle(i);
+                    var run = runs.getRun(i);
+                    var font = FontManager.instance.getOrCreate(style.fontFamily, style.fontWeight, style.fontStyle).font;
+                    font.RequestCharactersInTextureSafe(text.Substring(run.start, run.end - run.start),
+                        Mathf.CeilToInt(style.fontSize), style.UnityFontStyle);
+                }
+            }
         }
 
         public void setParagraphStyle(ParagraphStyle style) {
