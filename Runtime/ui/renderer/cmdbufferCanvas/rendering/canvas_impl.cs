@@ -862,7 +862,7 @@ namespace Unity.UIWidgets.ui {
                         break;
                     }
 
-                    case DrawImage cmd: {_drawImage(cmd.image, (uiOffset.fromOffset(cmd.offset)).Value,
+                    case DrawImage cmd: {this._drawImage(cmd.image, (uiOffset.fromOffset(cmd.offset)).Value,
                             uiPaint.fromPaint(cmd.paint));
                         break;
                     }
