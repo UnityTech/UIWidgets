@@ -136,6 +136,10 @@ namespace Unity.UIWidgets.Runtime.external
     {
         IReadOnlyList<T> Search(in uiRect boundingBox);
         void BulkLoad(IEnumerable<T> items);
+
+        void Insert(T data);
+
+        void Clear();
     }
 
     public class RTree<T> : BBoxHierarchy<T> where T : ISpatialData

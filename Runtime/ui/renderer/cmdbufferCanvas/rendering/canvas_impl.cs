@@ -932,7 +932,7 @@ namespace Unity.UIWidgets.ui {
                     drawCmds.Add(picture.drawCmds[cmdIndices[i]]);
                 }
             }
-            
+
             foreach (var drawCmd in drawCmds) {
                 switch (drawCmd) {
                     case uiDrawSave _:

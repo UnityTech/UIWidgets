@@ -36,6 +36,10 @@ namespace Unity.UIWidgets.ui {
         readonly List<uiDrawCmd> _drawCmds = new List<uiDrawCmd>(128);
 
         readonly List<uiCanvasState> _states = new List<uiCanvasState>(32);
+        
+        readonly BBoxHierarchy<IndexedRect> _bbh = new RTree<IndexedRect>();
+
+        readonly List<int> _stateUpdateIndices = new List<int>();
 
         public uiPictureRecorder() {
             this.reset();
@@ -68,6 +72,8 @@ namespace Unity.UIWidgets.ui {
                 layerOffset = null,
                 paintBounds = uiRectHelper.zero
             });
+            this._bbh.Clear();
+            this._stateUpdateIndices.Clear();
         }
 
         public uiPicture endRecording() {
@@ -75,21 +81,14 @@ namespace Unity.UIWidgets.ui {
                 throw new Exception("unmatched save/restore commands");
             }
             
-            int index = 0;
-            RTree<IndexedRect> bbh = new RTree<IndexedRect>();
             uiList<int> stateUpdateIndices = ObjectPool<uiList<int>>.alloc();
-            foreach (var cmd in this._drawCmds) {
-                if (cmd is uiStateUpdateDrawCmd) {
-                    stateUpdateIndices.Add(index);
-                }
-                else {
-                    bbh.Insert(new IndexedRect(cmd.bounds(5), index));
-                }
-                index++;
-            }
-
+            stateUpdateIndices.AddRange(this._stateUpdateIndices);
             var state = this._getState();
-            return uiPicture.create(this._drawCmds, state.paintBounds, bbh: bbh, stateUpdateIndices: stateUpdateIndices);
+            return uiPicture.create(
+                this._drawCmds,
+                state.paintBounds,
+                bbh: this._bbh,
+                stateUpdateIndices: stateUpdateIndices);
         }
 
         public void addDrawCmd(uiDrawCmd drawCmd) {
@@ -98,6 +97,7 @@ namespace Unity.UIWidgets.ui {
             switch (drawCmd) {
                 case uiDrawSave _:
                     this._states.Add(this._getState().copy());
+                    this._stateUpdateIndices.Add(this._drawCmds.Count - 1);
                     break;
                 case uiDrawSaveLayer cmd: {
                     this._states.Add(new uiCanvasState {
@@ -107,6 +107,7 @@ namespace Unity.UIWidgets.ui {
                         layerOffset = cmd.rect.Value.topLeft,
                         paintBounds = uiRectHelper.zero
                     });
+                    this._stateUpdateIndices.Add(this._drawCmds.Count - 1);
                     break;
                 }
                 case uiDrawRestore _: {
@@ -124,6 +125,7 @@ namespace Unity.UIWidgets.ui {
                     }
 
                     this._setState(state);
+                    this._stateUpdateIndices.Add(this._drawCmds.Count - 1);
                     break;
                 }
                 case uiDrawTranslate cmd: {
@@ -131,6 +133,7 @@ namespace Unity.UIWidgets.ui {
                     state.xform = new uiMatrix3(state.xform);
                     state.xform.preTranslate(cmd.dx, cmd.dy);
                     this._setState(state);
+                    this._stateUpdateIndices.Add(this._drawCmds.Count - 1);
                     break;
                 }
                 case uiDrawScale cmd: {
@@ -138,6 +141,7 @@ namespace Unity.UIWidgets.ui {
                     state.xform = new uiMatrix3(state.xform);
                     state.xform.preScale(cmd.sx, (cmd.sy ?? cmd.sx));
                     this._setState(state);
+                    this._stateUpdateIndices.Add(this._drawCmds.Count - 1);
                     break;
                 }
                 case uiDrawRotate cmd: {
@@ -153,6 +157,7 @@ namespace Unity.UIWidgets.ui {
                     }
 
                     this._setState(state);
+                    this._stateUpdateIndices.Add(this._drawCmds.Count - 1);
                     break;
                 }
                 case uiDrawSkew cmd: {
@@ -160,6 +165,7 @@ namespace Unity.UIWidgets.ui {
                     state.xform = new uiMatrix3(state.xform);
                     state.xform.preSkew(cmd.sx, cmd.sy);
                     this._setState(state);
+                    this._stateUpdateIndices.Add(this._drawCmds.Count - 1);
                     break;
                 }
                 case uiDrawConcat cmd: {
@@ -167,18 +173,21 @@ namespace Unity.UIWidgets.ui {
                     state.xform = new uiMatrix3(state.xform);
                     state.xform.preConcat(cmd.matrix.Value);
                     this._setState(state);
+                    this._stateUpdateIndices.Add(this._drawCmds.Count - 1);
                     break;
                 }
                 case uiDrawResetMatrix _: {
                     var state = this._getState();
                     state.xform = uiMatrix3.I();
                     this._setState(state);
+                    this._stateUpdateIndices.Add(this._drawCmds.Count - 1);
                     break;
                 }
                 case uiDrawSetMatrix cmd: {
                     var state = this._getState();
                     state.xform = new uiMatrix3(cmd.matrix.Value);
                     this._setState(state);
+                    this._stateUpdateIndices.Add(this._drawCmds.Count - 1);
                     break;
                 }
                 case uiDrawClipRect cmd: {
@@ -187,6 +196,7 @@ namespace Unity.UIWidgets.ui {
                     var rect = state.xform.mapRect(cmd.rect.Value);
                     state.scissor = state.scissor == null ? rect : state.scissor.Value.intersect(rect);
                     this._setState(state);
+                    this._stateUpdateIndices.Add(this._drawCmds.Count - 1);
                     break;
                 }
                 case uiDrawClipRRect cmd: {
@@ -195,6 +205,7 @@ namespace Unity.UIWidgets.ui {
                     var rect = state.xform.mapRect(uiRectHelper.fromRect(cmd.rrect.outerRect).Value);
                     state.scissor = state.scissor == null ? rect : state.scissor.Value.intersect(rect);
                     this._setState(state);
+                    this._stateUpdateIndices.Add(this._drawCmds.Count - 1);
                     break;
                 }
                 case uiDrawClipPath cmd: {
@@ -210,6 +221,7 @@ namespace Unity.UIWidgets.ui {
                     state.scissor = state.scissor == null ? rect : state.scissor.Value.intersect(rect);
                     this._setState(state);
                     ObjectPool<uiMeshMesh>.release(transformedMesh);
+                    this._stateUpdateIndices.Add(this._drawCmds.Count - 1);
                     break;
                 }
                 case uiDrawPath cmd: {
@@ -250,9 +262,13 @@ namespace Unity.UIWidgets.ui {
                         float sigma = scale * paint.maskFilter.Value.sigma;
                         float sigma3 = 3 * sigma;
                         this._addPaintBounds(uiRectHelper.inflate(mesh.bounds, sigma3));
+                        this._bbh.Insert(new IndexedRect(uiRectHelper.inflate(mesh.bounds, sigma3 + 5),
+                            this._drawCmds.Count - 1));
                     }
                     else {
                         this._addPaintBounds(mesh.bounds);
+                        this._bbh.Insert(new IndexedRect(uiRectHelper.inflate(mesh.bounds, 5),
+                            this._drawCmds.Count - 1));
                     }
 
                     ObjectPool<uiMeshMesh>.release(mesh);
@@ -264,24 +280,32 @@ namespace Unity.UIWidgets.ui {
                         cmd.image.width, cmd.image.height);
                     rect = state.xform.mapRect(rect);
                     this._addPaintBounds(rect);
+                    this._bbh.Insert(new IndexedRect(uiRectHelper.inflate(rect, 5),
+                        this._drawCmds.Count - 1));
                     break;
                 }
                 case uiDrawImageRect cmd: {
                     var state = this._getState();
                     var rect = state.xform.mapRect(cmd.dst.Value);
                     this._addPaintBounds(rect);
+                    this._bbh.Insert(new IndexedRect(uiRectHelper.inflate(rect, 5),
+                        this._drawCmds.Count - 1));
                     break;
                 }
                 case uiDrawImageNine cmd: {
                     var state = this._getState();
                     var rect = state.xform.mapRect(cmd.dst.Value);
                     this._addPaintBounds(rect);
+                    this._bbh.Insert(new IndexedRect(uiRectHelper.inflate(rect, 5),
+                        this._drawCmds.Count - 1));
                     break;
                 }
                 case uiDrawPicture cmd: {
                     var state = this._getState();
                     var rect = state.xform.mapRect(uiRectHelper.fromRect(cmd.picture.paintBounds).Value);
                     this._addPaintBounds(rect);
+                    this._bbh.Insert(new IndexedRect(uiRectHelper.inflate(rect, 5),
+                        this._drawCmds.Count - 1));
                     break;
                 }
                 case uiDrawTextBlob cmd: {
@@ -290,15 +314,21 @@ namespace Unity.UIWidgets.ui {
                     var rect = uiRectHelper.fromRect(
                         cmd.textBlob.Value.shiftedBoundsInText(cmd.offset.Value.dx, cmd.offset.Value.dy)).Value;
                     rect = state.xform.mapRect(rect);
+                    this._bbh.Insert(new IndexedRect(uiRectHelper.inflate(rect, 5),
+                        this._drawCmds.Count - 1));
 
                     var paint = cmd.paint;
                     if (paint.maskFilter != null && paint.maskFilter.Value.sigma != 0) {
                         float sigma = scale * paint.maskFilter.Value.sigma;
                         float sigma3 = 3 * sigma;
                         this._addPaintBounds(uiRectHelper.inflate(rect, sigma3));
+                        this._bbh.Insert(new IndexedRect(uiRectHelper.inflate(rect, sigma3 + 5),
+                            this._drawCmds.Count - 1));
                     }
                     else {
                         this._addPaintBounds(rect);
+                        this._bbh.Insert(new IndexedRect(uiRectHelper.inflate(rect, 5),
+                            this._drawCmds.Count - 1));
                     }
 
                     break;
