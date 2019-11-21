@@ -546,7 +546,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         public float margin {
-            get { return this.width * this.height; }
+            get { return this.width + this.height; }
         }
 
         public static readonly Rect zero = new Rect(0, 0, 0, 0);
