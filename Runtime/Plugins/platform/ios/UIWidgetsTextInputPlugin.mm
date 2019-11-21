@@ -556,8 +556,8 @@ static UIReturnKeyType ToUIReturnKeyType(NSString* inputType) {
     NSUInteger selectionBase = ((UIWidgetsTextPosition*)_selectedTextRange.start).index;
     NSUInteger selectionExtent = ((UIWidgetsTextPosition*)_selectedTextRange.end).index;
     
-    NSUInteger composingBase = -1;
-    NSUInteger composingExtent = -1;
+    NSUInteger composingBase = 0;
+    NSUInteger composingExtent = 0;
     if (self.markedTextRange != nil) {
         composingBase = ((UIWidgetsTextPosition*)self.markedTextRange.start).index;
         composingExtent = ((UIWidgetsTextPosition*)self.markedTextRange.end).index;
