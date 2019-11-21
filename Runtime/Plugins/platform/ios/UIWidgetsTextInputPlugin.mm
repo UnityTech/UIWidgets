@@ -425,6 +425,10 @@ static UIReturnKeyType ToUIReturnKeyType(NSString* inputType) {
 
 - (UITextPosition*)positionFromPosition:(UITextPosition*)position offset:(NSInteger)offset {
     NSUInteger offsetPosition = ((UIWidgetsTextPosition*)position).index;
+    NSInteger newLocation = (NSInteger)offsetPosition + offset;
+    if (newLocation < 0 || newLocation > (NSInteger)self.text.length) {
+      return nil;
+    }
     if (offset >= 0) {
         for (NSInteger i = 0; i < offset && offsetPosition < self.text.length; ++i)
             offsetPosition = [self incrementOffsetPosition:offsetPosition];
@@ -552,8 +556,8 @@ static UIReturnKeyType ToUIReturnKeyType(NSString* inputType) {
     NSUInteger selectionBase = ((UIWidgetsTextPosition*)_selectedTextRange.start).index;
     NSUInteger selectionExtent = ((UIWidgetsTextPosition*)_selectedTextRange.end).index;
     
-    NSUInteger composingBase = 0;
-    NSUInteger composingExtent = 0;
+    NSUInteger composingBase = -1;
+    NSUInteger composingExtent = -1;
     if (self.markedTextRange != nil) {
         composingBase = ((UIWidgetsTextPosition*)self.markedTextRange.start).index;
         composingExtent = ((UIWidgetsTextPosition*)self.markedTextRange.end).index;
