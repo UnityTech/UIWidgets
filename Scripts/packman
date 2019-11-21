@@ -2,7 +2,7 @@
 
 repo_url="git@github.cds.internal.unity3d.com:unity/com.unity.uiwidgets.git"
 package_name="com.unity.uiwidgets"
-target_version="c017089e9"
+target_version="867331b5"
 
 function usage() {
     echo "$0 [path to target repository]"
@@ -88,12 +88,9 @@ cp -R Editor $target_repository/
 echo "Copied Editor"
 
 rm -rf $target_repository/Samples
-cp -R Samples $target_repository/
+git clone https://github.com/UIWidgets/UIWidgetsSamples.git $target_repository/Samples
+rm -rf $target_repository/Samples/.git
 echo "Copied Samples"
-
-rm -rf $target_repository/Tests
-cp -R Tests $target_repository/
-echo "Copied Tests"
 
 cp README.md* $target_repository
 echo "Copied README"
