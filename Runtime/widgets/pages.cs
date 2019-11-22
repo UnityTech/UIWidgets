@@ -7,6 +7,8 @@ namespace Unity.UIWidgets.widgets {
     public abstract class PageRoute : ModalRoute {
         public readonly bool fullscreenDialog;
 
+        public PageRoute() {}
+
         public PageRoute(RouteSettings settings, bool fullscreenDialog = false) : base(settings) {
             this.fullscreenDialog = fullscreenDialog;
         }
