@@ -457,17 +457,12 @@ namespace Unity.UIWidgets.ui {
                             int textCount = textEnd - textStart;
                             // Keep track of the pointer to _glyphPositions in the start of this run
                             int glyphPositionStyleRunStart = pGlyphPositions;
-                            Font font = FontManager.instance.getOrCreate(
-                                style.fontFamily,
-                                style.fontWeight,
-                                style.fontStyle).font;
 
                             // Ellipsize the text if ellipsis string is set, and this is the last lineStyleRun of
                             // the current line, and this is the last line or max line is not set
                             if (!string.IsNullOrEmpty(ellipsis) && !hardBreak && !this._width.isInfinite() &&
                                 lineStyleRunIndex == lineStyleRunCount - 1 &&
                                 (lineNumber == lineLimit - 1 || this._paragraphStyle.maxLines == null)) {
-                                font.RequestCharactersInTextureSafe(ellipsis, style.UnityFontSize, style.UnityFontStyle);
                                 float ellipsisWidth = Layout.measureText(ellipsis, style);
 
                                 // Find the minimum number of characters to truncate, so that the truncated text
@@ -537,6 +532,8 @@ namespace Unity.UIWidgets.ui {
                             }
 
                             // Create paint record
+                            var font = FontManager.instance.getOrCreate(style.fontFamily,
+                                style.fontWeight, style.fontStyle).font;
                             var metrics = FontMetrics.fromFont(font, style.UnityFontSize);
                             PaintRecord paintRecord = new PaintRecord(style, runXOffset, 0, builder.make(),
                                 metrics, advance);
@@ -665,26 +662,10 @@ namespace Unity.UIWidgets.ui {
             return nextLineStart - lineStart;
         }
 
-        internal void setText(string text, StyledRuns runs, bool skipRequestCharacters = false) {
-            if (text == null || text.isEmpty()) {
-                this.clear();
-                this._text = text;
-                this._runs = runs;
-                this._needsLayout = false;
-                return;
-            }
+        internal void setText(string text, StyledRuns runs) {
             this._text = text;
             this._runs = runs;
             this._needsLayout = true;
-            if (!skipRequestCharacters) {
-                for (int i = 0; i < runs.size; i++) {
-                    var run = runs.getRun(i);
-                    var style = run.style;
-                    var font = FontManager.instance.getOrCreate(style.fontFamily, style.fontWeight, style.fontStyle).font;
-                    font.RequestCharactersInTextureSafe(text.Substring(run.start, run.end - run.start),
-                        style.UnityFontSize, style.UnityFontStyle);
-                }
-            }
         }
 
         public void setParagraphStyle(ParagraphStyle style) {
