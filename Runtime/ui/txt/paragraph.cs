@@ -676,8 +676,8 @@ namespace Unity.UIWidgets.ui {
             this._needsLayout = true;
             if (!skipRequestCharacters) {
                 for (int i = 0; i < runs.size; i++) {
-                    var style = runs.getStyle(i);
                     var run = runs.getRun(i);
+                    var style = run.style;
                     var font = FontManager.instance.getOrCreate(style.fontFamily, style.fontWeight, style.fontStyle).font;
                     font.RequestCharactersInTextureSafe(text.Substring(run.start, run.end - run.start),
                         style.UnityFontSize, style.UnityFontStyle);
