@@ -83,14 +83,20 @@ rm -rf $target_repository/Runtime
 cp -R Runtime $target_repository/
 echo "Copied Runtime"
 
+rm -rf $target_repository/Runtime/Resources/fonts
+rm -rf $target_repository/Runtime/Resources/images
+rm -rf $target_repository/Runtime/Plugins
+echo "Removed Resources and Plugins"
+
 rm -rf $target_repository/Editor
 cp -R Editor $target_repository/
 echo "Copied Editor"
 
+echo "Cloning Samples"
 rm -rf $target_repository/Samples
 git clone https://github.com/UIWidgets/UIWidgetsSamples.git $target_repository/Samples
 rm -rf $target_repository/Samples/.git
-echo "Copied Samples"
+echo "Cloned Samples"
 
 cp README.md* $target_repository
 echo "Copied README"
