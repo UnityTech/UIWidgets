@@ -174,6 +174,8 @@ namespace Unity.UIWidgets.cupertino {
             this._divisions = divisions;
             this._activeColor = activeColor;
             this._onChanged = onChanged;
+            this.onChangeStart = onChangeStart;
+            this.onChangeEnd = onChangeEnd;
             this._drag = new HorizontalDragGestureRecognizer();
             this._drag.onStart = this._handleDragStart;
             this._drag.onUpdate = this._handleDragUpdate;
