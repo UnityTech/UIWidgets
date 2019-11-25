@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.service;
 using Unity.UIWidgets.ui;
@@ -213,6 +214,9 @@ namespace Unity.UIWidgets.painting {
                 var builder = new ParagraphBuilder(this._createParagraphStyle());
                 this._text.build(builder, this.textScaleFactor);
                 this._paragraph = builder.build();
+            }
+            else {
+                Debug.Log($"Use Old Paragraph [{DateTime.Now.Millisecond}]");
             }
 
             this._lastMinWidth = minWidth;
