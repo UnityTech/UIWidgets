@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.Runtime.external;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -766,6 +768,21 @@ namespace Unity.UIWidgets.ui {
             int saveCount = 0;
 
             var drawCmds = picture.drawCmds;
+            var queryBound = this._currentLayer.currentState.matrix?.invert().Value
+                                 .mapRect(this._currentLayer.layerBounds) ??
+                             this._currentLayer.layerBounds;
+
+            if (!uiRectHelper.contains(queryBound, uiRectHelper.fromRect(picture.paintBounds).Value)) {
+                var indices = picture.bbh.Search(queryBound).Select(bound => bound.index);
+                List<int> cmdIndices = indices.ToList();
+                cmdIndices.AddRange(picture.stateUpdatesIndices);
+                cmdIndices.Sort();
+                drawCmds = new List<DrawCmd>();
+                for (int i = 0; i < cmdIndices.Count; i++) {
+                    drawCmds.Add(picture.drawCmds[cmdIndices[i]]);
+                }
+            }
+            
             foreach (var drawCmd in drawCmds) {
                 switch (drawCmd) {
                     case DrawSave _:
@@ -870,6 +887,7 @@ namespace Unity.UIWidgets.ui {
                     }
 
                     case DrawTextBlob cmd: {
+                        this._paintTextShadow(cmd.textBlob, cmd.offset);
                         this._drawTextBlob(cmd.textBlob, (uiOffset.fromOffset(cmd.offset)).Value,
                             uiPaint.fromPaint(cmd.paint));
                         break;
@@ -898,6 +916,24 @@ namespace Unity.UIWidgets.ui {
             int saveCount = 0;
 
             var drawCmds = picture.drawCmds;
+            var queryBound = this._currentLayer.currentState.matrix?.invert().Value
+                                 .mapRect(this._currentLayer.layerBounds) ??
+                             this._currentLayer.layerBounds;
+            
+            if (!uiRectHelper.contains(queryBound, picture.paintBounds)) {
+                var indices = picture.bbh.Search(queryBound).Select(bound => bound.index);
+                List<int> cmdIndices = indices.ToList();
+                cmdIndices.Capacity += picture.stateUpdatesIndices.Count;
+                for (int i = 0; i < picture.stateUpdatesIndices.Count; i++) {
+                    cmdIndices.Add(picture.stateUpdatesIndices[i]);
+                }
+                cmdIndices.Sort();
+                drawCmds = new List<uiDrawCmd>();
+                for (int i = 0; i < cmdIndices.Count; i++) {
+                    drawCmds.Add(picture.drawCmds[cmdIndices[i]]);
+                }
+            }
+
             foreach (var drawCmd in drawCmds) {
                 switch (drawCmd) {
                     case uiDrawSave _:
@@ -994,6 +1030,7 @@ namespace Unity.UIWidgets.ui {
                     }
 
                     case uiDrawTextBlob cmd: {
+                        this._paintTextShadow(cmd.textBlob, new Offset(cmd.offset.Value.dx, cmd.offset.Value.dy));
                         this._drawTextBlob(cmd.textBlob, cmd.offset.Value, cmd.paint);
                         break;
                     }
@@ -1009,6 +1046,22 @@ namespace Unity.UIWidgets.ui {
 
             if (needsSave) {
                 this._restore();
+            }
+        }
+
+        void _paintTextShadow(TextBlob? textBlob, Offset offset) {
+            D.assert(textBlob != null);
+            if (textBlob.Value.style.shadows != null && textBlob.Value.style.shadows.isNotEmpty()) {
+                textBlob.Value.style.shadows.ForEach(shadow => {
+                    Paint paint = new Paint {
+                        color = shadow.color,
+                        maskFilter = shadow.blurRadius != 0
+                            ? MaskFilter.blur(BlurStyle.normal, shadow.blurRadius)
+                            : null,
+                    };
+                    this._drawTextBlob(textBlob, uiOffset.fromOffset(shadow.offset + offset).Value,
+                        uiPaint.fromPaint(paint));
+                });
             }
         }
 
@@ -1037,12 +1090,14 @@ namespace Unity.UIWidgets.ui {
             }
 
             if (paint.maskFilter != null && paint.maskFilter.Value.sigma != 0) {
-                this._drawWithMaskFilter(textBlobBounds, paint, paint.maskFilter.Value, null, null, false, 0, 0, tex,
-                    textBlobBounds, mesh, notEmoji, this.___drawTextDrawMeshCallback);
+                this._drawWithMaskFilter(textBlobBounds, paint, paint.maskFilter.Value, null, null, false, 0, 0,
+                    notEmoji ? tex : EmojiUtils.image.texture,
+                    textBlobBounds, mesh, true, this.___drawTextDrawMeshCallback);
                 return;
             }
 
             this._drawTextDrawMeshCallback(paint, null, null, false, 0, 0, tex, textBlobBounds, mesh, notEmoji);
+            
         }
 
         public void flush(uiPicture picture) {

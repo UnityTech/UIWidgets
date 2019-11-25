@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.painting;
 
 namespace Unity.UIWidgets.ui {
@@ -99,6 +100,7 @@ namespace Unity.UIWidgets.ui {
         public readonly string fontFamily = kDefaultFontFamily;
         public readonly Paint foreground;
         public readonly Paint background;
+        public readonly List<BoxShadow> shadows;
 
         internal UnityEngine.Color UnityColor {
             get { return this.color.toColor(); }
@@ -142,7 +144,8 @@ namespace Unity.UIWidgets.ui {
                     decorationColor: style.decorationColor ?? currentStyle.decorationColor,
                     fontFamily: style.fontFamily ?? currentStyle.fontFamily,
                     foreground: style.foreground ?? currentStyle.foreground,
-                    background: style.background ?? currentStyle.background
+                    background: style.background ?? currentStyle.background,
+                    shadows: style.shadows ?? currentStyle.shadows
                 );
             }
 
@@ -159,7 +162,8 @@ namespace Unity.UIWidgets.ui {
                 decorationColor: style.decorationColor,
                 fontFamily: style.fontFamily,
                 foreground: style.foreground,
-                background: style.background
+                background: style.background,
+                shadows: style.shadows
             );
         }
 
@@ -179,7 +183,8 @@ namespace Unity.UIWidgets.ui {
                    Equals(this.decoration, other.decoration) &&
                    Equals(this.decorationColor, other.decorationColor) &&
                    this.decorationStyle == other.decorationStyle &&
-                   string.Equals(this.fontFamily, other.fontFamily);
+                   string.Equals(this.fontFamily, other.fontFamily) &&
+                   this.shadows.equalsList(other.shadows);
         }
 
         public override bool Equals(object obj) {
@@ -212,6 +217,7 @@ namespace Unity.UIWidgets.ui {
                 hashCode = (hashCode * 397) ^ (this.decorationColor != null ? this.decorationColor.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ this.decorationStyle.GetHashCode();
                 hashCode = (hashCode * 397) ^ (this.fontFamily != null ? this.fontFamily.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (this.shadows != null ? this.shadows.GetHashCode() : 0);
                 return hashCode;
             }
         }
@@ -225,13 +231,21 @@ namespace Unity.UIWidgets.ui {
         }
 
 
-        public TextStyle(Color color = null, float? fontSize = null,
-            FontWeight fontWeight = null, FontStyle? fontStyle = null, float? letterSpacing = null,
-            float? wordSpacing = null, TextBaseline? textBaseline = null, float? height = null,
-            TextDecoration decoration = null, TextDecorationStyle? decorationStyle = null, Color decorationColor = null,
+        public TextStyle(Color color = null,
+            float? fontSize = null,
+            FontWeight fontWeight = null,
+            FontStyle? fontStyle = null,
+            float? letterSpacing = null,
+            float? wordSpacing = null,
+            TextBaseline? textBaseline = null,
+            float? height = null,
+            TextDecoration decoration = null,
+            TextDecorationStyle? decorationStyle = null,
+            Color decorationColor = null,
             string fontFamily = null,
             Paint foreground = null,
-            Paint background = null
+            Paint background = null,
+            List<BoxShadow> shadows = null
         ) {
             this.color = color ?? this.color;
             this.fontSize = fontSize ?? this.fontSize;
@@ -248,6 +262,7 @@ namespace Unity.UIWidgets.ui {
             this.fontFamily = fontFamily ?? this.fontFamily;
             this.foreground = foreground ?? this.foreground;
             this.background = background ?? this.background;
+            this.shadows = shadows ?? this.shadows;
         }
     }
 

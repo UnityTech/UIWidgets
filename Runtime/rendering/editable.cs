@@ -1320,7 +1320,7 @@ namespace Unity.UIWidgets.rendering {
             get {
                 switch (Application.platform) {
                     case RuntimePlatform.IPhonePlayer:
-                        return Rect.fromLTWH(0.0f, -EditableUtils._kCaretHeightOffset + 0.5f, this.cursorWidth,
+                        return Rect.fromLTWH(0.0f, 0.0f, this.cursorWidth,
                             this.preferredLineHeight + 2.0f);
                     default:
                         return Rect.fromLTWH(0.0f, EditableUtils._kCaretHeightOffset, this.cursorWidth,
@@ -1363,17 +1363,29 @@ namespace Unity.UIWidgets.rendering {
             if (this._cursorOffset != null) {
                 caretRect = caretRect.shift(this._cursorOffset);
             }
-
-#if !UNITY_IOS
-            if (this._textPainter.getFullHeightForCaret(textPosition, this._caretPrototype) != null) {
-                caretRect = Rect.fromLTWH(
-                    caretRect.left,
-                    caretRect.top - EditableUtils._kCaretHeightOffset,
-                    caretRect.width,
-                    this._textPainter.getFullHeightForCaret(textPosition, this._caretPrototype).Value
-                );
+            
+            float? caretHeight = this._textPainter.getFullHeightForCaret(textPosition, this._caretPrototype);
+            if (caretHeight != null) {
+                switch (Application.platform) {
+                    case RuntimePlatform.IPhonePlayer:
+                        float heightDiff = caretHeight.Value - caretRect.height;
+                        caretRect = Rect.fromLTWH(
+                            caretRect.left,
+                            caretRect.top + heightDiff / 2f,
+                            caretRect.width,
+                            caretRect.height
+                        );
+                        break;
+                    default:
+                        caretRect = Rect.fromLTWH(
+                            caretRect.left,
+                            caretRect.top - EditableUtils._kCaretHeightOffset,
+                            caretRect.width,
+                            caretHeight.Value
+                        );
+                        break;
+                }
             }
-#endif
 
             caretRect = caretRect.shift(this._getPixelPerfectCursorOffset(caretRect));
 

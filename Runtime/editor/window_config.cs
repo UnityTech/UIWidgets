@@ -4,7 +4,12 @@ namespace Unity.UIWidgets.editor {
     public class WindowConfig {
         public readonly bool disableRasterCache;
 
-        public static float MaxRasterImageSize = 4096;
+#if UNITY_ANDROID
+            //make API compatible to low-end Android devices
+            public static float MaxRasterImageSize = 2048;
+#else
+            public static float MaxRasterImageSize = 4096;
+#endif
 
         static bool? _disableComputeBuffer = null;
 

@@ -30,10 +30,8 @@ namespace Unity.UIWidgets.ui {
                 return;
             }
             this._isNaiveRRect = isNaiveRRect && this._hasOnlyMoveTos();
-            if (this._isNaiveRRect) {
-                this._shapeHint = shapeHint;
-                this._rRectCorner = corner;
-            }
+            this._shapeHint = shapeHint;
+            this._rRectCorner = corner;
         }
         
         bool _hasOnlyMoveTos() {
@@ -80,6 +78,8 @@ namespace Unity.UIWidgets.ui {
             this.needCache = false;
             this.pathKey = 0;
             this._isNaiveRRect = false;
+            this._shapeHint = uiPathShapeHint.Other;
+            this._rRectCorner = 0;
         }
 
         void _reset() {
@@ -168,6 +168,14 @@ namespace Unity.UIWidgets.ui {
             }
 
             return uiRectHelper.fromLTRB(this._minX, this._minY, this._maxX, this._maxY);
+        }
+
+        public uiRect getBoundsWithMargin(float margin) {
+            if (this._minX - margin >= this._maxX + margin || this._minY - margin >= this._maxY + margin) {
+                return uiRectHelper.zero;
+            }
+
+            return uiRectHelper.fromLTRB(this._minX - margin, this._minY - margin, this._maxX + margin, this._maxY + margin);
         }
 
         void _appendMoveTo(float x, float y) {
