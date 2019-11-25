@@ -403,7 +403,7 @@ namespace Unity.UIWidgets.ui {
         }
 
         uiVertexUV _expandFill(float fringe) {
-            float aa = fringe;
+            float aa = this.canSkipAAHairline ? 0f : fringe;
             float woff = aa * 0.5f;
             var points = this._points;
             var paths = this._paths;
@@ -469,7 +469,7 @@ namespace Unity.UIWidgets.ui {
 
             uiList<Vector3> _strokeVertices = null;
             uiList<Vector2> _strokeUV = null;
-            if (aa > 0.0f && !this.canSkipAAHairline) {
+            if (aa > 0.0f) {
                 _strokeVertices = ObjectPool<uiList<Vector3>>.alloc();
                 _strokeUV = ObjectPool<uiList<Vector2>>.alloc();
                 cvertices = 0;

@@ -2102,8 +2102,12 @@ namespace Unity.UIWidgets.material {
             this.hasFloatingPlaceholder = hasFloatingPlaceholder;
             this.isDense = isDense;
             this.contentPadding = contentPadding;
+            this.prefix = prefix;
+            this.prefixText = prefixText;
             this.prefixIcon = prefixIcon;
             this.prefixStyle = prefixStyle;
+            this.suffix = suffix;
+            this.suffixText = suffixText;
             this.suffixIcon = suffixIcon;
             this.suffixStyle = suffixStyle;
             this.counter = counter;

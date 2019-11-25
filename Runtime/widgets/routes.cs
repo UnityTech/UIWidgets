@@ -471,8 +471,9 @@ namespace Unity.UIWidgets.widgets {
     }
 
     public abstract class ModalRoute : LocalHistoryRouteTransitionRoute {
-        protected ModalRoute(RouteSettings settings) : base(settings) {
-        }
+        
+        protected ModalRoute() {}
+        protected ModalRoute(RouteSettings settings) : base(settings) { }
 
         public static Color _kTransparent = new Color(0x00000000);
 
