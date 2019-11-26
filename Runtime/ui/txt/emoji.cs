@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Unity.UIWidgets.editor;
 using Unity.UIWidgets.foundation;
 using UnityEngine;
 
@@ -434,6 +435,15 @@ namespace Unity.UIWidgets.ui {
                         _image = new Image(Resources.Load<Texture2D>(value.spriteSheetAssetName));
                     }
                     catch (Exception e) {
+#if UNITY_EDITOR
+                        if (Resources.Load("images/EmojiIOS13.2") == null) {
+                            D.assert(() => {
+                                Debug.Log("It appears that you have not imported UIWidgetsResources.");
+                                return true;
+                            });
+                            UIWidgetsResourcesImporterWindow.ShowResourcesImporterWindow();
+                        }
+#endif
                         _image = null;
                         Debug.LogError(e.StackTrace);
                     }

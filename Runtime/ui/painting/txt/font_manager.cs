@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Unity.UIWidgets.editor;
 using Unity.UIWidgets.foundation;
 using UnityEngine;
 
@@ -35,6 +36,23 @@ namespace Unity.UIWidgets.ui {
 
         public void addFont(Font font, string familyName,
             FontWeight fontWeight = null, FontStyle fontStyle = FontStyle.normal) {
+            if (font == null) {
+                D.assert(() => {
+                    Debug.LogWarning($"Font missing (when adding font for {familyName})!");
+                    return true;
+                });
+#if UNITY_EDITOR
+                if (Resources.Load("fonts/MaterialIcons-Regular") == null) {
+                    D.assert(() => {
+                        Debug.Log("It appears that you have not imported UIWidgetsResources.");
+                        return true;
+                    });
+                    UIWidgetsResourcesImporterWindow.ShowResourcesImporterWindow();
+                }
+#endif
+                return;
+            }
+
             fontWeight = fontWeight ?? FontWeight.normal;
 
             D.assert(font != null);
