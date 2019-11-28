@@ -78,6 +78,11 @@ namespace Unity.UIWidgets.ui {
 
         public Picture endRecording() {
             this.restoreToCount(1);
+            
+            if (this._states.Count > 1) {
+                throw new Exception("unmatched save/restore commands");
+            }
+
             var state = this._getState();
             return new Picture(new List<DrawCmd>(this._drawCmds), state.paintBounds, this._isDynamic);
         }
