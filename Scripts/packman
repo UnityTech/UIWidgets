@@ -2,7 +2,7 @@
 
 repo_url="git@github.cds.internal.unity3d.com:unity/com.unity.uiwidgets.git"
 package_name="com.unity.uiwidgets"
-target_version="10dbdd3b"
+target_version="795ced574"
 
 function usage() {
     echo "$0 [path to target repository]"
@@ -83,9 +83,12 @@ rm -rf $target_repository/Runtime
 cp -R Runtime $target_repository/
 echo "Copied Runtime"
 
-rm -rf $target_repository/Runtime/Resources/fonts
-rm -rf $target_repository/Runtime/Resources/images
 rm -rf $target_repository/Runtime/Plugins
+rm -rf $target_repository/Runtime/Plugins.meta
+rm -rf $target_repository/Runtime/Resources/images
+rm -rf $target_repository/Runtime/Resources/images.meta
+rm -rf $target_repository/Runtime/Resources/fonts
+rm -rf $target_repository/Runtime/Resources/fonts.meta
 echo "Removed Resources and Plugins"
 
 rm -rf $target_repository/Editor
@@ -110,6 +113,7 @@ echo
 echo "cd $target_repository"
 echo "Update CHANGELOG.md, adding entry for the new version."
 echo "Update package.json, changing the version number."
+echo "Update the resource package in 'Package Resources' folder, if needed."
 echo "git commit"
 echo "git push"
 echo "Visit https://yamato.cds.internal.unity3d.com/jobs/242-com.unity.uiwidgets and wait for the jobs to succeed."
