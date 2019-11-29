@@ -131,8 +131,8 @@ namespace Unity.UIWidgets.ui {
                     //check for underflow
                     if (this._states.Count > 1) {
                         this.restore();
-                        this._stateUpdateIndices.Add(this._drawCmds.Count - 1);
                     }
+                    this._stateUpdateIndices.Add(this._drawCmds.Count - 1);
                     break;
                 }
 
