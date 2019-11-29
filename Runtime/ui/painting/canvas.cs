@@ -99,9 +99,11 @@ namespace Unity.UIWidgets.ui {
         }
 
         public void restore() {
-            this._saveCount--;
-            this._recorder.addDrawCmd(new DrawRestore {
-            });
+            if (this._saveCount > 1) {
+                this._saveCount--;
+                this._recorder.addDrawCmd(new DrawRestore {
+                });
+            }
         }
 
         public int getSaveCount() {

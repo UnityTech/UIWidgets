@@ -53,7 +53,32 @@ namespace Unity.UIWidgets.ui {
             });
         }
 
+        void restoreToCount(int count) {
+            count = this._states.Count - count;
+            while (count > 0) {
+                this.addDrawCmd(new DrawRestore());
+                count--;
+            }
+        }
+
+        void restore() {
+            var stateToRestore = this._getState();
+            this._states.RemoveAt(this._states.Count - 1);
+            var state = this._getState();
+
+            if (!stateToRestore.saveLayer) {
+                state.paintBounds = stateToRestore.paintBounds;
+            }
+            else {
+                var paintBounds = stateToRestore.paintBounds.shift(stateToRestore.layerOffset);
+                paintBounds = state.xform.mapRect(paintBounds);
+                this._addPaintBounds(paintBounds);
+            }
+        }
+
         public Picture endRecording() {
+            this.restoreToCount(1);
+            
             if (this._states.Count > 1) {
                 throw new Exception("unmatched save/restore commands");
             }
@@ -81,19 +106,10 @@ namespace Unity.UIWidgets.ui {
                 }
 
                 case DrawRestore _: {
-                    var stateToRestore = this._getState();
-                    this._states.RemoveAt(this._states.Count - 1);
-                    var state = this._getState();
-
-                    if (!stateToRestore.saveLayer) {
-                        state.paintBounds = stateToRestore.paintBounds;
+                    //check for underflow
+                    if (this._states.Count > 1) {
+                        this.restore();
                     }
-                    else {
-                        var paintBounds = stateToRestore.paintBounds.shift(stateToRestore.layerOffset);
-                        paintBounds = state.xform.mapRect(paintBounds);
-                        this._addPaintBounds(paintBounds);
-                    }
-
                     break;
                 }
 
