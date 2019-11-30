@@ -3,7 +3,7 @@ using Unity.UIWidgets.rendering;
 using Unity.UIWidgets.ui;
 using Unity.UIWidgets.widgets;
 
-namespace Unity.UIWidgets.plugins.raycast {
+namespace Unity.UIWidgets.engine.raycast {
     class RaycastableBox : SingleChildRenderObjectWidget {
         public RaycastableBox(
             Key key = null,

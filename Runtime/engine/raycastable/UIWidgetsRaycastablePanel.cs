@@ -1,7 +1,7 @@
 using Unity.UIWidgets.engine;
 using UnityEngine;
 
-namespace Unity.UIWidgets.plugins.raycast {
+namespace Unity.UIWidgets.engine.raycast {
     [RequireComponent(typeof(RectTransform))]
     public class UIWidgetsRaycastablePanel : UIWidgetsPanel, ICanvasRaycastFilter {
         int windowHashCode;

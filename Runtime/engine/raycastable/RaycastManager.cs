@@ -3,7 +3,7 @@ using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.ui;
 using UnityEngine;
 
-namespace Unity.UIWidgets.plugins.raycast {
+namespace Unity.UIWidgets.engine.raycast {
     public class RaycastableRect {
         bool _isDirty = true;
 
