@@ -2,7 +2,7 @@
 
 repo_url="git@github.cds.internal.unity3d.com:unity/com.unity.uiwidgets.git"
 package_name="com.unity.uiwidgets"
-target_version="795ced574"
+target_version="988f051"
 
 function usage() {
     echo "$0 [path to target repository]"
