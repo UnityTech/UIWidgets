@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Unity.UIWidgets.foundation;
-using Unity.UIWidgets.Runtime.external;
+using Unity.UIWidgets.external;
 
 namespace Unity.UIWidgets.ui {
     public class uiPicture : PoolObject {
