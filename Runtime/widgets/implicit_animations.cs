@@ -439,11 +439,11 @@ namespace Unity.UIWidgets.widgets {
 
     public class AnimatedAlign : ImplicitlyAnimatedWidget {
         public AnimatedAlign(
-            Alignment alignment,
-            TimeSpan duration,
+            Key key = null,
+            Alignment alignment = null,
             Widget child = null,
             Curve curve = null,
-            Key key = null
+            TimeSpan? duration = null
         ) : base(key: key, curve: curve ?? Curves.linear, duration: duration) {
             D.assert(alignment != null);
             this.alignment = alignment;
@@ -487,8 +487,8 @@ namespace Unity.UIWidgets.widgets {
 
     public class AnimatedPositioned : ImplicitlyAnimatedWidget {
         public AnimatedPositioned(
-            Widget child,
-            TimeSpan duration,
+            Key key = null,
+            Widget child = null,
             float? left = null,
             float? top = null,
             float? right = null,
@@ -496,7 +496,7 @@ namespace Unity.UIWidgets.widgets {
             float? width = null,
             float? height = null,
             Curve curve = null,
-            Key key = null
+            TimeSpan? duration = null
         ) : base(key: key, curve: curve ?? Curves.linear, duration: duration) {
             D.assert(left == null || right == null || width == null);
             D.assert(top == null || bottom == null || height == null);
@@ -510,11 +510,11 @@ namespace Unity.UIWidgets.widgets {
         }
 
         public static AnimatedPositioned fromRect(
-            TimeSpan duration,
+            Key key = null,
             Widget child = null,
             Rect rect = null,
             Curve curve = null,
-            Key key = null
+            TimeSpan? duration = null
         ) {
             return new AnimatedPositioned(
                 child: child,
@@ -607,8 +607,8 @@ namespace Unity.UIWidgets.widgets {
 
     public class AnimatedPositionedDirectional : ImplicitlyAnimatedWidget {
         public AnimatedPositionedDirectional(
-            Widget child,
-            TimeSpan duration,
+            Key key = null,
+            Widget child = null,
             float? start = null,
             float? top = null,
             float? end = null,
@@ -616,7 +616,7 @@ namespace Unity.UIWidgets.widgets {
             float? width = null,
             float? height = null,
             Curve curve = null,
-            Key key = null
+            TimeSpan? duration = null
         ) : base(key: key, curve: curve, duration: duration) {
             D.assert(start == null || end == null || width == null);
             D.assert(top == null || bottom == null || height == null);
