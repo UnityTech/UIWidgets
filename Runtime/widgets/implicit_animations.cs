@@ -437,6 +437,275 @@ namespace Unity.UIWidgets.widgets {
         }
     }
 
+    public class AnimatedAlign : ImplicitlyAnimatedWidget {
+        public AnimatedAlign(
+            Alignment alignment,
+            TimeSpan duration,
+            Widget child = null,
+            Curve curve = null,
+            Key key = null
+        ) : base(key: key, curve: curve ?? Curves.linear, duration: duration) {
+            D.assert(alignment != null);
+            this.alignment = alignment;
+            this.child = child;
+        }
+
+        public readonly Alignment alignment;
+
+        public readonly Widget child;
+
+        public override State createState() {
+            return new _AnimatedAlignState();
+        }
+
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+            base.debugFillProperties(properties: properties);
+            properties.add(new DiagnosticsProperty<Alignment>("alignment", value: this.alignment));
+        }
+    }
+
+    class _AnimatedAlignState : AnimatedWidgetBaseState<AnimatedAlign> {
+        AlignmentTween _alignment;
+
+        protected override void forEachTween(TweenVisitor visitor) {
+            this._alignment = (AlignmentTween) visitor.visit(this, tween: this._alignment,
+                targetValue: this.widget.alignment, constructor: value => new AlignmentTween(begin: value));
+        }
+
+        public override Widget build(BuildContext context) {
+            return new Align(
+                alignment: this._alignment.evaluate(animation: this.animation),
+                child: this.widget.child
+            );
+        }
+
+        public override void debugFillProperties(DiagnosticPropertiesBuilder description) {
+            base.debugFillProperties(properties: description);
+            description.add(new DiagnosticsProperty<AlignmentTween>("alignment", value: this._alignment, defaultValue: null));
+        }
+    }
+
+    public class AnimatedPositioned : ImplicitlyAnimatedWidget {
+        public AnimatedPositioned(
+            Widget child,
+            TimeSpan duration,
+            float? left = null,
+            float? top = null,
+            float? right = null,
+            float? bottom = null,
+            float? width = null,
+            float? height = null,
+            Curve curve = null,
+            Key key = null
+        ) : base(key: key, curve: curve ?? Curves.linear, duration: duration) {
+            D.assert(left == null || right == null || width == null);
+            D.assert(top == null || bottom == null || height == null);
+            this.child = child;
+            this.left = left;
+            this.top = top;
+            this.right = right;
+            this.bottom = bottom;
+            this.width = width;
+            this.height = height;
+        }
+
+        public static AnimatedPositioned fromRect(
+            TimeSpan duration,
+            Widget child = null,
+            Rect rect = null,
+            Curve curve = null,
+            Key key = null
+        ) {
+            return new AnimatedPositioned(
+                child: child,
+                duration: duration,
+                left: rect.left,
+                top: rect.top,
+                right: null,
+                bottom: null,
+                width: rect.width,
+                height: rect.height,
+                curve: curve ?? Curves.linear,
+                key: key
+            );
+        }
+
+        public readonly Widget child;
+
+        public readonly float? left;
+
+        public readonly float? top;
+
+        public readonly float? right;
+
+        public readonly float? bottom;
+
+        public readonly float? width;
+
+        public readonly float? height;
+
+        public override State createState() {
+            return new _AnimatedPositionedState();
+        }
+
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+            base.debugFillProperties(properties: properties);
+            properties.add(new FloatProperty("left", value: this.left, defaultValue: null));
+            properties.add(new FloatProperty("top", value: this.top, defaultValue: null));
+            properties.add(new FloatProperty("right", value: this.right, defaultValue: null));
+            properties.add(new FloatProperty("bottom", value: this.bottom, defaultValue: null));
+            properties.add(new FloatProperty("width", value: this.width, defaultValue: null));
+            properties.add(new FloatProperty("height", value: this.height, defaultValue: null));
+        }
+    }
+
+    class _AnimatedPositionedState : AnimatedWidgetBaseState<AnimatedPositioned> {
+        Tween<float?> _left;
+        Tween<float?> _top;
+        Tween<float?> _right;
+        Tween<float?> _bottom;
+        Tween<float?> _width;
+        Tween<float?> _height;
+
+        protected override void forEachTween(TweenVisitor visitor) {
+            this._left = visitor.visit(this, tween: this._left, targetValue: this.widget.left,
+                constructor: value => new NullableFloatTween(begin: value));
+            this._top = visitor.visit(this, tween: this._top, targetValue: this.widget.top,
+                constructor: value => new NullableFloatTween(begin: value));
+            this._right = visitor.visit(this, tween: this._right, targetValue: this.widget.right,
+                constructor: value => new NullableFloatTween(begin: value));
+            this._bottom = visitor.visit(this, tween: this._bottom, targetValue: this.widget.bottom,
+                constructor: value => new NullableFloatTween(begin: value));
+            this._width = visitor.visit(this, tween: this._width, targetValue: this.widget.width,
+                constructor: value => new NullableFloatTween(begin: value));
+            this._height = visitor.visit(this, tween: this._height, targetValue: this.widget.height,
+                constructor: value => new NullableFloatTween(begin: value));
+        }
+
+        public override Widget build(BuildContext context) {
+            return new Positioned(
+                child: this.widget.child,
+                left: this._left?.evaluate(animation: this.animation),
+                top: this._top?.evaluate(animation: this.animation),
+                right: this._right?.evaluate(animation: this.animation),
+                bottom: this._bottom?.evaluate(animation: this.animation),
+                width: this._width?.evaluate(animation: this.animation),
+                height: this._height?.evaluate(animation: this.animation)
+            );
+        }
+
+        public override void debugFillProperties(DiagnosticPropertiesBuilder description) {
+            base.debugFillProperties(properties: description);
+            description.add(ObjectFlagProperty<Tween<float?>>.has("left", value: this._left));
+            description.add(ObjectFlagProperty<Tween<float?>>.has("top", value: this._top));
+            description.add(ObjectFlagProperty<Tween<float?>>.has("right", value: this._right));
+            description.add(ObjectFlagProperty<Tween<float?>>.has("bottom", value: this._bottom));
+            description.add(ObjectFlagProperty<Tween<float?>>.has("width", value: this._width));
+            description.add(ObjectFlagProperty<Tween<float?>>.has("height", value: this._height));
+        }
+    }
+
+    public class AnimatedPositionedDirectional : ImplicitlyAnimatedWidget {
+        public AnimatedPositionedDirectional(
+            Widget child,
+            TimeSpan duration,
+            float? start = null,
+            float? top = null,
+            float? end = null,
+            float? bottom = null,
+            float? width = null,
+            float? height = null,
+            Curve curve = null,
+            Key key = null
+        ) : base(key: key, curve: curve, duration: duration) {
+            D.assert(start == null || end == null || width == null);
+            D.assert(top == null || bottom == null || height == null);
+            this.child = child;
+            this.start = start;
+            this.top = top;
+            this.end = end;
+            this.bottom = bottom;
+            this.width = width;
+            this.height = height;
+        }
+
+        public readonly Widget child;
+
+        public readonly float? start;
+
+        public readonly float? top;
+
+        public readonly float? end;
+
+        public readonly float? bottom;
+
+        public readonly float? width;
+
+        public readonly float? height;
+
+        public override State createState() {
+            return new _AnimatedPositionedDirectionalState();
+        }
+
+        public override void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+            base.debugFillProperties(properties: properties);
+            properties.add(new FloatProperty("start", value: this.start, defaultValue: null));
+            properties.add(new FloatProperty("top", value: this.top, defaultValue: null));
+            properties.add(new FloatProperty("end", value: this.end, defaultValue: null));
+            properties.add(new FloatProperty("bottom", value: this.bottom, defaultValue: null));
+            properties.add(new FloatProperty("width", value: this.width, defaultValue: null));
+            properties.add(new FloatProperty("height", value: this.height, defaultValue: null));
+        }
+    }
+
+    class _AnimatedPositionedDirectionalState : AnimatedWidgetBaseState<AnimatedPositionedDirectional> {
+        Tween<float?> _start;
+        Tween<float?> _top;
+        Tween<float?> _end;
+        Tween<float?> _bottom;
+        Tween<float?> _width;
+        Tween<float?> _height;
+
+        protected override void forEachTween(TweenVisitor visitor) {
+            this._start = visitor.visit(this, tween: this._start, targetValue: this.widget.start,
+                constructor: value => new NullableFloatTween(begin: value));
+            this._top = visitor.visit(this, tween: this._top, targetValue: this.widget.top,
+                constructor: value => new NullableFloatTween(begin: value));
+            this._end = visitor.visit(this, tween: this._end, targetValue: this.widget.end,
+                constructor: value => new NullableFloatTween(begin: value));
+            this._bottom = visitor.visit(this, tween: this._bottom, targetValue: this.widget.bottom,
+                constructor: value => new NullableFloatTween(begin: value));
+            this._width = visitor.visit(this, tween: this._width, targetValue: this.widget.width,
+                constructor: value => new NullableFloatTween(begin: value));
+            this._height = visitor.visit(this, tween: this._height, targetValue: this.widget.height,
+                constructor: value => new NullableFloatTween(begin: value));
+        }
+
+        public override Widget build(BuildContext context) {
+            D.assert(WidgetsD.debugCheckHasDirectionality(context));
+            return Positioned.directional(
+                textDirection: Directionality.of(context: context),
+                child: this.widget.child,
+                start: this._start?.evaluate(animation: this.animation),
+                top: this._top?.evaluate(animation: this.animation),
+                end: this._end?.evaluate(animation: this.animation),
+                bottom: this._bottom?.evaluate(animation: this.animation),
+                width: this._width?.evaluate(animation: this.animation),
+                height: this._height?.evaluate(animation: this.animation)
+            );
+        }
+
+        public override void debugFillProperties(DiagnosticPropertiesBuilder description) {
+            base.debugFillProperties(properties: description);
+            description.add(ObjectFlagProperty<Tween<float?>>.has("start", value: this._start));
+            description.add(ObjectFlagProperty<Tween<float?>>.has("top", value: this._top));
+            description.add(ObjectFlagProperty<Tween<float?>>.has("end", value: this._end));
+            description.add(ObjectFlagProperty<Tween<float?>>.has("bottom", value: this._bottom));
+            description.add(ObjectFlagProperty<Tween<float?>>.has("width", value: this._width));
+            description.add(ObjectFlagProperty<Tween<float?>>.has("height", value: this._height));
+        }
+    }
+
     public class AnimatedOpacity : ImplicitlyAnimatedWidget {
         public AnimatedOpacity(
             Key key = null,
