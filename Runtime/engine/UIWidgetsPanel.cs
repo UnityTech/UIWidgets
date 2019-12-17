@@ -138,6 +138,13 @@ namespace Unity.UIWidgets.engine {
             this._displayMetrics.onViewMetricsChanged();
         }
 
+        protected virtual void InitWindowAdapter() {
+            D.assert(this._windowAdapter == null);
+            this._windowAdapter = new UIWidgetWindowAdapter(this);
+
+            this._windowAdapter.OnEnable();
+        }
+
         protected override void OnEnable() {
             base.OnEnable();
 
@@ -153,10 +160,7 @@ namespace Unity.UIWidgets.engine {
                 _repaintEvent = new Event {type = EventType.Repaint};
             }
 
-            D.assert(this._windowAdapter == null);
-            this._windowAdapter = new UIWidgetWindowAdapter(this);
-
-            this._windowAdapter.OnEnable();
+            this.InitWindowAdapter();
 
             Widget root;
             using (this._windowAdapter.getScope()) {
