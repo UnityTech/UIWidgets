@@ -63,15 +63,18 @@ namespace Unity.UIWidgets.engine {
 
 #if UNITY_ANDROID
                 this._devicePixelRatio = AndroidDevicePixelRatio();
-#endif
-
+#else
 #if UNITY_WEBGL
                 this._devicePixelRatio = UIWidgetsWebGLDevicePixelRatio();
-#endif
-
+#else
 #if UNITY_IOS
                 this._devicePixelRatio = IOSDeviceScaleFactor();
+#else
+                this._devicePixelRatio = Screen.dpi / 96; // on a 96 PPI screen, one px maps to 1 pixel.
 #endif
+#endif
+#endif
+
 
                 if (this._devicePixelRatio <= 0) {
                     this._devicePixelRatio = 1;
