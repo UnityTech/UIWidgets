@@ -841,12 +841,17 @@ namespace Unity.UIWidgets.rendering {
                 float deficit = tableWidth - maxWidthConstraint;
 
                 int availableColumns = this.columns;
-                float minimumDeficit = 0.00000001f;
-                while (deficit > 0.0f && totalFlex > minimumDeficit) {
+                
+                //(Xingwei Zhu) this deficit is double and set to be 0.00000001f in flutter.
+                //since we use float by default, making it larger should make sense in most cases
+                float minimumDeficit = 0.0001f;
+                while (deficit > minimumDeficit && totalFlex > minimumDeficit) {
                     float newTotalFlex = 0.0f;
                     for (int x = 0; x < this.columns; x++) {
                         if (flexes[x] != null) {
-                            float newWidth = widths[x] - deficit * flexes[x].Value / totalFlex;
+                            //(Xingwei Zhu) in case deficit * flexes[x].Value / totalFlex => 0 if deficit is really small, leading to dead loop,
+                            //we amend it with a default larger value to ensure that this loop will eventually end
+                            float newWidth = widths[x] - Mathf.Max(minimumDeficit, deficit * flexes[x].Value / totalFlex);
                             D.assert(newWidth.isFinite());
                             if (newWidth <= minWidths[x]) {
                                 deficit -= widths[x] - minWidths[x];
