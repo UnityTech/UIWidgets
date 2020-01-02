@@ -364,7 +364,7 @@ namespace Unity.UIWidgets.service {
         } 
     }
     
-#if UNITY_WEBGL
+#if UNITY_WEBGL && !UNITY_EDITOR
     class UIWidgetsWebGLKeyboardDelegate : AbstractUIWidgetsKeyboardDelegate {
         
         public override void show() {
