@@ -26,6 +26,14 @@ namespace Unity.UIWidgets.ui {
             get { return this.bottom - this.top; }
         }
 
+        public float area {
+            get { return this.width * this.height; }
+        }
+
+        public float margin {
+            get { return this.width + this.height; }
+        }
+
         public uiOffset topLeft {
             get { return new uiOffset(this.left, this.top); }
         }

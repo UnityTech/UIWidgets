@@ -226,6 +226,14 @@ namespace Unity.UIWidgets.ui {
             return Rect.fromLTRB(this._minX, this._minY, this._maxX, this._maxY);
         }
 
+        public Rect getBoundsWithMargin(float margin) {
+            if (this._minX - margin >= this._maxX + margin || this._minY - margin >= this._maxY + margin) {
+                return Rect.zero;
+            }
+
+            return Rect.fromLTRB(this._minX - margin, this._minY - margin, this._maxX + margin, this._maxY + margin);
+        }
+
         public static Path combine(PathOperation operation, Path path1, Path path2) {
             D.assert(path1 != null);
             D.assert(path2 != null);

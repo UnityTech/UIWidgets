@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.UIWidgets.foundation;
+using Unity.UIWidgets.Runtime.external;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -766,6 +768,21 @@ namespace Unity.UIWidgets.ui {
             int saveCount = 0;
 
             var drawCmds = picture.drawCmds;
+            var queryBound = this._currentLayer.currentState.matrix?.invert().Value
+                                 .mapRect(this._currentLayer.layerBounds) ??
+                             this._currentLayer.layerBounds;
+
+            if (!uiRectHelper.contains(queryBound, uiRectHelper.fromRect(picture.paintBounds).Value)) {
+                var indices = picture.bbh.Search(queryBound).Select(bound => bound.index);
+                List<int> cmdIndices = indices.ToList();
+                cmdIndices.AddRange(picture.stateUpdatesIndices);
+                cmdIndices.Sort();
+                drawCmds = new List<DrawCmd>();
+                for (int i = 0; i < cmdIndices.Count; i++) {
+                    drawCmds.Add(picture.drawCmds[cmdIndices[i]]);
+                }
+            }
+            
             foreach (var drawCmd in drawCmds) {
                 switch (drawCmd) {
                     case DrawSave _:
@@ -899,6 +916,24 @@ namespace Unity.UIWidgets.ui {
             int saveCount = 0;
 
             var drawCmds = picture.drawCmds;
+            var queryBound = this._currentLayer.currentState.matrix?.invert().Value
+                                 .mapRect(this._currentLayer.layerBounds) ??
+                             this._currentLayer.layerBounds;
+            
+            if (!uiRectHelper.contains(queryBound, picture.paintBounds)) {
+                var indices = picture.bbh.Search(queryBound).Select(bound => bound.index);
+                List<int> cmdIndices = indices.ToList();
+                cmdIndices.Capacity += picture.stateUpdatesIndices.Count;
+                for (int i = 0; i < picture.stateUpdatesIndices.Count; i++) {
+                    cmdIndices.Add(picture.stateUpdatesIndices[i]);
+                }
+                cmdIndices.Sort();
+                drawCmds = new List<uiDrawCmd>();
+                for (int i = 0; i < cmdIndices.Count; i++) {
+                    drawCmds.Add(picture.drawCmds[cmdIndices[i]]);
+                }
+            }
+
             foreach (var drawCmd in drawCmds) {
                 switch (drawCmd) {
                     case uiDrawSave _:

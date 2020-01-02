@@ -541,6 +541,14 @@ namespace Unity.UIWidgets.ui {
             get { return new Size(this.width, this.height); }
         }
 
+        public float area {
+            get { return this.width * this.height; }
+        }
+
+        public float margin {
+            get { return this.width + this.height; }
+        }
+
         public static readonly Rect zero = new Rect(0, 0, 0, 0);
 
         public static readonly Rect one = new Rect(0, 0, 1, 1);
