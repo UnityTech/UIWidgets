@@ -587,7 +587,7 @@ namespace Unity.UIWidgets.widgets {
         }
     }
 
-    class SliverFillRemaining : SingleChildRenderObjectWidget {
+    public class SliverFillRemaining : SingleChildRenderObjectWidget {
         public SliverFillRemaining(
             Key key = null,
             Widget child = null
