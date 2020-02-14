@@ -492,7 +492,7 @@ namespace Unity.UIWidgets.widgets {
             }
         }
 
-        public RoutePredicate withName(string name) {
+        public static RoutePredicate withName(string name) {
             return (Route route) => !route.willHandlePopInternally
                                     && route is ModalRoute
                                     && route.settings.name == name;
