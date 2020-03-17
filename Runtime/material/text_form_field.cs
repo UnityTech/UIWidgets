@@ -90,7 +90,6 @@ namespace UIWidgets.Runtime.material {
             }
         ) {
             D.assert(initialValue == null || controller == null);
-            D.assert(maxLines > 0);
             D.assert(maxLines == null || maxLines > 0);
             D.assert(minLines == null || minLines > 0);
             D.assert((maxLines == null) || (minLines == null) || (maxLines >= minLines),
