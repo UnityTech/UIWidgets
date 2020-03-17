@@ -5,7 +5,7 @@ using com.unity.uiwidgets.Runtime.rendering;
 using Unity.UIWidgets.foundation;
 using Unity.UIWidgets.painting;
 using Unity.UIWidgets.rendering;
-using Unity.UIWidgets.Runtime.external;
+using Unity.UIWidgets.external;
 using Unity.UIWidgets.ui;
 
 namespace Unity.UIWidgets.widgets {
@@ -587,7 +587,7 @@ namespace Unity.UIWidgets.widgets {
         }
     }
 
-    class SliverFillRemaining : SingleChildRenderObjectWidget {
+    public class SliverFillRemaining : SingleChildRenderObjectWidget {
         public SliverFillRemaining(
             Key key = null,
             Widget child = null

@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Unity.UIWidgets.Runtime.external
+namespace Unity.UIWidgets.external
 {    class SplayTree<TKey, TValue> : IDictionary<TKey, TValue> where TKey : IComparable<TKey> {
         SplayTreeNode root;
         int count;
