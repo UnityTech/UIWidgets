@@ -81,7 +81,6 @@ namespace Unity.UIWidgets.rendering {
             }
 
             float paintedChildSize = this.calculatePaintOffset(this.constraints, from: 0.0f, to: extent);
-            Debug.Log("size" + paintedChildSize);
             D.assert(paintedChildSize.isFinite());
             D.assert(paintedChildSize >= 0.0);
             this.geometry = new SliverGeometry(

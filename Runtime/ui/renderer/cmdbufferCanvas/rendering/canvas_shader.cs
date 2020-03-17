@@ -425,7 +425,7 @@ namespace Unity.UIWidgets.ui {
 
             image.texture.filterMode = paint.filterMode;
             props.SetTexture(_texId, image.texture);
-            props.SetInt(_texModeId, image.texture is RenderTexture ? 1 : 0); // pre alpha if RT else post alpha
+            props.SetInt(_texModeId, image.texture is RenderTexture || image.isDynamic ? 1 : 0); // pre alpha if RT else post alpha
 
             return PictureFlusher.CmdDraw.create(
                 mesh: mesh,
