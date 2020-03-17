@@ -39,7 +39,7 @@ namespace Unity.UIWidgets.material {
             ThemeData theme = null,
             ThemeData darkTheme = null,
             Locale locale = null,
-            List<LocalizationsDelegate<MaterialLocalizations>> localizationsDelegates = null,
+            List<LocalizationsDelegate> localizationsDelegates = null,
             LocaleListResolutionCallback localeListResolutionCallback = null,
             LocaleResolutionCallback localeResolutionCallback = null,
             List<Locale> supportedLocales = null,
@@ -92,7 +92,7 @@ namespace Unity.UIWidgets.material {
 
         public readonly Locale locale;
 
-        public readonly List<LocalizationsDelegate<MaterialLocalizations>> localizationsDelegates;
+        public readonly List<LocalizationsDelegate> localizationsDelegates;
 
         public readonly LocaleListResolutionCallback localeListResolutionCallback;
 
