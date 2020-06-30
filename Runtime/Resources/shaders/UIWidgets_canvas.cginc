@@ -30,6 +30,18 @@ struct v2f {
     float2 fpos : TEXCOORD1;
 };
 
+inline half3 gamma_to_linear_space(half3 sRGB) {
+    return sRGB * (sRGB * (sRGB * 0.305306011h + 0.682171111h) + 0.012522878h);
+}
+
+inline half4 adjust_color(half4 color) {
+#ifdef UNITY_COLORSPACE_GAMMA
+    return color;
+#else
+    color.rgb = gamma_to_linear_space(color.rgb);
+    return color;
+#endif
+}
 
 half shader_gradient_layout(half2 pos) {
     half4 p4 = half4(pos, 0.0, 1.0);
@@ -50,9 +62,9 @@ half shader_gradient_layout(half2 pos) {
 half4 shader_gradient_colorize(half pt) {
     if (_tileMode == 0) { // clamp
         if (pt <= 0.0) {
-            return _leftColor;
+            return adjust_color(_leftColor);
         } else if (pt >= 1.0) {
-            return _rightColor;
+            return adjust_color(_rightColor);
         }
         
         half2 coord = half2(pt, 0.5);
@@ -107,7 +119,7 @@ half4 shader_color (v2f i) {
     half4 c;
     
 #if defined(UIWIDGETS_COLOR)
-    c = _color;
+    c = adjust_color(_color);
 #elif defined(UIWIDGETS_IMAGE)
     half2 pt = shader_image_layout(i.fpos);
     c = shader_image_colorize(pt);
