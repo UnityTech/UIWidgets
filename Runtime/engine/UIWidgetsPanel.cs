@@ -195,7 +195,7 @@ namespace Unity.UIWidgets.engine {
             
             if (this._viewMetricsCallbackRegistered) {
                 this._viewMetricsCallbackRegistered = false;
-                UIWidgetsMessageManager.instance.RemoveChannelMessageDelegate("ViewportMatricsChanged",
+                UIWidgetsMessageManager.instance?.RemoveChannelMessageDelegate("ViewportMatricsChanged",
                     this._handleViewMetricsChanged);
             }
             
