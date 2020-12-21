@@ -192,6 +192,13 @@ namespace Unity.UIWidgets.engine {
         }
 
         protected override void OnDisable() {
+            
+            if (this._viewMetricsCallbackRegistered) {
+                this._viewMetricsCallbackRegistered = false;
+                UIWidgetsMessageManager.instance.RemoveChannelMessageDelegate("ViewportMatricsChanged",
+                    this._handleViewMetricsChanged);
+            }
+            
             D.assert(this._windowAdapter != null);
             this._windowAdapter.OnDisable();
             this._windowAdapter = null;
