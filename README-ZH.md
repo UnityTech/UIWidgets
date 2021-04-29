@@ -1,3 +1,5 @@
+⚠️ 本项目的开发与维护目前已转移至https://github.com/Unity-Technologies/com.unity.uiwidgets. 如果您遇到Issue或者对UIWidgets有任何意见和建议，请移步我们的新仓库。谢谢您的关注！
+
 # UIWidgets
 
 
