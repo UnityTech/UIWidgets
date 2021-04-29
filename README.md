@@ -1,3 +1,5 @@
+⚠️ The main repository of UIWidgets has been moved to https://github.com/Unity-Technologies/com.unity.uiwidgets. Please visit the new site if you have an issue or want to contribute. Thanks!
+
 # UIWidgets
 [中文](README-ZH.md)
 
