@@ -53,6 +53,8 @@ namespace Unity.UIWidgets.engine {
         public void onViewMetricsChanged() {
             //view metrics marks dirty
             this._viewMetrics = null;
+            //mark devicePixelRatio dirty 
+            this._devicePixelRatio = -1;
         }
 
         public float devicePixelRatio {
@@ -71,6 +73,10 @@ namespace Unity.UIWidgets.engine {
 
 #if UNITY_IOS
                 this._devicePixelRatio = IOSDeviceScaleFactor();
+#endif
+                
+#if UNITY_STANDALONE_OSX
+                this._devicePixelRatio = OSXDeviceScaleFactor();
 #endif
 
                 if (this._devicePixelRatio <= 0) {
@@ -192,5 +198,11 @@ namespace Unity.UIWidgets.engine {
 		[DllImport("__Internal")]
 		static extern viewMetrics IOSGetViewportPadding();
 #endif
+        
+#if UNITY_STANDALONE_OSX
+        [DllImport("NSScreenUtils")]
+        static extern float OSXDeviceScaleFactor();
+#endif
+        
     }
 }
