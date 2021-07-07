@@ -300,7 +300,6 @@ EmojiUtils.configuration = new EmojiResourceConfiguration(
 
 With the provided packaged stateful widget `UnityObjectDetector` and its `onRelease` callback function, you can easily drag some objects (for example GameObject from Hierarchy, files from Project Window, etc) into the area, get the UnityEngine.Object[] references and make further modification.
 
-
 ## Debug UIWidgets Application
 
 #### Define UIWidgets_DEBUG
